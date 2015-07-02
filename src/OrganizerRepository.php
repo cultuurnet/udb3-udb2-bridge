@@ -109,7 +109,6 @@ class OrganizerRepository extends ActorRepository
             foreach ($eventStream as $domainMessage) {
                 $domainEvent = $domainMessage->getPayload();
                 switch (get_class($domainEvent)) {
-
                     case OrganizerCreated::class:
                         $this->applyOrganizerCreated($domainEvent, $domainMessage->getMetadata());
                         break;

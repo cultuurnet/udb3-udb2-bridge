@@ -137,7 +137,6 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
             foreach ($eventStream as $domainMessage) {
                 $domainEvent = $domainMessage->getPayload();
                 switch (get_class($domainEvent)) {
-
                     case PlaceCreated::class:
                         $this->applyPlaceCreated(
                             $domainEvent,
