@@ -14,6 +14,7 @@
   ],
   "require": {
     "cultuurnet/udb3": "dev-develop as 0.1",
+    "cultuurnet/auth": "~1.2",
     "cultuurnet/entry": "~0.1"
   },
   "require-dev": {

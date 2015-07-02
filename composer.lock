@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "7f155c915a812c9f41a3a375caa88ac4",
+    "hash": "6fe21efbe0372512180b4f5cf4672449",
     "packages": [
         {
             "name": "beberlei/assert",
@@ -220,16 +220,16 @@
         },
         {
             "name": "cultuurnet/auth",
-            "version": "v1.1.0",
+            "version": "1.2.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/Auth.git",
-                "reference": "4369e59f01fb7e3b6e88538e7c17851afd50e5cf"
+                "reference": "40e95e60308386dd4d4ddf14fff6696206037ef3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/Auth/zipball/4369e59f01fb7e3b6e88538e7c17851afd50e5cf",
-                "reference": "4369e59f01fb7e3b6e88538e7c17851afd50e5cf",
+                "url": "https://api.github.com/repos/cultuurnet/Auth/zipball/40e95e60308386dd4d4ddf14fff6696206037ef3",
+                "reference": "40e95e60308386dd4d4ddf14fff6696206037ef3",
                 "shasum": ""
             },
             "require": {
@@ -263,7 +263,7 @@
                 "Apache-2.0"
             ],
             "description": "Authentication service for CultuurNet web services",
-            "time": "2014-10-28 13:01:49"
+            "time": "2015-06-30 15:52:03"
         },
         {
             "name": "cultuurnet/calendar-summary",
