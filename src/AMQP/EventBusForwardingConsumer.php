@@ -61,6 +61,13 @@ class EventBusForwardingConsumer implements LoggerAwareInterface
     private $channel;
 
     /**
+     * Seconds to delay the actual consumption of the message after it arrived.
+     *
+     * @var int
+     */
+    private $delay = 0;
+
+    /**
      * @param AMQPStreamConnection $connection
      * @param EventBusInterface $eventBus
      */
@@ -70,7 +77,8 @@ class EventBusForwardingConsumer implements LoggerAwareInterface
         DeserializerLocatorInterface $deserializerLocator,
         String $consumerTag,
         String $exchangeName,
-        String $queueName
+        String $queueName,
+        $delay = 0
     ) {
         $this->connection = $connection;
         $this->channel = $connection->channel();
@@ -84,8 +92,17 @@ class EventBusForwardingConsumer implements LoggerAwareInterface
         $this->consumerTag = $consumerTag;
         $this->exchangeName = $exchangeName;
 
+        $this->delay = $delay;
+
         $this->declareQueue();
         $this->registerConsumeCallback();
+    }
+
+    private function delayIfNecessary()
+    {
+        if ($this->delay > 0) {
+            sleep($this->delay);
+        }
     }
 
     public function consume(AMQPMessage $message)
@@ -126,6 +143,8 @@ class EventBusForwardingConsumer implements LoggerAwareInterface
             ];
 
             $stream = new DomainEventStream($events);
+
+            $this->delayIfNecessary();
 
             if ($this->logger) {
                 $this->logger->info(
