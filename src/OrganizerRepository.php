@@ -37,7 +37,7 @@ class OrganizerRepository extends ActorRepository
 
     use LoggerAwareTrait;
     use Udb2UtilityTrait;
-    use \CultuurNet\UDB3\Udb3RepositoryTrait;
+    use Udb3RepositoryTrait;
 
     /**
      * @var RepositoryInterface
