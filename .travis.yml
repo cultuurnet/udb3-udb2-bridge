@@ -4,16 +4,19 @@ php:
 - 5.6
 matrix:
   include:
-    - env: udb3version='dev-feature/III-369 as 0.1'
-    - env: udb3version='dev-develop as 0.1'
+    - php: 5.6
+    - php: 5.6
+      env: udb3version='dev-feature/III-369 as 0.1'
+    - php: 5.6
+      env: udb3version='dev-develop as 0.1'
 install:
 - composer install
-- composer require cultuurnet/udb3:${udb3version} --update-with-dependencies
+- if [ ! -z "$udb3version" ]; then composer require "cultuurnet/udb3:${udb3version}" --no-update --update-with-dependencies; fi;
 script:
 - ./vendor/bin/phpunit
 - ./vendor/bin/phing test
 after_script:
-- ./vendor/bin/coveralls -vvv
+- if [[ "$TRAVIS_PHP_VERSION" = "5.6" && "$udb3version" = "dev-develop as 0.1" ]]; then ./vendor/bin/coveralls -vvv; fi;
 notifications:
   email:
     recipients:
