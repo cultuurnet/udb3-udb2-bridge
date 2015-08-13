@@ -2,7 +2,13 @@ language: php
 php:
 - 5.5
 - 5.6
-install: composer install
+matrix:
+  include:
+    - env: udb3version='dev-feature/III-369 as 0.1'
+    - env: udb3version='dev-develop as 0.1'
+install:
+- composer install
+- composer require cultuurnet/udb3:${udb3version} --update-with-dependencies
 script:
 - ./vendor/bin/phpunit
 - ./vendor/bin/phing test
