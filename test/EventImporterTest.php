@@ -102,6 +102,10 @@ class EventImporterTest extends \PHPUnit_Framework_TestCase
      */
     public function it_updates_an_existing_event_with_cdbxml()
     {
+        if (!class_exists(Title::class)) {
+            $this->markTestSkipped('Required class Title not available');
+        }
+
         $cdbId = '7914ed2d-9f28-4946-b9bd-ae8f7a4aea11';
 
         $event = Event::create(
