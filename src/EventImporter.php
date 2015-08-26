@@ -170,8 +170,7 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
     {
         try {
             return $this->cdbXmlService->getCdbXmlOfEvent($eventId);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $this->logger->error(
                 $e->getMessage(),
                 [
