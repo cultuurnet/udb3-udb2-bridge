@@ -353,9 +353,8 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
         // Set event type and theme.
         $categories = $event->getCategories();
         foreach ($categories as $key => $category) {
-            if ($category->getType() == 'eventtype' || $category->getType(
-                ) == 'theme'
-            ) {
+            if ($category->getType() == 'eventtype' ||
+                $category->getType() == 'theme') {
                 $categories->delete($key);
             }
         }
@@ -538,9 +537,8 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
         );
 
         // Save the bookingperiod.
-        if ($bookingInfo->getAvailabilityStarts(
-            ) && $bookingInfo->getAvailabilityEnds()
-        ) {
+        if ($bookingInfo->getAvailabilityStarts() &&
+            $bookingInfo->getAvailabilityEnds()) {
             $startDate = new \DateTime($bookingInfo->getAvailabilityStarts());
             $endDate = new \DateTime($bookingInfo->getAvailabilityEnds());
             $bookingPeriod = new BookingPeriod(
