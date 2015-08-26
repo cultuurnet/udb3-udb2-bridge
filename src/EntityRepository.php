@@ -11,7 +11,6 @@ use Broadway\Domain\AggregateRoot;
 use Broadway\Domain\DomainEventStream;
 use Broadway\EventSourcing\EventStreamDecoratorInterface;
 use Broadway\Repository\RepositoryInterface;
-use CultuurNet\UDB3\SearchAPI2\SearchServiceInterface;
 
 /**
  * Repository decorator that first updates UDB2.
@@ -26,12 +25,7 @@ abstract class EntityRepository implements RepositoryInterface
     protected $decoratee;
 
     /**
-     * @var SearchServiceInterface
-     */
-    protected $search;
-
-    /**
-     * @var EntryAPIImprovedFactory
+     * @var EntryAPIImprovedFactoryInterface
      */
     protected $entryAPIImprovedFactory;
 
@@ -47,12 +41,10 @@ abstract class EntityRepository implements RepositoryInterface
 
     public function __construct(
         RepositoryInterface $decoratee,
-        SearchServiceInterface $search,
-        EntryAPIImprovedFactory $entryAPIImprovedFactory,
+        EntryAPIImprovedFactoryInterface $entryAPIImprovedFactory,
         array $eventStreamDecorators = array()
     ) {
         $this->decoratee = $decoratee;
-        $this->search = $search;
         $this->entryAPIImprovedFactory = $entryAPIImprovedFactory;
         $this->eventStreamDecorators = $eventStreamDecorators;
     }
@@ -119,13 +111,7 @@ abstract class EntityRepository implements RepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function load($id)
-    {
-    }
-
-    abstract protected function getParams($id);
+    abstract public function load($id);
 
     abstract protected function getType();
-
-    abstract protected function importFromUDB2($id, $xml, $xmlNamespaceUrl);
 }

@@ -2,15 +2,16 @@
 
 /**
  * @file
- * Contains \Cultuurnet\UDB3\UDB2\PlaceRepository.
+ * Contains \Cultuurnet\UDB3\UDB2\Place\PlaceRepository.
  */
 
-namespace CultuurNet\UDB3\UDB2;
+namespace CultuurNet\UDB3\UDB2\Place;
 
 use Broadway\Domain\AggregateRoot;
 use Broadway\Domain\DomainMessage;
 use Broadway\Domain\Metadata;
 use Broadway\EventSourcing\EventStreamDecoratorInterface;
+use Broadway\Repository\AggregateNotFoundException;
 use Broadway\Repository\RepositoryInterface;
 use CultureFeed_Cdb_Data_Address;
 use CultureFeed_Cdb_Data_Category;
@@ -27,6 +28,7 @@ use CultuurNet\Entry\Language;
 use CultuurNet\Entry\Number;
 use CultuurNet\Entry\String;
 use CultuurNet\UDB3\Actor\ActorImportedFromUDB2;
+use CultuurNet\UDB3\EntityServiceInterface;
 use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\Place\Events\BookingInfoUpdated;
 use CultuurNet\UDB3\Place\Events\ContactPointUpdated;
@@ -44,6 +46,12 @@ use CultuurNet\UDB3\Place\Events\TypicalAgeRangeDeleted;
 use CultuurNet\UDB3\Place\Events\TypicalAgeRangeUpdated;
 use CultuurNet\UDB3\Place\Place;
 use CultuurNet\UDB3\SearchAPI2\SearchServiceInterface;
+use CultuurNet\UDB3\UDB2\ActorRepository;
+use CultuurNet\UDB3\UDB2\EntryAPIImprovedFactory;
+use CultuurNet\UDB3\UDB2\EntryAPIImprovedFactoryInterface;
+use CultuurNet\UDB3\UDB2\Place\PlaceImporterInterface;
+use CultuurNet\UDB3\UDB2\Udb2UtilityTrait;
+use CultuurNet\UDB3\UDB2\Udb3RepositoryTrait;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
@@ -54,25 +62,14 @@ use Psr\Log\LoggerAwareTrait;
  */
 class PlaceRepository extends ActorRepository implements RepositoryInterface, LoggerAwareInterface
 {
-
     use LoggerAwareTrait;
     use Udb2UtilityTrait;
     use Udb3RepositoryTrait;
 
     /**
-     * @var RepositoryInterface
+     * @var PlaceImporterInterface
      */
-    protected $decoratee;
-
-    /**
-     * @var SearchServiceInterface
-     */
-    protected $search;
-
-    /**
-     * @var EntryAPIImprovedFactory
-     */
-    protected $entryAPIImprovedFactory;
+    protected $placeImporter;
 
     /**
      * @var boolean
@@ -80,7 +77,7 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
     protected $syncBack = false;
 
     /**
-     * @var OrganizerService
+     * @var EntityServiceInterface
      */
     protected $organizerService;
 
@@ -93,15 +90,18 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
 
     public function __construct(
         RepositoryInterface $decoratee,
-        SearchServiceInterface $search,
-        EntryAPIImprovedFactory $entryAPIImprovedFactory,
-        OrganizerService $organizerService,
+        EntryAPIImprovedFactoryInterface $entryAPIImprovedFactory,
+        PlaceImporterInterface $placeImporter,
+        EntityServiceInterface $organizerService,
         array $eventStreamDecorators = array()
     ) {
-        $this->decoratee = $decoratee;
-        $this->search = $search;
-        $this->entryAPIImprovedFactory = $entryAPIImprovedFactory;
-        $this->eventStreamDecorators = $eventStreamDecorators;
+        parent::__construct(
+            $decoratee,
+            $entryAPIImprovedFactory,
+            $eventStreamDecorators
+        );
+
+        $this->placeImporter = $placeImporter;
         $this->organizerService = $organizerService;
         $this->aggregateClass = Place::class;
     }
@@ -114,6 +114,21 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
     public function syncBackOff()
     {
         $this->syncBack = false;
+    }
+
+    public function load($id)
+    {
+        try {
+            $place = $this->decoratee->load($id);
+        } catch (AggregateNotFoundException $e) {
+            $place = $this->placeImporter->createPlaceFromUDB2($id);
+
+            if (!$place) {
+                throw $e;
+            }
+        }
+
+        return $place;
     }
 
     /**
@@ -246,26 +261,6 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
     }
 
     /**
-     * Imports from UDB2.
-     *
-     * @param string $id
-     *   The id.
-     * @param string $actorXml
-     *   The actor xml.
-     * @param string $cdbSchemeUrl
-     *
-     * @return ActorImportedFromUDB2
-     */
-    protected function importFromUDB2($id, $actorXml, $cdbSchemeUrl)
-    {
-        return Place::importFromUDB2(
-            $id,
-            $actorXml,
-            $cdbSchemeUrl
-        );
-    }
-
-    /**
      * Listener on the placeCreated event. Send a new place also to UDB2 as event.
      */
     public function applyPlaceCreated(PlaceCreated $placeCreated, Metadata $metadata)
@@ -335,7 +330,9 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
     {
 
         $address = $placeCreated->getAddress();
-        $cdbAddress = new CultureFeed_Cdb_Data_Address($this->getPhysicalAddressForUdb3Address($address));
+        $cdbAddress = new CultureFeed_Cdb_Data_Address(
+            $this->getPhysicalAddressForUdb3Address($address)
+        );
 
         $location = new CultureFeed_Cdb_Data_Location($cdbAddress);
         $location->setLabel($placeCreated->getTitle());
@@ -356,7 +353,9 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
         // Set event type and theme.
         $categories = $event->getCategories();
         foreach ($categories as $key => $category) {
-            if ($category->getType() == 'eventtype' || $category->getType() == 'theme') {
+            if ($category->getType() == 'eventtype' || $category->getType(
+                ) == 'theme'
+            ) {
                 $categories->delete($key);
             }
         }
@@ -398,13 +397,18 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
         $language = new Language('nl');
 
         if (!empty($newDescription)) {
-            $entryApi->updateDescription($entityId, $entityType, $description, $language);
+            $entryApi->updateDescription(
+                $entityId,
+                $entityType,
+                $description,
+                $language
+            );
         } else {
             $entryApi->deleteDescription($entityId, $entityType, $language);
         }
     }
 
-     /**
+    /**
      * Send the updated age range also to CDB2.
      */
     private function applyTypicalAgeRangeUpdated(
@@ -456,7 +460,11 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
         $entityType = new EntityType('event');
         $organiserName = new String($organizer->name);
 
-        $entryApi->updateOrganiser($organizerUpdated->getPlaceId(), $entityType, $organiserName);
+        $entryApi->updateOrganiser(
+            $organizerUpdated->getPlaceId(),
+            $entityType,
+            $organiserName
+        );
 
     }
 
@@ -473,7 +481,10 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
 
         $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
         $entityType = new EntityType('event');
-        $entryApi->deleteOrganiser($organizerDeleted->getPlaceId(), $entityType);
+        $entryApi->deleteOrganiser(
+            $organizerDeleted->getPlaceId(),
+            $entityType
+        );
 
     }
 
@@ -527,7 +538,9 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
         );
 
         // Save the bookingperiod.
-        if ($bookingInfo->getAvailabilityStarts() && $bookingInfo->getAvailabilityEnds()) {
+        if ($bookingInfo->getAvailabilityStarts(
+            ) && $bookingInfo->getAvailabilityEnds()
+        ) {
             $startDate = new \DateTime($bookingInfo->getAvailabilityStarts());
             $endDate = new \DateTime($bookingInfo->getAvailabilityEnds());
             $bookingPeriod = new BookingPeriod(
@@ -599,7 +612,11 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
         $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
         $event = $entryApi->getEvent($domainEvent->getPlaceId());
 
-        $this->updateImageOnCdbItem($event, $domainEvent->getIndexToUpdate(), $domainEvent->getMediaObject());
+        $this->updateImageOnCdbItem(
+            $event,
+            $domainEvent->getIndexToUpdate(),
+            $domainEvent->getMediaObject()
+        );
         $entryApi->updateEvent($event);
 
     }
