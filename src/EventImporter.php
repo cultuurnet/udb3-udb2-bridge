@@ -20,6 +20,7 @@ use CultuurNet\UDB3\PlaceService;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerTrait;
+use Psr\Log\NullLogger;
 
 /**
  * Listens for update/create events coming from UDB2 and applies the
@@ -63,6 +64,7 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
         $this->repository = $repository;
         $this->placeService = $placeService;
         $this->organizerService = $organizerService;
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -97,7 +99,7 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
      * @return Event
      * @throws EntityNotFoundException
      */
-    private function update($eventId, $fallbackToCreate = false)
+    private function update($eventId, $fallbackToCreate = true)
     {
         try {
             $event = $this->loadEvent($eventId);
@@ -137,6 +139,13 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
         );
 
         $this->repository->save($event);
+
+        $this->logger->info(
+            'Event updated in UDB3',
+            [
+                'eventId' => $eventId,
+            ]
+        );
 
         return $event;
     }
@@ -178,6 +187,13 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
             );
 
             $this->repository->save($event);
+
+            $this->logger->info(
+                'Event created in UDB3',
+                [
+                    'eventId' => $eventId,
+                ]
+            );
         } catch (\Exception $e) {
             if ($fallbackToUpdate) {
                 if ($this->logger) {
