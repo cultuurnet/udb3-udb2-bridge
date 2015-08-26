@@ -20,6 +20,7 @@ use CultuurNet\UDB3\PlaceService;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerTrait;
+use Psr\Log\NullLogger;
 
 /**
  * Listens for update/create events coming from UDB2 and applies the
@@ -63,6 +64,7 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
         $this->repository = $repository;
         $this->placeService = $placeService;
         $this->organizerService = $organizerService;
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -95,9 +97,10 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
      * @param string $eventId
      * @param bool $fallbackToCreate
      * @return Event
-     * @throws EntityNotFoundException
+     * @throws EventNotFoundException
+     *   If the event can not be found by the CDBXML service implementation.
      */
-    private function update($eventId, $fallbackToCreate = false)
+    private function update($eventId, $fallbackToCreate = true)
     {
         try {
             $event = $this->loadEvent($eventId);
@@ -115,7 +118,7 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
                 return $this->create($eventId, false);
             } else {
                 if ($this->logger) {
-                    $this->logger->notice(
+                    $this->logger->error(
                         "Could not update event because it does not exist yet on UDB3",
                         [
                             'eventId' => $eventId
@@ -133,10 +136,17 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
 
         $event->updateWithCdbXml(
             $eventXml,
-            \CultureFeed_Cdb_Default::CDB_SCHEME_URL
+            $this->cdbXmlService->getCdbXmlNamespaceUri()
         );
 
         $this->repository->save($event);
+
+        $this->logger->info(
+            'Event updated in UDB3',
+            [
+                'eventId' => $eventId,
+            ]
+        );
 
         return $event;
     }
@@ -153,16 +163,32 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
     /**
      * @param string $eventId
      * @return string
+     * @throws EventNotFoundException
+     *   If the event can not be found by the CDBXML service implementation.
      */
     private function getCdbXmlOfEvent($eventId)
     {
-        return $this->cdbXmlService->getCdbXmlOfEvent($eventId);
+        try {
+            return $this->cdbXmlService->getCdbXmlOfEvent($eventId);
+        } catch (\Exception $e) {
+            $this->logger->error(
+                $e->getMessage(),
+                [
+                    'eventId' => $eventId,
+                    'exception' => $e,
+                ]
+            );
+
+            throw $e;
+        }
     }
 
     /**
      * @param string $eventId
      * @param bool $fallbackToUpdate
-     * @return null|Event
+     * @return Event|null
+     * @throws EventNotFoundException
+     *   If the event can not be found by the CDBXML service implementation.
      */
     private function create($eventId, $fallbackToUpdate = true)
     {
@@ -174,10 +200,17 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
             $event = Event::importFromUDB2(
                 $eventId,
                 $eventXml,
-                \CultureFeed_Cdb_Default::CDB_SCHEME_URL
+                $this->cdbXmlService->getCdbXmlNamespaceUri()
             );
 
             $this->repository->save($event);
+
+            $this->logger->info(
+                'Event created in UDB3',
+                [
+                    'eventId' => $eventId,
+                ]
+            );
         } catch (\Exception $e) {
             if ($fallbackToUpdate) {
                 if ($this->logger) {
@@ -195,7 +228,7 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
                 return $this->update($eventId, false);
             } else {
                 if ($this->logger) {
-                    $this->logger->notice(
+                    $this->logger->error(
                         "Event creation in UDB3 failed with an exception",
                         [
                             'exception' => $e,
@@ -226,7 +259,7 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
     private function importDependencies($eventXml)
     {
         $udb2Event = EventItemFactory::createEventFromCdbXml(
-            \CultureFeed_Cdb_Default::CDB_SCHEME_URL,
+            $this->cdbXmlService->getCdbXmlNamespaceUri(),
             $eventXml
         );
 

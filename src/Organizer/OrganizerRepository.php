@@ -5,12 +5,12 @@
  * Contains \Cultuurnet\UDB3\UDB2\OrganizerRepository.
  */
 
-namespace CultuurNet\UDB3\UDB2;
+namespace CultuurNet\UDB3\UDB2\Organizer;
 
 use Broadway\Domain\AggregateRoot;
 use Broadway\Domain\DomainMessage;
 use Broadway\Domain\Metadata;
-use Broadway\EventSourcing\EventStreamDecoratorInterface;
+use Broadway\Repository\AggregateNotFoundException;
 use Broadway\Repository\RepositoryInterface;
 use CultureFeed_Cdb_Data_ActorDetail;
 use CultureFeed_Cdb_Data_ActorDetailList;
@@ -21,10 +21,13 @@ use CultureFeed_Cdb_Data_Phone;
 use CultureFeed_Cdb_Data_Url;
 use CultureFeed_Cdb_Default;
 use CultureFeed_Cdb_Item_Actor;
-use CultuurNet\UDB3\Actor\ActorImportedFromUDB2;
 use CultuurNet\UDB3\Organizer\Events\OrganizerCreated;
 use CultuurNet\UDB3\Organizer\Organizer;
-use CultuurNet\UDB3\SearchAPI2\SearchServiceInterface;
+use CultuurNet\UDB3\UDB2\ActorRepository;
+use CultuurNet\UDB3\UDB2\EntryAPIImprovedFactory;
+use CultuurNet\UDB3\UDB2\EntryAPIImprovedFactoryInterface;
+use CultuurNet\UDB3\UDB2\Udb2UtilityTrait;
+use CultuurNet\UDB3\UDB2\Udb3RepositoryTrait;
 use Psr\Log\LoggerAwareTrait;
 
 /**
@@ -34,25 +37,9 @@ use Psr\Log\LoggerAwareTrait;
  */
 class OrganizerRepository extends ActorRepository
 {
-
     use LoggerAwareTrait;
     use Udb2UtilityTrait;
     use Udb3RepositoryTrait;
-
-    /**
-     * @var RepositoryInterface
-     */
-    protected $decoratee;
-
-    /**
-     * @var SearchServiceInterface
-     */
-    protected $search;
-
-    /**
-     * @var EntryAPIImprovedFactory
-     */
-    protected $entryAPIImprovedFactory;
 
     /**
      * @var boolean
@@ -60,23 +47,44 @@ class OrganizerRepository extends ActorRepository
     protected $syncBack = false;
 
     /**
-     * @var EventStreamDecoratorInterface[]
+     * @var string
      */
-    private $eventStreamDecorators = array();
+    private $aggregateClass;
 
-     private $aggregateClass;
+    /**
+     * @var OrganizerImporterInterface
+     */
+    private $organizerImporter;
 
     public function __construct(
         RepositoryInterface $decoratee,
-        SearchServiceInterface $search,
-        EntryAPIImprovedFactory $entryAPIImprovedFactory,
+        EntryAPIImprovedFactoryInterface $entryAPIImprovedFactory,
+        OrganizerImporterInterface $organizerImporter,
         array $eventStreamDecorators = array()
     ) {
+        parent::__construct(
+            $decoratee,
+            $entryAPIImprovedFactory,
+            $eventStreamDecorators
+        );
         $this->decoratee = $decoratee;
-        $this->search = $search;
-        $this->entryAPIImprovedFactory = $entryAPIImprovedFactory;
-        $this->eventStreamDecorators = $eventStreamDecorators;
         $this->aggregateClass = Organizer::class;
+        $this->organizerImporter = $organizerImporter;
+    }
+
+    public function load($id)
+    {
+        try {
+            $organizer = $this->decoratee->load($id);
+        } catch (AggregateNotFoundException $e) {
+            $organizer = $this->organizerImporter->createOrganizerFromUDB2($id);
+
+            if (!$organizer) {
+                throw $e;
+            }
+        }
+
+        return $organizer;
     }
 
     public function syncBackOn()
@@ -94,7 +102,6 @@ class OrganizerRepository extends ActorRepository
      */
     public function save(AggregateRoot $aggregate)
     {
-
         if ($this->syncBack) {
             // We can not directly act on the aggregate, as the uncommitted events will
             // be reset once we retrieve them, therefore we clone the object.
@@ -110,7 +117,10 @@ class OrganizerRepository extends ActorRepository
                 $domainEvent = $domainMessage->getPayload();
                 switch (get_class($domainEvent)) {
                     case OrganizerCreated::class:
-                        $this->applyOrganizerCreated($domainEvent, $domainMessage->getMetadata());
+                        $this->applyOrganizerCreated(
+                            $domainEvent,
+                            $domainMessage->getMetadata()
+                        );
                         break;
 
                     default:
@@ -120,26 +130,6 @@ class OrganizerRepository extends ActorRepository
         }
 
         $this->decoratee->save($aggregate);
-    }
-
-    /**
-     * Imports from UDB2.
-     *
-     * @param string $id
-     *   The id.
-     * @param string $actorXml
-     *   The actor xml.
-     * @param string $cdbSchemeUrl
-     *
-     * @return ActorImportedFromUDB2
-     */
-    protected function importFromUDB2($id, $actorXml, $cdbSchemeUrl)
-    {
-        return Organizer::importFromUDB2(
-            $id,
-            $actorXml,
-            $cdbSchemeUrl
-        );
     }
 
     /**
@@ -167,7 +157,9 @@ class OrganizerRepository extends ActorRepository
 
         $addresses = $organizerCreated->getAddresses();
         foreach ($addresses as $address) {
-            $cdbAddress = new CultureFeed_Cdb_Data_Address($this->getPhysicalAddressForUdb3Address($address));
+            $cdbAddress = new CultureFeed_Cdb_Data_Address(
+                $this->getPhysicalAddressForUdb3Address($address)
+            );
             $contactInfo->addAddress($cdbAddress);
         }
 
@@ -188,7 +180,13 @@ class OrganizerRepository extends ActorRepository
         $actor->setContactInfo($contactInfo);
 
         $categorieList = new \CultureFeed_Cdb_Data_CategoryList();
-        $categorieList->add(new \CultureFeed_Cdb_Data_Category('actortype', '8.11.0.0.0', 'Organisator(en)'));
+        $categorieList->add(
+            new \CultureFeed_Cdb_Data_Category(
+                'actortype',
+                '8.11.0.0.0',
+                'Organisator(en)'
+            )
+        );
         $actor->setCategories($categorieList);
 
         $cdbXml = new CultureFeed_Cdb_Default();

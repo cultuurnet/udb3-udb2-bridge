@@ -5,51 +5,50 @@
 
 namespace CultuurNet\UDB3\UDB2;
 
-use CultuurNet\Search\Parameter\Group;
+use CultuurNet\Search\Parameter\FilterQuery;
 use CultuurNet\Search\Parameter\Query;
 use CultuurNet\UDB3\SearchAPI2\SearchServiceInterface;
 
-class EventCdbXmlFromSearchService implements EventCdbXmlServiceInterface
+class ActorCdbXmlFromSearchService implements ActorCdbXmlServiceInterface
 {
     /**
      * @var SearchServiceInterface
      */
-    private $search;
+    protected $search;
 
     /**
      * @var string
      */
     private $cdbXmlNamespaceUri;
 
-    /**
-     * @param SearchServiceInterface $search
-     * @param string $cdbXmlNamespaceUri
-     */
     public function __construct(
         SearchServiceInterface $search,
         $cdbXmlNamespaceUri = 'http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.2/FINAL'
     ) {
-        $this->search = $search;
         $this->cdbXmlNamespaceUri = $cdbXmlNamespaceUri;
+        $this->search = $search;
     }
 
     /**
-     * @inheritdoc
+     * @return string
      */
     public function getCdbXmlNamespaceUri()
     {
         return $this->cdbXmlNamespaceUri;
     }
 
-    public function getCdbXmlOfEvent($eventId)
+    /**
+     * @param string $actorId
+     * @return string
+     * @throws ActorNotFoundException If the actor can not be found.
+     */
+    public function getCdbXmlOfActor($actorId)
     {
-        $parameters = [
-            new Query('cdbid:"' . $eventId . '"'),
-            new Group(true),
-        ];
-
         $results = $this->search->search(
-            $parameters
+            [
+                new Query('cdbid:"' . $actorId . '"'),
+                new FilterQuery('type:actor')
+            ]
         );
 
         $cdbXml = $results->getBody(true);
@@ -61,24 +60,29 @@ class EventCdbXmlFromSearchService implements EventCdbXmlServiceInterface
         while ($reader->read()) {
             switch ($reader->nodeType) {
                 case ($reader::ELEMENT):
-                    if ($reader->localName == "event" &&
-                        $reader->getAttribute('cdbid') == $eventId
+                    if ($reader->localName == "actor" &&
+                        $reader->getAttribute('cdbid') == $actorId
                     ) {
+                        if ($reader->namespaceURI !== $this->cdbXmlNamespaceUri) {
+                            // @todo Use a more specific exception here.
+                            throw new \RuntimeException('Namespace URI does not match, expected ' . $this->cdbXmlNamespaceUri . ', actual ' . $reader->namespaceURI);
+                        }
+
                         $node = $reader->expand();
                         $dom = new \DomDocument('1.0');
                         $n = $dom->importNode($node, true);
                         $dom->appendChild($n);
-                        $eventXml = $dom->saveXML();
+                        $actorXml = $dom->saveXML();
                     }
             }
         }
 
-        if (!isset($eventXml)) {
-            throw new EventNotFoundException(
-                "Event with cdbid '{$eventId}' could not be found via Search API v2."
+        if (!isset($actorXml)) {
+            throw new ActorNotFoundException(
+                "Actor with cdbid '{$actorId}' could not be found via Search API v2."
             );
-        } else {
-            return $eventXml;
         }
+
+        return $actorXml;
     }
 }

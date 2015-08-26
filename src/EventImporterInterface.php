@@ -15,12 +15,16 @@ interface EventImporterInterface
     /**
      * @param string $eventId
      * @return Event
+     * @throws EventNotFoundException
+     *   If the event can not be found in UDB2.
      */
     public function updateEventFromUDB2($eventId);
 
     /**
      * @param string $eventId
      * @return Event
+     * @throws EventNotFoundException
+     *   If the event can not be found in UDB2.
      */
     public function createEventFromUDB2($eventId);
 }
