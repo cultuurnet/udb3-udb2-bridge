@@ -97,7 +97,8 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
      * @param string $eventId
      * @param bool $fallbackToCreate
      * @return Event
-     * @throws EntityNotFoundException
+     * @throws EventNotFoundException
+     *   If the event can not be found by the CDBXML service implementation.
      */
     private function update($eventId, $fallbackToCreate = true)
     {
@@ -117,7 +118,7 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
                 return $this->create($eventId, false);
             } else {
                 if ($this->logger) {
-                    $this->logger->notice(
+                    $this->logger->error(
                         "Could not update event because it does not exist yet on UDB3",
                         [
                             'eventId' => $eventId
@@ -162,16 +163,33 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
     /**
      * @param string $eventId
      * @return string
+     * @throws EventNotFoundException
+     *   If the event can not be found by the CDBXML service implementation.
      */
     private function getCdbXmlOfEvent($eventId)
     {
-        return $this->cdbXmlService->getCdbXmlOfEvent($eventId);
+        try {
+            return $this->cdbXmlService->getCdbXmlOfEvent($eventId);
+        }
+        catch (\Exception $e) {
+            $this->logger->error(
+                $e->getMessage(),
+                [
+                    'eventId' => $eventId,
+                    'exception' => $e,
+                ]
+            );
+
+            throw $e;
+        }
     }
 
     /**
      * @param string $eventId
      * @param bool $fallbackToUpdate
-     * @return null|Event
+     * @return Event|null
+     * @throws EventNotFoundException
+     *   If the event can not be found by the CDBXML service implementation.
      */
     private function create($eventId, $fallbackToUpdate = true)
     {
@@ -211,7 +229,7 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
                 return $this->update($eventId, false);
             } else {
                 if ($this->logger) {
-                    $this->logger->notice(
+                    $this->logger->error(
                         "Event creation in UDB3 failed with an exception",
                         [
                             'exception' => $e,
