@@ -17,11 +17,28 @@ class EventCdbXmlFromSearchService implements EventCdbXmlServiceInterface
     private $search;
 
     /**
-     * @param SearchServiceInterface $search
+     * @var string
      */
-    public function __construct(SearchServiceInterface $search)
-    {
+    private $cdbXmlNamespaceUri;
+
+    /**
+     * @param SearchServiceInterface $search
+     * @param string $cdbXmlNamespaceUri
+     */
+    public function __construct(
+        SearchServiceInterface $search,
+        $cdbXmlNamespaceUri = 'http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.2/FINAL'
+    ) {
         $this->search = $search;
+        $this->cdbXmlNamespaceUri = $cdbXmlNamespaceUri;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCdbXmlNamespaceUri()
+    {
+        return $this->cdbXmlNamespaceUri;
     }
 
     public function getCdbXmlOfEvent($eventId)
