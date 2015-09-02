@@ -115,6 +115,10 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
      */
     public function it_updates_udb2_contact_info_based_on_udb3_booking_info()
     {
+        if (!class_exists(BookingInfo::class)) {
+            $this->markTestSkipped();
+        }
+
         $cdbXmlNamespaceUri = self::NS;
 
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
@@ -142,7 +146,6 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
             '2007-03-01T13:00:00Z',
             '2007-03-01T13:00:00Z',
             'booking name'
-
         );
         $event->updateBookingInfo($bookingInfo);
 
