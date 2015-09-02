@@ -99,7 +99,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
 
     public function __construct(
         RepositoryInterface $decoratee,
-        EntryAPIImprovedFactory $entryAPIImprovedFactory,
+        EntryAPIImprovedFactoryInterface $entryAPIImprovedFactory,
         EventImporterInterface $eventImporter,
         PlaceService $placeService,
         OrganizerService $organizerService,
