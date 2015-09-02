@@ -272,9 +272,12 @@ trait Udb2UtilityTrait
 
     /**
      * Update the cdb item based on a bookingInfo object.
+     *
+     * @param CultureFeed_Cdb_Item_Event $cdbItem
+     * @param BookingInfo $bookingInfo
      */
     private function updateCdbItemByBookingInfo(
-        CultureFeed_Cdb_Item_Base $cdbItem,
+        CultureFeed_Cdb_Item_Event $cdbItem,
         BookingInfo $bookingInfo
     ) {
 
