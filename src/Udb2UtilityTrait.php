@@ -308,7 +308,14 @@ trait Udb2UtilityTrait
                     $contactInfo->removePhone($phoneIndex);
                 }
             }
-            $contactInfo->addPhone(new CultureFeed_Cdb_Data_Phone($bookingInfo->getPhone(), false, true));
+            $contactInfo->addPhone(
+                new CultureFeed_Cdb_Data_Phone(
+                    $bookingInfo->getPhone(),
+                    null,
+                    null,
+                    true
+                )
+            );
         }
 
         if ($bookingInfo->getUrl()) {
