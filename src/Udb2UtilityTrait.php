@@ -341,6 +341,10 @@ trait Udb2UtilityTrait
         $cdbItem->setContactInfo($newContactInfo);
     }
 
+    /**
+     * @param CultureFeed_Cdb_Data_ContactInfo $contactInfo
+     * @return CultureFeed_Cdb_Data_ContactInfo
+     */
     private function copyContactInfoWithoutReservationChannels(
         CultureFeed_Cdb_Data_ContactInfo $contactInfo
     ) {
