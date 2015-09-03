@@ -299,16 +299,16 @@ trait Udb2UtilityTrait
 
         // Add the contact info.
         $contactInfo = $cdbItem->getContactInfo();
-        if (empty($contactInfo)) {
+        if (!$contactInfo instanceof CultureFeed_Cdb_Data_ContactInfo) {
             $contactInfo = new CultureFeed_Cdb_Data_ContactInfo();
         }
-        if ($bookingInfo->getPhone()) {
-            foreach ($contactInfo->getPhones() as $phoneIndex => $phone) {
-                if ($phone->isForReservations()) {
-                    $contactInfo->removePhone($phoneIndex);
-                }
-            }
-            $contactInfo->addPhone(
+
+        $newContactInfo = $this->copyContactInfoWithoutReservationChannels(
+            $contactInfo
+        );
+
+        if (!empty($bookingInfo->getPhone())) {
+            $newContactInfo->addPhone(
                 new CultureFeed_Cdb_Data_Phone(
                     $bookingInfo->getPhone(),
                     null,
@@ -318,25 +318,59 @@ trait Udb2UtilityTrait
             );
         }
 
-        if ($bookingInfo->getUrl()) {
-            foreach ($contactInfo->getUrls() as $urlIndex => $url) {
-                if ($url->isForReservations()) {
-                    $contactInfo->removeUrl($urlIndex);
-                }
-            }
-            $contactInfo->addUrl(new CultureFeed_Cdb_Data_Url($bookingInfo->getUrl(), false, true));
+        if (!empty($bookingInfo->getUrl())) {
+            $newContactInfo->addUrl(
+                new CultureFeed_Cdb_Data_Url(
+                    $bookingInfo->getUrl(),
+                    false,
+                    true
+                )
+            );
         }
 
         if (!empty($bookingInfo->getEmail())) {
-            foreach ($contactInfo->getMails() as $mailIndex => $mail) {
-                if ($mail->isForReservations()) {
-                    $contactInfo->removeMail($mailIndex);
-                }
-            }
-            $contactInfo->addMail(new CultureFeed_Cdb_Data_Mail($bookingInfo->getEmail(), false, true));
+            $newContactInfo->addMail(
+                new CultureFeed_Cdb_Data_Mail(
+                    $bookingInfo->getEmail(),
+                    false,
+                    true
+                )
+            );
         }
-        $cdbItem->setContactInfo($contactInfo);
 
+        $cdbItem->setContactInfo($newContactInfo);
+    }
+
+    private function copyContactInfoWithoutReservationChannels(
+        CultureFeed_Cdb_Data_ContactInfo $contactInfo
+    ) {
+        $newContactInfo = new CultureFeed_Cdb_Data_ContactInfo();
+
+        foreach ($contactInfo->getAddresses() as $address) {
+            $newContactInfo->addAddress($address);
+        }
+
+        /** @var CultureFeed_Cdb_Data_Phone $phone */
+        foreach ($contactInfo->getPhones() as $phone) {
+            if (!$phone->isForReservations()) {
+                $newContactInfo->addPhone($phone);
+            }
+        }
+
+        /** @var CultureFeed_Cdb_Data_Url $url */
+        foreach ($contactInfo->getUrls() as $url) {
+            if (!$url->isForReservations()) {
+                $newContactInfo->addUrl($url);
+            }
+        }
+
+        foreach ($contactInfo->getMails() as $mail) {
+            if (!$mail->isForReservations()) {
+                $newContactInfo->addMail($mail);
+            }
+        }
+
+        return $newContactInfo;
     }
 
     /**

@@ -113,7 +113,7 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function it_updates_udb2_contact_info_based_on_udb3_booking_info()
+    public function it_updates_udb2_reservation_contact_info_based_on_udb3_booking_info()
     {
         if (!class_exists(BookingInfo::class)) {
             $this->markTestSkipped();
@@ -152,6 +152,71 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
         $expectedContactInfo = CultureFeed_Cdb_Data_ContactInfo::parseFromCdbXml(
             new \SimpleXMLElement(
                 file_get_contents(__DIR__ . '/contactinfo.xml'),
+                0,
+                false,
+                $cdbXmlNamespaceUri
+            )
+        );
+
+        $this->entryAPI->expects($this->once())
+            ->method('getEvent')
+            ->with($id)
+            ->willReturn($udb2Event);
+
+        $this->entryAPI->expects($this->once())
+            ->method('updateContactInfo')
+            ->with(
+                $id,
+                'event',
+                $expectedContactInfo
+            );
+
+        $this->repository->syncBackOn();
+        $this->repository->save($event);
+    }
+
+    /**
+     * @test
+     */
+    public function it_empties_udb2_reservation_contact_info_based_on_udb3_booking_info()
+    {
+        if (!class_exists(BookingInfo::class)) {
+            $this->markTestSkipped();
+        }
+
+        $cdbXmlNamespaceUri = self::NS;
+
+        $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
+
+        $cdbXml = file_get_contents(__DIR__ . '/event.xml');
+
+        $event = Event::importFromUDB2(
+            $id,
+            $cdbXml,
+            $cdbXmlNamespaceUri
+        );
+
+        $udb2Event = EventItemFactory::createEventFromCdbXml(
+            $cdbXmlNamespaceUri,
+            $cdbXml
+        );
+
+        $this->repository->save($event);
+
+        $bookingInfo = new BookingInfo(
+            '',
+            '',
+            '',
+            '',
+            '2007-03-01T13:00:00Z',
+            '2007-03-01T13:00:00Z',
+            'booking name'
+        );
+        $event->updateBookingInfo($bookingInfo);
+
+        $expectedContactInfo = CultureFeed_Cdb_Data_ContactInfo::parseFromCdbXml(
+            new \SimpleXMLElement(
+                file_get_contents(__DIR__ . '/contactinfo-emptied.xml'),
                 0,
                 false,
                 $cdbXmlNamespaceUri

@@ -56,8 +56,11 @@
             </physical>
         </address>
         <mail>jonas@cnet.be</mail>
+        <mail reservation="true">tickets@exampl.com</mail>
         <phone type="phone">123</phone>
+        <phone reservation="true">+32 555 555</phone>
         <url>http://www.test.com</url>
+        <url reservation="true">http://tickets.exampl.com</url>
     </contactinfo>
     <eventdetails>
         <eventdetail lang="nl">
