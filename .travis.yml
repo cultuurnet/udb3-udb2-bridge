@@ -8,7 +8,7 @@ matrix:
       env: udb3version='dev-develop as 0.1'
 install:
 - composer install
-- if [ ! -z "$udb3version" ]; then composer require "cultuurnet/udb3:${udb3version}" --no-update --update-with-dependencies; fi;
+- if [ ! -z "$udb3version" ]; then composer require "cultuurnet/udb3:${udb3version}"; fi;
 script:
 - ./vendor/bin/phpunit
 - ./vendor/bin/phing test
