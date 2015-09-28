@@ -44,6 +44,8 @@ class SpecificationDecoratedEventCdbXml implements EventCdbXmlServiceInterface
         );
 
         $this->guardSpecification($udb2Event);
+
+        return $eventCdbXml;
     }
 
     private function guardSpecification(\CultureFeed_Cdb_Item_Event $event)
