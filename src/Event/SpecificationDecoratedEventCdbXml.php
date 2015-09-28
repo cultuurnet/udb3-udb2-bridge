@@ -25,8 +25,8 @@ class SpecificationDecoratedEventCdbXml implements EventCdbXmlServiceInterface
 
     public function __construct(
         EventCdbXmlServiceInterface $wrapped,
-        SpecificationInterface $specification)
-    {
+        SpecificationInterface $specification
+    ) {
         $this->wrapped = $wrapped;
         $this->specification = $specification;
     }
