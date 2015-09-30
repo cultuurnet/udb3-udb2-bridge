@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0d20708054bd7e289e5dc4235dfc7f9b",
-    "content-hash": "3f19f923828830b5ed48cba118f0f8fc",
+    "hash": "6c82628321f97a1e93f4b5e47d9e0f5e",
+    "content-hash": "21b913ffed9de1232feb566e6c2ba426",
     "packages": [
         {
             "name": "beberlei/assert",
@@ -643,16 +643,16 @@
         },
         {
             "name": "cultuurnet/udb3",
-            "version": "dev-develop",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb3-php.git",
-                "reference": "92864655418556050b6f61b658e4ccc069118415"
+                "reference": "62dd5748ecca2ffe4ef031843e5e6663112b86af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/92864655418556050b6f61b658e4ccc069118415",
-                "reference": "92864655418556050b6f61b658e4ccc069118415",
+                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/62dd5748ecca2ffe4ef031843e5e6663112b86af",
+                "reference": "62dd5748ecca2ffe4ef031843e5e6663112b86af",
                 "shasum": ""
             },
             "require": {
@@ -688,6 +688,7 @@
             "require-dev": {
                 "alchemy/zippy": "~0.2",
                 "phing/phing": "~2.10",
+                "phpspec/phpspec": "~2.0",
                 "phpunit/phpunit": "~4.3",
                 "satooshi/php-coveralls": "~0.7",
                 "squizlabs/php_codesniffer": "~2.2"
@@ -718,7 +719,7 @@
                 }
             ],
             "description": "UDB3 PHP libraries",
-            "time": "2015-09-30 12:18:54"
+            "time": "2015-09-30 12:17:22"
         },
         {
             "name": "danielstjules/stringy",
@@ -4393,18 +4394,9 @@
             "time": "2015-09-14 14:14:09"
         }
     ],
-    "aliases": [
-        {
-            "alias": "0.1",
-            "alias_normalized": "0.1.0.0",
-            "version": "dev-develop",
-            "package": "cultuurnet/udb3"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "cultuurnet/udb3": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
