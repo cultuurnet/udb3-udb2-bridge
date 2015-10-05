@@ -14,5 +14,9 @@ use CultuurNet\Entry\EntryAPI;
  */
 interface EntryAPIImprovedFactoryInterface
 {
+    /**
+     * @param TokenCredentials $tokenCredentials
+     * @return EntryAPI
+     */
     public function withTokenCredentials(TokenCredentials $tokenCredentials);
 }
