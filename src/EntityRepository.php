@@ -37,7 +37,7 @@ abstract class EntityRepository implements RepositoryInterface
     /**
      * @var EventStreamDecoratorInterface[]
      */
-    private $eventStreamDecorators = array();
+    protected $eventStreamDecorators = array();
 
     public function __construct(
         RepositoryInterface $decoratee,
