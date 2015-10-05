@@ -20,7 +20,11 @@ class EventSubscriberDecoratedEntryAPIImprovedFactory implements EntryAPIImprove
      */
     private $eventSubscriber;
 
-    function __construct(
+    /**
+     * @param EntryAPIImprovedFactoryInterface $wrapped
+     * @param EventSubscriberInterface $eventSubscriber
+     */
+    public function __construct(
         EntryAPIImprovedFactoryInterface $wrapped,
         EventSubscriberInterface $eventSubscriber
     ) {
