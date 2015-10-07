@@ -284,7 +284,10 @@ trait Udb2UtilityTrait
         // Add the booking Period.
         $bookingPeriod = $cdbItem->getBookingPeriod();
         if (empty($bookingPeriod)) {
-            $bookingPeriod = new CultureFeed_Cdb_Data_Calendar_BookingPeriod();
+            $bookingPeriod = new CultureFeed_Cdb_Data_Calendar_BookingPeriod(
+                null,
+                null
+            );
         }
 
         if ($bookingInfo->getAvailabilityStarts()) {
