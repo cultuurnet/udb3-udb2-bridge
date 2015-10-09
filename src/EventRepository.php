@@ -33,6 +33,7 @@ use CultuurNet\UDB3\Event\Events\BookingInfoUpdated;
 use CultuurNet\UDB3\Event\Events\ContactPointUpdated;
 use CultuurNet\UDB3\Event\Events\DescriptionUpdated;
 use CultuurNet\UDB3\Event\Events\EventCreated;
+use CultuurNet\UDB3\Event\Events\EventCreatedFromCdbXml;
 use CultuurNet\UDB3\Event\Events\EventDeleted;
 use CultuurNet\UDB3\Event\Events\EventWasLabelled;
 use CultuurNet\UDB3\Event\Events\ImageAdded;
@@ -47,6 +48,7 @@ use CultuurNet\UDB3\Event\Events\Unlabelled;
 use CultuurNet\UDB3\Event\TitleTranslated;
 use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\PlaceService;
+use CultuurNet\UDB3\XmlString;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
@@ -268,6 +270,13 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
 
                     case ImageDeleted::class:
                         $this->applyImageDeleted(
+                            $domainEvent,
+                            $domainMessage->getMetadata()
+                        );
+                        break;
+
+                    case EventCreatedFromCdbXml::class:
+                        $this->applyEventCreatedFromCdbXml(
                             $domainEvent,
                             $domainMessage->getMetadata()
                         );
@@ -728,4 +737,65 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         $cdbEvent->setLocation($location);
 
     }
+
+    public function applyEventCreatedFromCdbXml(
+        EventCreatedFromCdbXml $eventCreatedFromCdbXml,
+        Metadata $metadata
+    ) {
+        // Get full value of EvenXmlString.
+        // Add cdbid with eventid value as attribute to cdbxml element.
+
+    }
+
+//    /**
+//     * Listener on the eventCreated event. Send a new event also to UDB2.
+//     */
+//    public function applyEventCreated(EventCreated $eventCreated, Metadata $metadata)
+//    {
+//
+//        $event = new CultureFeed_Cdb_Item_Event();
+//        $event->setCdbId($eventCreated->getEventId());
+//
+//        $nlDetail = new CultureFeed_Cdb_Data_EventDetail();
+//        $nlDetail->setLanguage('nl');
+//        $nlDetail->setTitle($eventCreated->getTitle());
+//
+//        $details = new CultureFeed_Cdb_Data_EventDetailList();
+//        $details->add($nlDetail);
+//        $event->setDetails($details);
+//
+//        // Set location and calendar info.
+//        $this->setLocationForEventCreated($eventCreated, $event);
+//        $this->setCalendarForItemCreated($eventCreated, $event);
+//
+//        // Set event type and theme.
+//        $event->setCategories(new CultureFeed_Cdb_Data_CategoryList());
+//        $eventType = new CultureFeed_Cdb_Data_Category(
+//            'eventtype',
+//            $eventCreated->getEventType()->getId(),
+//            $eventCreated->getEventType()->getLabel()
+//        );
+//        $event->getCategories()->add($eventType);
+//
+//        if ($eventCreated->getTheme() !== null) {
+//            $theme = new CultureFeed_Cdb_Data_Category(
+//                'theme',
+//                $eventCreated->getTheme()->getId(),
+//                $eventCreated->getTheme()->getLabel()
+//            );
+//            $event->getCategories()->add($theme);
+//        }
+//
+//        // Empty contact info.
+//        $contactInfo = new CultureFeed_Cdb_Data_ContactInfo();
+//        $event->setContactInfo($contactInfo);
+//
+//        $cdbXml = new CultureFeed_Cdb_Default();
+//        $cdbXml->addItem($event);
+//
+//        $this->createImprovedEntryAPIFromMetadata($metadata)
+//            ->createEvent((string)$cdbXml);
+//
+//        return $eventCreated->getEventId();
+//    }
 }
