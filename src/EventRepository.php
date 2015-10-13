@@ -67,11 +67,6 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
     protected $decoratee;
 
     /**
-     * @var EntryAPIImprovedFactory
-     */
-    protected $entryAPIImprovedFactory;
-
-    /**
      * @var boolean
      */
     protected $syncBack = false;
@@ -106,7 +101,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         array $eventStreamDecorators = array()
     ) {
         $this->decoratee = $decoratee;
-        $this->entryAPIImprovedFactory = $entryAPIImprovedFactory;
+        $this->setEntryAPIImprovedFactory($entryAPIImprovedFactory);
         $this->eventStreamDecorators = $eventStreamDecorators;
         $this->organizerService = $organizerService;
         $this->placeService = $placeService;

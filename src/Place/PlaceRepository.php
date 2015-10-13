@@ -47,10 +47,7 @@ use CultuurNet\UDB3\Place\Events\TypicalAgeRangeUpdated;
 use CultuurNet\UDB3\Place\Place;
 use CultuurNet\UDB3\SearchAPI2\SearchServiceInterface;
 use CultuurNet\UDB3\UDB2\ActorRepository;
-use CultuurNet\UDB3\UDB2\EntryAPIImprovedFactory;
 use CultuurNet\UDB3\UDB2\EntryAPIImprovedFactoryInterface;
-use CultuurNet\UDB3\UDB2\Place\PlaceImporterInterface;
-use CultuurNet\UDB3\UDB2\Udb2UtilityTrait;
 use CultuurNet\UDB3\UDB2\Udb3RepositoryTrait;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -63,7 +60,6 @@ use Psr\Log\LoggerAwareTrait;
 class PlaceRepository extends ActorRepository implements RepositoryInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
-    use Udb2UtilityTrait;
     use Udb3RepositoryTrait;
 
     /**

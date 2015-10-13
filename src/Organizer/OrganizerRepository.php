@@ -24,9 +24,7 @@ use CultureFeed_Cdb_Item_Actor;
 use CultuurNet\UDB3\Organizer\Events\OrganizerCreated;
 use CultuurNet\UDB3\Organizer\Organizer;
 use CultuurNet\UDB3\UDB2\ActorRepository;
-use CultuurNet\UDB3\UDB2\EntryAPIImprovedFactory;
 use CultuurNet\UDB3\UDB2\EntryAPIImprovedFactoryInterface;
-use CultuurNet\UDB3\UDB2\Udb2UtilityTrait;
 use CultuurNet\UDB3\UDB2\Udb3RepositoryTrait;
 use Psr\Log\LoggerAwareTrait;
 
@@ -38,7 +36,6 @@ use Psr\Log\LoggerAwareTrait;
 class OrganizerRepository extends ActorRepository
 {
     use LoggerAwareTrait;
-    use Udb2UtilityTrait;
     use Udb3RepositoryTrait;
 
     /**
