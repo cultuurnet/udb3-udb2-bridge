@@ -72,7 +72,8 @@ trait Udb2UtilityTrait
 
         if (isset($metadata['consumer'])) {
             $consumerKey = $metadata['consumer']['key'];
-            $consumerCredentials = new ConsumerCredentials($consumerKey);
+            $consumerSecret = $metadata['consumer']['secret'];
+            $consumerCredentials = new ConsumerCredentials($consumerKey, $consumerSecret);
 
             $entryAPI = $this->entryAPIImprovedFactory->withConsumerAndTokenCredentials(
                 $consumerCredentials,
