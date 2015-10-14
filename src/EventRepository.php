@@ -68,11 +68,6 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
     protected $decoratee;
 
     /**
-     * @var EntryAPIImprovedFactory
-     */
-    protected $entryAPIImprovedFactory;
-
-    /**
      * @var boolean
      */
     protected $syncBack = false;
@@ -107,7 +102,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         array $eventStreamDecorators = array()
     ) {
         $this->decoratee = $decoratee;
-        $this->entryAPIImprovedFactory = $entryAPIImprovedFactory;
+        $this->setEntryAPIImprovedFactory($entryAPIImprovedFactory);
         $this->eventStreamDecorators = $eventStreamDecorators;
         $this->organizerService = $organizerService;
         $this->placeService = $placeService;
@@ -418,13 +413,8 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         $contactInfo = new CultureFeed_Cdb_Data_ContactInfo();
         $event->setContactInfo($contactInfo);
 
-        $cdbXml = new CultureFeed_Cdb_Default();
-        $cdbXml->addItem($event);
-
         $this->createImprovedEntryAPIFromMetadata($metadata)
-            ->createEvent((string)$cdbXml);
-
-        return $eventCreated->getEventId();
+            ->createEvent($event);
     }
 
     /**

@@ -19,15 +19,12 @@ use Broadway\Repository\RepositoryInterface;
  */
 abstract class EntityRepository implements RepositoryInterface
 {
+    use Udb2UtilityTrait;
+
     /**
      * @var RepositoryInterface
      */
     protected $decoratee;
-
-    /**
-     * @var EntryAPIImprovedFactoryInterface
-     */
-    protected $entryAPIImprovedFactory;
 
     /**
      * @var boolean
@@ -45,7 +42,7 @@ abstract class EntityRepository implements RepositoryInterface
         array $eventStreamDecorators = array()
     ) {
         $this->decoratee = $decoratee;
-        $this->entryAPIImprovedFactory = $entryAPIImprovedFactory;
+        $this->setEntryAPIImprovedFactory($entryAPIImprovedFactory);
         $this->eventStreamDecorators = $eventStreamDecorators;
     }
 

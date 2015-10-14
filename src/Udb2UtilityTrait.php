@@ -42,6 +42,19 @@ use Zend\Validator\Exception\RuntimeException;
  */
 trait Udb2UtilityTrait
 {
+    /**
+     * @var EntryAPIImprovedFactoryInterface
+     */
+    protected $entryAPIImprovedFactory;
+
+    /**
+     * @param EntryAPIImprovedFactoryInterface $entryAPIImprovedFactory
+     */
+    protected function setEntryAPIImprovedFactory(
+        EntryAPIImprovedFactoryInterface $entryAPIImprovedFactory
+    ) {
+        $this->entryAPIImprovedFactory = $entryAPIImprovedFactory;
+    }
 
     /**
      * @param Metadata $metadata
