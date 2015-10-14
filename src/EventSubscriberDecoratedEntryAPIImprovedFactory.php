@@ -5,6 +5,7 @@
 
 namespace CultuurNet\UDB3\UDB2;
 
+use CultuurNet\Auth\ConsumerCredentials;
 use CultuurNet\Auth\TokenCredentials;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -35,6 +36,20 @@ class EventSubscriberDecoratedEntryAPIImprovedFactory implements EntryAPIImprove
     public function withTokenCredentials(TokenCredentials $tokenCredentials)
     {
         $entryAPI = $this->wrapped->withTokenCredentials($tokenCredentials);
+
+        $entryAPI->getHttpClientFactory()->addSubscriber($this->eventSubscriber);
+
+        return $entryAPI;
+    }
+
+    public function withConsumerAndTokenCredentials(
+        ConsumerCredentials $consumerCredentials,
+        TokenCredentials $tokenCredentials
+    ) {
+        $entryAPI = $this->wrapped->withConsumerAndTokenCredentials(
+            $consumerCredentials,
+            $tokenCredentials
+        );
 
         $entryAPI->getHttpClientFactory()->addSubscriber($this->eventSubscriber);
 

@@ -26,6 +26,7 @@ use CultureFeed_Cdb_Data_Phone;
 use CultureFeed_Cdb_Data_Url;
 use CultureFeed_Cdb_Item_Base;
 use CultureFeed_Cdb_Item_Event;
+use CultuurNet\Auth\ConsumerCredentials;
 use CultuurNet\Entry\EntryAPI;
 use CultuurNet\UDB3\Address;
 use CultuurNet\UDB3\BookingInfo;
@@ -66,10 +67,22 @@ trait Udb2UtilityTrait
         if (!isset($metadata['uitid_token_credentials'])) {
             throw new RuntimeException('No token credentials found. They are needed to access the entry API, so aborting request.');
         }
+
         $tokenCredentials = $metadata['uitid_token_credentials'];
-        $entryAPI = $this->entryAPIImprovedFactory->withTokenCredentials(
-            $tokenCredentials
-        );
+
+        if (isset($metadata['consumer'])) {
+            $consumerKey = $metadata['consumer']['key'];
+            $consumerCredentials = new ConsumerCredentials($consumerKey);
+
+            $entryAPI = $this->entryAPIImprovedFactory->withConsumerAndTokenCredentials(
+                $consumerCredentials,
+                $tokenCredentials
+            );
+        } else {
+            $entryAPI = $this->entryAPIImprovedFactory->withTokenCredentials(
+                $tokenCredentials
+            );
+        }
 
         return $entryAPI;
     }
