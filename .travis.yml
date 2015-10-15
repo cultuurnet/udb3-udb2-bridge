@@ -12,3 +12,4 @@ notifications:
   email:
     recipients:
     - kristof@2dotstwice.be
+  slack: cnet:UzmZZjVck1RNHTyrTSe6NTd9
