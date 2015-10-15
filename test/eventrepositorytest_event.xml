@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <cdb:cdbxml xmlns:cdb="http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL">
-    <cdb:event availablefrom="2014-04-18T00:00:00" availableto="2014-11-19T00:00:00" cdbid="004aea08-e13d-48c9-b9eb-a18f20e6d44e" createdby="elinedelanghe" creationdate="2014-04-18T15:46:13" externalid="CDB:2bcdedee-625b-4344-86c4-3f21ac301404" isparent="false" lastupdated="2014-11-07T14:26:19" lastupdatedby="elinedelanghe" pctcomplete="90" published="true" owner="Invoerders Algemeen " private="true" validator="Cultuurkuur Validatoren" wfstatus="approved">
+    <cdb:event availablefrom="2014-04-18T00:00:00" availableto="2014-11-19T00:00:00" createdby="elinedelanghe" creationdate="2014-04-18T15:46:13" isparent="false" lastupdated="2014-11-07T14:26:19" lastupdatedby="elinedelanghe" pctcomplete="90" published="true" owner="Invoerders Algemeen " private="true" validator="Cultuurkuur Validatoren" wfstatus="approved">
         <cdb:agefrom>7</cdb:agefrom>
         <cdb:calendar>
             <cdb:timestamps>
