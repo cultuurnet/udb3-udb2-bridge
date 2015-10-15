@@ -5,7 +5,6 @@ php:
 install:
 - composer install
 script:
-- ./vendor/bin/phpunit
 - ./vendor/bin/phing test
 after_script:
 - if [[ "$TRAVIS_PHP_VERSION" = "5.6" ]]; then ./vendor/bin/coveralls -vvv; fi;

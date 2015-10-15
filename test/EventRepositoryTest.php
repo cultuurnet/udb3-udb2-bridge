@@ -17,10 +17,12 @@ use CultuurNet\UDB3\Event\Event;
 use CultuurNet\UDB3\Event\ReadModel\JSONLD\OrganizerServiceInterface;
 use CultuurNet\UDB3\Event\ReadModel\JSONLD\PlaceServiceInterface;
 use CultuurNet\UDB3\EventSourcing\ExecutionContextMetadataEnricher;
+use CultuurNet\UDB3\EventXmlString;
 use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\PlaceService;
 use PHPUnit_Framework_TestCase;
 use CultureFeed_Cdb_Data_ContactInfo;
+use ValueObjects\String\String;
 
 class EventRepositoryTest extends PHPUnit_Framework_TestCase
 {

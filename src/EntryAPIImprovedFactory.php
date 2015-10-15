@@ -39,8 +39,6 @@ final class EntryAPIImprovedFactory implements EntryAPIImprovedFactoryInterface
             $tokenCredentials
         );
 
-        $this->addCommandLineLogger($entryApi);
-
         return $entryApi;
     }
 
@@ -59,28 +57,6 @@ final class EntryAPIImprovedFactory implements EntryAPIImprovedFactoryInterface
             $tokenCredentials
         );
 
-        $this->addCommandLineLogger($entryApi);
-
         return $entryApi;
-    }
-
-    /**
-     * @param EntryAPI $entryApi
-     */
-    public function addCommandLineLogger(EntryAPI $entryApi)
-    {
-        // Print request and response for debugging purposes. Only on CLI.
-        if (PHP_SAPI === 'cli') {
-            $adapter = new ClosureLogAdapter(
-                function ($message, $priority, $extras) {
-                    print $message;
-                }
-            );
-
-            $format = "\n\n# Request:\n{request}\n\n# Response:\n{response}\n\n# Errors: {curl_code} {curl_error}\n\n";
-            $log = new LogPlugin($adapter, $format);
-
-            $entryApi->getHttpClientFactory()->addSubscriber($log);
-        }
     }
 }
