@@ -269,6 +269,5 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
 
         $this->repository->syncBackOn();
         $this->repository->save($event);
-
     }
 }
