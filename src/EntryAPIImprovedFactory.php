@@ -5,6 +5,7 @@
 
 namespace CultuurNet\UDB3\UDB2;
 
+use CultuurNet\Auth\ConsumerCredentials;
 use CultuurNet\Auth\TokenCredentials;
 use CultuurNet\Entry\EntryAPI;
 use Guzzle\Log\ClosureLogAdapter;
@@ -38,19 +39,23 @@ final class EntryAPIImprovedFactory implements EntryAPIImprovedFactoryInterface
             $tokenCredentials
         );
 
-        // Print request and response for debugging purposes. Only on CLI.
-        if (PHP_SAPI === 'cli') {
-            $adapter = new ClosureLogAdapter(
-                function ($message, $priority, $extras) {
-                    print $message;
-                }
-            );
+        return $entryApi;
+    }
 
-            $format = "\n\n# Request:\n{request}\n\n# Response:\n{response}\n\n# Errors: {curl_code} {curl_error}\n\n";
-            $log = new LogPlugin($adapter, $format);
-
-            $entryApi->getHttpClientFactory()->addSubscriber($log);
-        }
+    /**
+     * @param ConsumerCredentials $consumerCredentials
+     * @param TokenCredentials $tokenCredentials
+     * @return EntryAPI
+     */
+    public function withConsumerAndTokenCredentials(
+        ConsumerCredentials $consumerCredentials,
+        TokenCredentials $tokenCredentials
+    ) {
+        $entryApi = new EntryAPI(
+            $this->consumer->getTargetUrl(),
+            $consumerCredentials,
+            $tokenCredentials
+        );
 
         return $entryApi;
     }

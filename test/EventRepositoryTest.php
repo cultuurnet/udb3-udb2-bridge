@@ -17,10 +17,12 @@ use CultuurNet\UDB3\Event\Event;
 use CultuurNet\UDB3\Event\ReadModel\JSONLD\OrganizerServiceInterface;
 use CultuurNet\UDB3\Event\ReadModel\JSONLD\PlaceServiceInterface;
 use CultuurNet\UDB3\EventSourcing\ExecutionContextMetadataEnricher;
+use CultuurNet\UDB3\EventXmlString;
 use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\PlaceService;
 use PHPUnit_Framework_TestCase;
 use CultureFeed_Cdb_Data_ContactInfo;
+use ValueObjects\String\String;
 
 class EventRepositoryTest extends PHPUnit_Framework_TestCase
 {
@@ -235,6 +237,35 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
                 'event',
                 $expectedContactInfo
             );
+
+        $this->repository->syncBackOn();
+        $this->repository->save($event);
+    }
+
+    /**
+     * @test
+     */
+    public function it_creates_an_event_from_cdbxml()
+    {
+        $expectedXmlStringArgument = file_get_contents(__DIR__ . '/eventrepositorytest_event_with_cdbid.xml');
+
+        $this->entryAPI->expects($this->once())
+            ->method('createEventFromRawXml')
+            ->with($expectedXmlStringArgument);
+
+        $cdbXmlNamespaceUri = new String(self::NS);
+
+        $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
+        $idString = new String($id);
+
+        $cdbXml = file_get_contents(__DIR__ . '/eventrepositorytest_event.xml');
+        $eventXmlString = new EventXmlString($cdbXml);
+
+        $event = Event::createFromCdbXml(
+            $idString,
+            $eventXmlString,
+            $cdbXmlNamespaceUri
+        );
 
         $this->repository->syncBackOn();
         $this->repository->save($event);
