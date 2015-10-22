@@ -35,6 +35,7 @@ use CultuurNet\UDB3\Event\Events\DescriptionUpdated;
 use CultuurNet\UDB3\Event\Events\EventCreated;
 use CultuurNet\UDB3\Event\Events\EventCreatedFromCdbXml;
 use CultuurNet\UDB3\Event\Events\EventDeleted;
+use CultuurNet\UDB3\Event\Events\EventUpdatedFromCdbXml;
 use CultuurNet\UDB3\Event\Events\EventWasLabelled;
 use CultuurNet\UDB3\Event\Events\ImageAdded;
 use CultuurNet\UDB3\Event\Events\ImageDeleted;
@@ -271,6 +272,13 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
 
                     case EventCreatedFromCdbXml::class:
                         $this->applyEventCreatedFromCdbXml(
+                            $domainEvent,
+                            $domainMessage->getMetadata()
+                        );
+                        break;
+
+                    case EventUpdatedFromCdbXml::class:
+                        $this->applyEventUpdatedFromCdbXml(
                             $domainEvent,
                             $domainMessage->getMetadata()
                         );
@@ -740,5 +748,22 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         // Send to EntryApi UDB2.
         $this->createImprovedEntryAPIFromMetadata($metadata)
             ->createEventFromRawXml((string)$eventXmlStringWithCdbid);
+    }
+
+    public function applyEventUpdatedFromCdbXml(
+        EventUpdatedFromCdbXml $eventUpdatedFromCdbXml,
+        Metadata $metadata
+    ) {
+        $eventId = $eventUpdatedFromCdbXml->getEventId();
+
+        // Get EventXmlString Object
+        $eventXmlString = $eventUpdatedFromCdbXml->getEventXmlString();
+        $eventXmlStringWithCdbid = $eventXmlString->withCdbidAttribute(
+            $eventId
+        )->toNative();
+
+        // Send to EntryApi UDB2.
+        $this->createImprovedEntryAPIFromMetadata($metadata)
+            ->updateEventFromRawXml($eventId, (string)$eventXmlStringWithCdbid);
     }
 }
