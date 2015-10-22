@@ -279,10 +279,6 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
         $expectedEventId = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
         $expectedXmlStringArgument = file_get_contents(__DIR__ . '/eventrepositorytest_event_with_cdbid.xml');
 
-        $this->entryAPI->expects($this->once())
-            ->method('updateEventFromRawXml')
-            ->with($expectedEventId, $expectedXmlStringArgument);
-
         $cdbXmlNamespaceUri = new String(self::NS);
 
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
@@ -291,7 +287,19 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
         $cdbXml = file_get_contents(__DIR__ . '/eventrepositorytest_event.xml');
         $eventXmlString = new EventXmlString($cdbXml);
 
-        $event = Event::updateFromCdbXml(
+        $event = Event::createFromCdbXml(
+            $idString,
+            $eventXmlString,
+            $cdbXmlNamespaceUri
+        );
+
+        $this->repository->save($event);
+
+        $this->entryAPI->expects($this->once())
+            ->method('updateEventFromRawXml')
+            ->with($expectedEventId, $expectedXmlStringArgument);
+
+        $event->updateFromCdbXml(
             $idString,
             $eventXmlString,
             $cdbXmlNamespaceUri
