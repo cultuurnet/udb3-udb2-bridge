@@ -47,6 +47,7 @@ use CultuurNet\UDB3\Event\Events\TypicalAgeRangeDeleted;
 use CultuurNet\UDB3\Event\Events\TypicalAgeRangeUpdated;
 use CultuurNet\UDB3\Event\Events\Unlabelled;
 use CultuurNet\UDB3\Event\TitleTranslated;
+use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\PlaceService;
 use Psr\Log\LoggerAwareInterface;
@@ -62,6 +63,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
     use LoggerAwareTrait;
     use Udb2UtilityTrait;
     use Udb3RepositoryTrait;
+    use DelegateEventHandlingToSpecificMethodTrait;
 
     /**
      * @var RepositoryInterface
@@ -140,186 +142,52 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
             /** @var DomainMessage $domainMessage */
             foreach ($eventStream as $domainMessage) {
                 $domainEvent = $domainMessage->getPayload();
-
-                switch (get_class($domainEvent)) {
-                    case EventWasLabelled::class:
-                        /** @var EventWasLabelled $domainEvent */
-                        $this->applyEventWasLabelled(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case Unlabelled::class:
-                        /** @var Unlabelled $domainEvent */
-                        $this->applyUnlabelled(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-
-                        break;
-
-                    case TitleTranslated::class:
-                        /** @var TitleTranslated $domainEvent */
-                        $this->applyTitleTranslated(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case DescriptionTranslated::class:
-                        /** @var DescriptionTranslated $domainEvent */
-                        $this->applyDescriptionTranslated(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case EventCreated::class:
-                        $this->applyEventCreated(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case EventDeleted::class:
-                        $this->applyEventDeleted(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case MajorInfoUpdated::class:
-                        $this->applyMajorInfoUpdated(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case DescriptionUpdated::class:
-                        /** @var DescriptionUpdated $domainEvent */
-                        $this->applyDescriptionUpdated(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case TypicalAgeRangeUpdated::class:
-                        /** @var TypicalAgeRangeUpdated $domainEvent */
-                        $this->applyTypicalAgeRangeUpdated(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case TypicalAgeRangeDeleted::class:
-                        /** @var TypicalAgeRangeDeleted $domainEvent */
-                        $this->applyTypicalAgeRangeDeleted(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case OrganizerUpdated::class:
-                        $this->applyOrganizerUpdated(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case OrganizerDeleted::class:
-                        $this->applyOrganizerDeleted(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-
-                        break;
-
-                    case ContactPointUpdated::class:
-                        $this->applyContactPointUpdated(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case BookingInfoUpdated::class:
-                        $this->applyBookingInfoUpdated(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case ImageAdded::class:
-                        $this->applyImageAdded(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case ImageUpdated::class:
-                        $this->applyImageUpdated(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case ImageDeleted::class:
-                        $this->applyImageDeleted(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case EventCreatedFromCdbXml::class:
-                        $this->applyEventCreatedFromCdbXml(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case EventUpdatedFromCdbXml::class:
-                        $this->applyEventUpdatedFromCdbXml(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    default:
-                        // Ignore any other actions
-                }
+                $this->handle($domainMessage);
             }
         }
 
         $this->decoratee->save($aggregate);
     }
 
+    /**
+     * @param EventWasLabelled $labelled
+     * @param DomainMessage $domainMessage
+     */
     private function applyEventWasLabelled(
         EventWasLabelled $labelled,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
-        $this->createImprovedEntryAPIFromMetadata($metadata)
+        $this->createEntryAPI($domainMessage)
             ->addKeyword(
                 $labelled->getEventId(),
                 $labelled->getLabel()
             );
     }
 
+    /**
+     * @param Unlabelled $unlabelled
+     * @param DomainMessage $domainMessage
+     */
     private function applyUnlabelled(
         Unlabelled $unlabelled,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
-        $this->createImprovedEntryAPIFromMetadata($metadata)
+        $this->createEntryAPI($metadata)
             ->deleteKeyword(
                 $unlabelled->getEventId(),
                 $unlabelled->getLabel()
             );
     }
 
+    /**
+     * @param TitleTranslated $domainEvent
+     * @param DomainMessage $domainMessage
+     */
     private function applyTitleTranslated(
         TitleTranslated $domainEvent,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
-        $this->createImprovedEntryAPIFromMetadata($metadata)
+        $this->createEntryAPI($metadata)
             ->translateEventTitle(
                 $domainEvent->getEventId(),
                 $domainEvent->getLanguage(),
@@ -327,11 +195,15 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
             );
     }
 
+    /**
+     * @param DescriptionTranslated $domainEvent
+     * @param DomainMessage $domainMessage
+     */
     private function applyDescriptionTranslated(
         DescriptionTranslated $domainEvent,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
-        $this->createImprovedEntryAPIFromMetadata($metadata)
+        $this->createEntryAPI($metadata)
             ->translateEventDescription(
                 $domainEvent->getEventId(),
                 $domainEvent->getLanguage(),
@@ -339,6 +211,11 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
             );
     }
 
+    /**
+     * @param AggregateRoot $aggregate
+     * @param DomainEventStream $eventStream
+     * @return DomainEventStream|\Broadway\Domain\DomainEventStreamInterface
+     */
     private function decorateForWrite(
         AggregateRoot $aggregate,
         DomainEventStream $eventStream
@@ -380,8 +257,10 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
 
     /**
      * Listener on the eventCreated event. Send a new event also to UDB2.
+     * @param EventCreated $eventCreated
+     * @param DomainMessage $domainMessage
      */
-    public function applyEventCreated(EventCreated $eventCreated, Metadata $metadata)
+    public function applyEventCreated(EventCreated $eventCreated, DomainMessage $domainMessage)
     {
 
         $event = new CultureFeed_Cdb_Item_Event();
@@ -421,29 +300,34 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         $contactInfo = new CultureFeed_Cdb_Data_ContactInfo();
         $event->setContactInfo($contactInfo);
 
-        $this->createImprovedEntryAPIFromMetadata($metadata)
+        $this->createEntryAPI($metadata)
             ->createEvent($event);
     }
 
     /**
      * Listener on the EventDeleted event.
      * Also send a request to remove the event in UDB2.
+     * @param EventDeleted $eventDeleted
+     * @param DomainMessage $domainMessage
+     * @return static
      */
-    public function applyEventDeleted(EventDeleted $eventDeleted, Metadata $metadata)
+    public function applyEventDeleted(EventDeleted $eventDeleted, DomainMessage $domainMessage)
     {
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
-        return $entryApi->deleteEvent($eventDeleted->getEventId());
+        $entryApi = $this->createEntryAPI($domainMessage);
+        $entryApi->deleteEvent($eventDeleted->getEventId());
     }
 
     /**
      * Send the updated major info to UDB2.
+     * @param MajorInfoUpdated $infoUpdated
+     * @param DomainMessage $domainMessage
      */
     public function applyMajorInfoUpdated(
         MajorInfoUpdated $infoUpdated,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
         $event = $entryApi->getEvent($infoUpdated->getEventId());
 
         $this->setLocationForEventCreated($infoUpdated, $event);
@@ -480,13 +364,15 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
 
     /**
      * Send the updated description also to CDB2.
+     * @param DescriptionUpdated $descriptionUpdated
+     * @param DomainMessage $domainMessage
      */
     private function applyDescriptionUpdated(
         DescriptionUpdated $descriptionUpdated,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
 
         $newDescription = $descriptionUpdated->getDescription();
         $entityId = $descriptionUpdated->getEventId();
@@ -504,13 +390,15 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
 
     /**
      * Send the updated age range also to CDB2.
+     * @param TypicalAgeRangeUpdated $ageRangeUpdated
+     * @param DomainMessage $domainMessage
      */
     private function applyTypicalAgeRangeUpdated(
         TypicalAgeRangeUpdated $ageRangeUpdated,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
 
         $ages = explode('-', $ageRangeUpdated->getTypicalAgeRange());
         $entityType = new EntityType('event');
@@ -521,13 +409,15 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
 
     /**
      * Send the deleted age range also to CDB2.
+     * @param TypicalAgeRangeDeleted $ageRangeDeleted
+     * @param DomainMessage $domainMessage
      */
     private function applyTypicalAgeRangeDeleted(
         TypicalAgeRangeDeleted $ageRangeDeleted,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
 
         $entityType = new EntityType('event');
         $entryApi->deleteAge($ageRangeDeleted->getEventId(), $entityType);
@@ -537,10 +427,11 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
     /**
      * Apply the organizer updated event to the event repository.
      * @param OrganizerUpdated $organizerUpdated
+     * @param DomainMessage $domainMessage
      */
     private function applyOrganizerUpdated(
         OrganizerUpdated $organizerUpdated,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
         $organizerJSONLD = $this->organizerService->getEntity(
@@ -549,7 +440,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
 
         $organizer = json_decode($organizerJSONLD);
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
 
         $entityType = new EntityType('event');
         $organiserName = new String($organizer->name);
@@ -562,14 +453,14 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
      * Delete the organizer also in UDB2..
      *
      * @param OrganizerDeleted $organizerDeleted
-     * @param Metadata $metadata
+     * @param DomainMessage $domainMessage
      */
     private function applyOrganizerDeleted(
         OrganizerDeleted $organizerDeleted,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
         $entityType = new EntityType('event');
         $entryApi->deleteOrganiser($organizerDeleted->getEventId(), $entityType);
 
@@ -579,14 +470,14 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
      * Updated the contact info in udb2.
      *
      * @param ContactPointUpdated $domainEvent
-     * @param Metadata $metadata
+     * @param DomainMessage $domainMessage
      */
     private function applyContactPointUpdated(
         ContactPointUpdated $domainEvent,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
         $event = $entryApi->getEvent($domainEvent->getEventId());
         $contactPoint = $domainEvent->getContactPoint();
 
@@ -604,14 +495,14 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
      * Updated the booking info in udb2.
      *
      * @param BookingInfoUpdated $domainEvent
-     * @param Metadata $metadata
+     * @param DomainMessage $domainMessage
      */
     private function applyBookingInfoUpdated(
         BookingInfoUpdated $domainEvent,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
         $event = $entryApi->getEvent($domainEvent->getEventId());
         $bookingInfo = $domainEvent->getBookingInfo();
 
@@ -646,13 +537,14 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
     /**
      * Apply the imageAdded event to udb2.
      * @param ImageAdded $domainEvent
+     * @param DomainMessage $domainMessage
      */
     private function applyImageAdded(
         ImageAdded $domainEvent,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
         $event = $entryApi->getEvent($domainEvent->getEventId());
 
         $this->addImageToCdbItem($event, $domainEvent->getMediaObject());
@@ -662,14 +554,15 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
 
     /**
      * Apply the imageUpdated event to udb2.
-     * @param ImageAdded $domainEvent
+     * @param ImageUpdated $domainEvent
+     * @param DomainMessage $domainMessage
      */
     private function applyImageUpdated(
         ImageUpdated $domainEvent,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
         $event = $entryApi->getEvent($domainEvent->getEventId());
 
         $this->updateImageOnCdbItem($event, $domainEvent->getIndexToUpdate(), $domainEvent->getMediaObject());
@@ -680,13 +573,14 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
     /**
      * Apply the imageDeleted event to udb2.
      * @param ImageDeleted $domainEvent
+     * @param DomainMessage $domainMessage
      */
     private function applyImageDeleted(
         ImageDeleted $domainEvent,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
         $event = $entryApi->getEvent($domainEvent->getEventId());
 
         $this->deleteImageOnCdbItem($event, $domainEvent->getIndexToDelete());
@@ -735,9 +629,13 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
 
     }
 
+    /**
+     * @param EventCreatedFromCdbXml $eventCreatedFromCdbXml
+     * @param DomainMessage $domainMessage
+     */
     public function applyEventCreatedFromCdbXml(
         EventCreatedFromCdbXml $eventCreatedFromCdbXml,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
         // Get EventXmlString Object
         $eventXmlString = $eventCreatedFromCdbXml->getEventXmlString();
@@ -746,13 +644,17 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         )->toNative();
 
         // Send to EntryApi UDB2.
-        $this->createImprovedEntryAPIFromMetadata($metadata)
+        $this->createEntryAPI($domainMessage)
             ->createEventFromRawXml((string)$eventXmlStringWithCdbid);
     }
 
+    /**
+     * @param EventUpdatedFromCdbXml $eventUpdatedFromCdbXml
+     * @param DomainMessage $domainMessage
+     */
     public function applyEventUpdatedFromCdbXml(
         EventUpdatedFromCdbXml $eventUpdatedFromCdbXml,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
         $eventId = $eventUpdatedFromCdbXml->getEventId();
 
@@ -763,7 +665,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         )->toNative();
 
         // Send to EntryApi UDB2.
-        $this->createImprovedEntryAPIFromMetadata($metadata)
+        $this->createEntryAPI($domainMessage)
             ->updateEventFromRawXml($eventId, (string)$eventXmlStringWithCdbid);
     }
 }

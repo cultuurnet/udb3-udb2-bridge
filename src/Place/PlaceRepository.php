@@ -29,6 +29,7 @@ use CultuurNet\Entry\Number;
 use CultuurNet\Entry\String;
 use CultuurNet\UDB3\Actor\ActorImportedFromUDB2;
 use CultuurNet\UDB3\EntityServiceInterface;
+use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\Place\Events\BookingInfoUpdated;
 use CultuurNet\UDB3\Place\Events\ContactPointUpdated;
@@ -61,6 +62,7 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
 {
     use LoggerAwareTrait;
     use Udb3RepositoryTrait;
+    use DelegateEventHandlingToSpecificMethodTrait;
 
     /**
      * @var PlaceImporterInterface
@@ -141,110 +143,7 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
             /** @var DomainMessage $domainMessage */
             foreach ($eventStream as $domainMessage) {
                 $domainEvent = $domainMessage->getPayload();
-                switch (get_class($domainEvent)) {
-                    case PlaceCreated::class:
-                        $this->applyPlaceCreated(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case PlaceDeleted::class:
-                        $this->applyPlaceDeleted(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case MajorInfoUpdated::class:
-                        $this->applyMajorInfoUpdated(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case DescriptionUpdated::class:
-                        /** @var DescriptionUpdated $domainEvent */
-                        $this->applyDescriptionUpdated(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case TypicalAgeRangeUpdated::class:
-                        $this->applyTypicalAgeRangeUpdated(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case TypicalAgeRangeDeleted::class:
-                        /** @var TypicalAgeRangeDeleted $domainEvent */
-                        $this->applyTypicalAgeRangeDeleted(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case OrganizerUpdated::class:
-                        $this->applyOrganizerUpdated(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case OrganizerDeleted::class:
-                        $this->applyOrganizerDeleted(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case ContactPointUpdated::class:
-                        $this->applyContactPointUpdated(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case BookingInfoUpdated::class:
-                        $this->applyBookingInfoUpdated(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case FacilitiesUpdated::class:
-                        $this->applyFacilitiesUpdated(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case ImageAdded::class:
-                        $this->applyImageAdded(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case ImageUpdated::class:
-                        $this->applyImageUpdated(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    case ImageDeleted::class:
-                        $this->applyImageDeleted(
-                            $domainEvent,
-                            $domainMessage->getMetadata()
-                        );
-                        break;
-
-                    default:
-                        // Ignore any other actions
-                }
+                $this->handle($domainMessage);
             }
         }
 
@@ -253,8 +152,11 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
 
     /**
      * Listener on the placeCreated event. Send a new place also to UDB2 as event.
+     * @param PlaceCreated $placeCreated
+     * @param DomainMessage $domainMessage
+     * @return
      */
-    public function applyPlaceCreated(PlaceCreated $placeCreated, Metadata $metadata)
+    public function applyPlaceCreated(PlaceCreated $placeCreated, DomainMessage $domainMessage)
     {
 
         $event = new CultureFeed_Cdb_Item_Event();
@@ -295,7 +197,7 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
         $contactInfo = new CultureFeed_Cdb_Data_ContactInfo();
         $event->setContactInfo($contactInfo);
 
-        $this->createImprovedEntryAPIFromMetadata($metadata)
+        $this->createEntryAPI($domainMessage)
             ->createEvent($event);
 
         return $placeCreated->getPlaceId();
@@ -304,15 +206,20 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
     /**
      * Listener on the placeDeleted event.
      * Also send a request to remove the place in UDB2.
+     * @param PlaceDeleted $placeDeleted
+     * @param DomainMessage $domainMessage
+     * @return static
      */
-    public function applyPlaceDeleted(PlaceDeleted $placeDeleted, Metadata $metadata)
+    public function applyPlaceDeleted(PlaceDeleted $placeDeleted, DomainMessage $domainMessage)
     {
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
         return $entryApi->deleteEvent($placeDeleted->getPlaceId());
     }
 
     /**
      * Set the location on the cdbEvent based on a PlaceCreated event.
+     * @param PlaceCreated $placeCreated
+     * @param CultureFeed_Cdb_Item_Event $cdbEvent
      */
     private function setLocationForPlaceCreated(PlaceCreated $placeCreated, CultureFeed_Cdb_Item_Event $cdbEvent)
     {
@@ -330,10 +237,12 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
 
     /**
      * Send the updated major info to UDB2.
+     * @param MajorInfoUpdated $infoUpdated
+     * @param DomainMessage $domainMessage
      */
-    public function applyMajorInfoUpdated(MajorInfoUpdated $infoUpdated, Metadata $metadata)
+    public function applyMajorInfoUpdated(MajorInfoUpdated $infoUpdated, DomainMessage $domainMessage)
     {
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
         $event = $entryApi->getEvent($infoUpdated->getPlaceId());
 
         $this->setCalendarForItemCreated($infoUpdated, $event);
@@ -369,13 +278,15 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
 
     /**
      * Send the updated description also to CDB2.
+     * @param DescriptionUpdated $descriptionUpdated
+     * @param DomainMessage $domainMessage
      */
     private function applyDescriptionUpdated(
         DescriptionUpdated $descriptionUpdated,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
 
         $newDescription = $descriptionUpdated->getDescription();
         $entityId = $descriptionUpdated->getPlaceId();
@@ -397,13 +308,15 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
 
     /**
      * Send the updated age range also to CDB2.
+     * @param TypicalAgeRangeUpdated $ageRangeUpdated
+     * @param DomainMessage $domainMessage
      */
     private function applyTypicalAgeRangeUpdated(
         TypicalAgeRangeUpdated $ageRangeUpdated,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
 
         $entityType = new EntityType('event');
         $ages = explode('-', $ageRangeUpdated->getTypicalAgeRange());
@@ -414,13 +327,15 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
 
     /**
      * Send the deleted age range also to CDB2.
+     * @param TypicalAgeRangeDeleted $ageRangeDeleted
+     * @param DomainMessage $domainMessage
      */
     private function applyTypicalAgeRangeDeleted(
         TypicalAgeRangeDeleted $ageRangeDeleted,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
 
         $entityType = new EntityType('event');
         $entryApi->deleteAge($ageRangeDeleted->getPlaceId(), $entityType);
@@ -430,10 +345,11 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
     /**
      * Apply the organizer updated event to the event repository.
      * @param OrganizerUpdated $organizerUpdated
+     * @param DomainMessage $domainMessage
      */
     private function applyOrganizerUpdated(
         OrganizerUpdated $organizerUpdated,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
         $organizerJSONLD = $this->organizerService->getEntity(
@@ -442,7 +358,7 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
 
         $organizer = json_decode($organizerJSONLD);
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
 
         $entityType = new EntityType('event');
         $organiserName = new String($organizer->name);
@@ -459,14 +375,14 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
      * Delete the organizer also in UDB2..
      *
      * @param OrganizerDeleted $organizerDeleted
-     * @param Metadata $metadata
+     * @param DomainMessage $domainMessage
      */
     private function applyOrganizerDeleted(
         OrganizerDeleted $organizerDeleted,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
         $entityType = new EntityType('event');
         $entryApi->deleteOrganiser(
             $organizerDeleted->getPlaceId(),
@@ -479,14 +395,14 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
      * Updated the contact info in udb2.
      *
      * @param ContactPointUpdated $domainEvent
-     * @param Metadata $metadata
+     * @param DomainMessage $domainMessage
      */
     private function applyContactPointUpdated(
         ContactPointUpdated $domainEvent,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
         $event = $entryApi->getEvent($domainEvent->getPlaceId());
         $contactPoint = $domainEvent->getContactPoint();
 
@@ -504,14 +420,14 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
      * Updated the booking info in udb2.
      *
      * @param BookingInfoUpdated $domainEvent
-     * @param Metadata $metadata
+     * @param DomainMessage $domainMessage
      */
     private function applyBookingInfoUpdated(
         BookingInfoUpdated $domainEvent,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
         $event = $entryApi->getEvent($domainEvent->getPlaceId());
         $bookingInfo = $domainEvent->getBookingInfo();
 
@@ -545,10 +461,11 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
     /**
      * Apply the facilitiesupdated event to udb2.
      * @param FacilitiesUpdated $facilitiesUpdated
+     * @param DomainMessage $domainMessage
      */
     private function applyFacilitiesUpdated(
         FacilitiesUpdated $facilitiesUpdated,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
         // Create the XML.
@@ -563,7 +480,7 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
         }
         $dom->appendChild($facilitiesElement);
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
 
         $entryApi->updateFacilities($facilitiesUpdated->getPlaceId(), $dom);
 
@@ -572,13 +489,14 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
     /**
      * Apply the imageAdded event to udb2.
      * @param ImageAdded $domainEvent
+     * @param DomainMessage $domainMessage
      */
     private function applyImageAdded(
         ImageAdded $domainEvent,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
         $event = $entryApi->getEvent($domainEvent->getPlaceId());
 
         $this->addImageToCdbItem($event, $domainEvent->getMediaObject());
@@ -588,14 +506,15 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
 
     /**
      * Apply the imageUpdated event to udb2.
-     * @param ImageAdded $domainEvent
+     * @param ImageUpdated|ImageUpdatedd $domainEvent
+     * @param DomainMessage $domainMessage
      */
     private function applyImageUpdated(
         ImageUpdated $domainEvent,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
         $event = $entryApi->getEvent($domainEvent->getPlaceId());
 
         $this->updateImageOnCdbItem(
@@ -610,13 +529,14 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
     /**
      * Apply the imageDeleted event to udb2.
      * @param ImageDeleted $domainEvent
+     * @param DomainMessage $domainMessage
      */
     private function applyImageDeleted(
         ImageDeleted $domainEvent,
-        Metadata $metadata
+        DomainMessage $domainMessage
     ) {
 
-        $entryApi = $this->createImprovedEntryAPIFromMetadata($metadata);
+        $entryApi = $this->createEntryAPI($domainMessage);
         $event = $entryApi->getEvent($domainEvent->getPlaceId());
 
         $this->deleteImageOnCdbItem($event, $domainEvent->getIndexToDelete());

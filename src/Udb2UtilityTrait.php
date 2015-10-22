@@ -7,6 +7,7 @@
 
 namespace CultuurNet\UDB3\UDB2;
 
+use Broadway\Domain\DomainMessage;
 use Broadway\Domain\Metadata;
 use CultureFeed_Cdb_Data_Address_PhysicalAddress;
 use CultureFeed_Cdb_Data_Calendar_BookingPeriod;
@@ -58,14 +59,17 @@ trait Udb2UtilityTrait
     }
 
     /**
-     * @param Metadata $metadata
+     * @param DomainMessage $domainMessage
      * @return EntryAPI
      */
-    public function createImprovedEntryAPIFromMetadata(Metadata $metadata)
+    public function createEntryAPI(DomainMessage $domainMessage)
     {
+        $metadata = $domainMessage->getMetadata();
         $metadata = $metadata->serialize();
         if (!isset($metadata['uitid_token_credentials'])) {
-            throw new RuntimeException('No token credentials found. They are needed to access the entry API, so aborting request.');
+            throw new RuntimeException(
+                'No token credentials found. They are needed to access the entry API, so aborting request.'
+            );
         }
 
         $tokenCredentials = $metadata['uitid_token_credentials'];
