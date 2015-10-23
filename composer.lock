@@ -507,12 +507,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/Entry.git",
-                "reference": "619cecda332b14bf9f92dedffcb717f62b3112ad"
+                "reference": "abc247dfd3b07cf6380199eb20b9af811e3b3d42"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/Entry/zipball/619cecda332b14bf9f92dedffcb717f62b3112ad",
-                "reference": "619cecda332b14bf9f92dedffcb717f62b3112ad",
+                "url": "https://api.github.com/repos/cultuurnet/Entry/zipball/abc247dfd3b07cf6380199eb20b9af811e3b3d42",
+                "reference": "abc247dfd3b07cf6380199eb20b9af811e3b3d42",
                 "shasum": ""
             },
             "require": {
@@ -549,7 +549,7 @@
                 }
             ],
             "description": "PHP library to access CultuurNet's Entry API",
-            "time": "2015-10-20 14:21:27"
+            "time": "2015-10-23 05:51:27"
         },
         {
             "name": "cultuurnet/search",
@@ -650,12 +650,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb3-php.git",
-                "reference": "18bcb2835121d489988a3a5c54dfcb993cf48a7b"
+                "reference": "12f9e4082973ceafb35c426d01a0756927027276"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/18bcb2835121d489988a3a5c54dfcb993cf48a7b",
-                "reference": "18bcb2835121d489988a3a5c54dfcb993cf48a7b",
+                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/12f9e4082973ceafb35c426d01a0756927027276",
+                "reference": "12f9e4082973ceafb35c426d01a0756927027276",
                 "shasum": ""
             },
             "require": {
@@ -721,7 +721,7 @@
                 }
             ],
             "description": "UDB3 PHP libraries",
-            "time": "2015-10-20 11:54:45"
+            "time": "2015-10-23 05:50:58"
         },
         {
             "name": "danielstjules/stringy",
@@ -3554,16 +3554,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "4.8.14",
+            "version": "4.8.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "b4900675926860bef091644849305399b986efa2"
+                "reference": "be8f7b9eacf8243940f8412f8b4a9a434c73dd7b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/b4900675926860bef091644849305399b986efa2",
-                "reference": "b4900675926860bef091644849305399b986efa2",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/be8f7b9eacf8243940f8412f8b4a9a434c73dd7b",
+                "reference": "be8f7b9eacf8243940f8412f8b4a9a434c73dd7b",
                 "shasum": ""
             },
             "require": {
@@ -3622,7 +3622,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2015-10-17 15:03:30"
+            "time": "2015-10-22 09:05:37"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
