@@ -172,7 +172,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         Unlabelled $unlabelled,
         DomainMessage $domainMessage
     ) {
-        $this->createEntryAPI($metadata)
+        $this->createEntryAPI($domainMessage)
             ->deleteKeyword(
                 $unlabelled->getEventId(),
                 $unlabelled->getLabel()
@@ -187,7 +187,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         TitleTranslated $domainEvent,
         DomainMessage $domainMessage
     ) {
-        $this->createEntryAPI($metadata)
+        $this->createEntryAPI($domainMessage)
             ->translateEventTitle(
                 $domainEvent->getEventId(),
                 $domainEvent->getLanguage(),
@@ -203,7 +203,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         DescriptionTranslated $domainEvent,
         DomainMessage $domainMessage
     ) {
-        $this->createEntryAPI($metadata)
+        $this->createEntryAPI($domainMessage)
             ->translateEventDescription(
                 $domainEvent->getEventId(),
                 $domainEvent->getLanguage(),
@@ -300,7 +300,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         $contactInfo = new CultureFeed_Cdb_Data_ContactInfo();
         $event->setContactInfo($contactInfo);
 
-        $this->createEntryAPI($metadata)
+        $this->createEntryAPI($domainMessage)
             ->createEvent($event);
     }
 
