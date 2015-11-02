@@ -650,12 +650,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb3-php.git",
-                "reference": "e194a6b00e5505450b4ea2cdcd04ba6c9b69ec3a"
+                "reference": "9f2240c421ee06a62278d4275c86403bdec9e605"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/e194a6b00e5505450b4ea2cdcd04ba6c9b69ec3a",
-                "reference": "e194a6b00e5505450b4ea2cdcd04ba6c9b69ec3a",
+                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/9f2240c421ee06a62278d4275c86403bdec9e605",
+                "reference": "9f2240c421ee06a62278d4275c86403bdec9e605",
                 "shasum": ""
             },
             "require": {
@@ -667,7 +667,7 @@
                 "cultuurnet/clock": "~0.1",
                 "cultuurnet/culturefeed-php": "~1.5",
                 "cultuurnet/deserializer": "~0.1",
-                "cultuurnet/entry": "~0.1",
+                "cultuurnet/entry": "dev-feature/III-481 as 0.1",
                 "cultuurnet/search": "~1.1",
                 "danielstjules/stringy": "~1.9",
                 "doctrine/dbal": "~2.4",
@@ -721,7 +721,7 @@
                 }
             ],
             "description": "UDB3 PHP libraries",
-            "time": "2015-11-02 12:35:10"
+            "time": "2015-11-02 13:20:45"
         },
         {
             "name": "danielstjules/stringy",
