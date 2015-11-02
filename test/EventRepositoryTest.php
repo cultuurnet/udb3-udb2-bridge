@@ -18,6 +18,8 @@ use CultuurNet\UDB3\Event\ReadModel\JSONLD\OrganizerServiceInterface;
 use CultuurNet\UDB3\Event\ReadModel\JSONLD\PlaceServiceInterface;
 use CultuurNet\UDB3\EventSourcing\ExecutionContextMetadataEnricher;
 use CultuurNet\UDB3\EventXmlString;
+use CultuurNet\UDB3\KeywordsString;
+use CultuurNet\UDB3\Label;
 use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\PlaceService;
 use PHPUnit_Framework_TestCase;
@@ -304,6 +306,52 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
             $eventXmlString,
             $cdbXmlNamespaceUri
         );
+
+        $this->repository->syncBackOn();
+        $this->repository->save($event);
+    }
+
+    /**
+     * @test
+     */
+    public function it_applies_labels()
+    {
+        $cdbXmlNamespaceUri = self::NS;
+
+        $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
+        $idString = new String($id);
+
+        $cdbXml = file_get_contents(__DIR__ . '/eventrepositorytest_event.xml');
+        $eventXmlString = new EventXmlString($cdbXml);
+
+        $event = Event::createFromCdbXml(
+            $idString,
+            $eventXmlString,
+            new String($cdbXmlNamespaceUri)
+        );
+
+        $this->repository->save($event);
+
+        $keywordsString = new KeywordsString(
+            file_get_contents(__DIR__ . '/KeywordsStringWithTwoKeywords.txt')
+        );
+
+        $event->applyLabels(
+            $idString,
+            $keywordsString
+        );
+
+        $expectedKeywords = [
+            new Label('Keyword B', true),
+            new Label('Keyword C', false)
+        ];
+
+        $this->entryAPI->expects($this->once())
+            ->method('addKeywords')
+            ->with(
+                $id,
+                $expectedKeywords
+            );
 
         $this->repository->syncBackOn();
         $this->repository->save($event);
