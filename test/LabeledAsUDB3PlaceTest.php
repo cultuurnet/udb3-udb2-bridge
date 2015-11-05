@@ -84,4 +84,19 @@ class LabeledAsUDB3PlaceTest extends \PHPUnit_Framework_TestCase
             $this->spec->isSatisfiedByEvent($event)
         );
     }
+
+    /**
+     * @test
+     */
+    public function it_gracefully_handles_invalid_keywords()
+    {
+        $event = $this->eventWith(
+            function (Event $e) {
+                $e->addKeyword('');
+                $e->addKeyword(';');
+            }
+        );
+
+        $this->assertFalse($this->spec->isSatisfiedByEvent($event));
+    }
 }
