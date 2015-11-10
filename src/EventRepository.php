@@ -42,6 +42,7 @@ use CultuurNet\UDB3\Event\Events\ImageAdded;
 use CultuurNet\UDB3\Event\Events\ImageDeleted;
 use CultuurNet\UDB3\Event\Events\ImageUpdated;
 use CultuurNet\UDB3\Event\Events\LabelsApplied;
+use CultuurNet\UDB3\Event\Events\LabelsMerged;
 use CultuurNet\UDB3\Event\Events\MajorInfoUpdated;
 use CultuurNet\UDB3\Event\Events\OrganizerDeleted;
 use CultuurNet\UDB3\Event\Events\OrganizerUpdated;
@@ -671,14 +672,14 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
             ->updateEventFromRawXml($eventId, (string)$eventXmlStringWithCdbid);
     }
 
-    public function applyLabelsApplied(
-        LabelsApplied $labelsApplied,
+    public function applyLabelsMerged(
+        LabelsMerged $labelsMerged,
         DomainMessage $domainMessage
     ) {
         $this->createEntryAPI($domainMessage)
             ->addKeywords(
-                $labelsApplied->getEventId()->toNative(),
-                $labelsApplied->getKeywordsString()->getLabels()
+                $labelsMerged->getEventId()->toNative(),
+                $labelsMerged->getLabels()->asArray()
             );
     }
 }
