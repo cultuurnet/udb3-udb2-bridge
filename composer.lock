@@ -507,12 +507,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/Entry.git",
-                "reference": "ba6f5ea1a94bacb7b01e8077e572ebfc2ef51bdb"
+                "reference": "0b16a19222fd84ff722f984e1fd316659e61a920"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/Entry/zipball/ba6f5ea1a94bacb7b01e8077e572ebfc2ef51bdb",
-                "reference": "ba6f5ea1a94bacb7b01e8077e572ebfc2ef51bdb",
+                "url": "https://api.github.com/repos/cultuurnet/Entry/zipball/0b16a19222fd84ff722f984e1fd316659e61a920",
+                "reference": "0b16a19222fd84ff722f984e1fd316659e61a920",
                 "shasum": ""
             },
             "require": {
@@ -549,7 +549,7 @@
                 }
             ],
             "description": "PHP library to access CultuurNet's Entry API",
-            "time": "2015-11-10 09:40:14"
+            "time": "2015-11-10 14:57:55"
         },
         {
             "name": "cultuurnet/search",
