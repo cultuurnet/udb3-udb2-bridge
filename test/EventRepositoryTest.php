@@ -20,6 +20,7 @@ use CultuurNet\UDB3\EventSourcing\ExecutionContextMetadataEnricher;
 use CultuurNet\UDB3\EventXmlString;
 use CultuurNet\UDB3\KeywordsString;
 use CultuurNet\UDB3\Label;
+use CultuurNet\UDB3\Language;
 use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\PlaceService;
 use PHPUnit_Framework_TestCase;
@@ -351,6 +352,55 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
             ->with(
                 $id,
                 $expectedKeywords
+            );
+
+        $this->repository->syncBackOn();
+        $this->repository->save($event);
+    }
+
+    /**
+     * @test
+     */
+    public function it_applies_a_translation()
+    {
+        $cdbXmlNamespaceUri = self::NS;
+
+        $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
+        $idString = new String($id);
+
+        $cdbXml = file_get_contents(__DIR__ . '/eventrepositorytest_event.xml');
+        $eventXmlString = new EventXmlString($cdbXml);
+
+        $event = Event::createFromCdbXml(
+            $idString,
+            $eventXmlString,
+            new String($cdbXmlNamespaceUri)
+        );
+
+        $this->repository->save($event);
+
+
+
+        $event->applyTranslation(
+            $idString,
+            new Language('en'),
+            new String('Title'),
+            new String('Short description'),
+            new String('Long long long extra long description')
+        );
+
+        $expectedFields = [
+            'title' => 'Title',
+            'shortdescription' => 'Short description',
+            'longdescription' => 'Long long long extra long description'
+        ];
+
+        $this->entryAPI->expects($this->once())
+            ->method('translate')
+            ->with(
+                $id,
+                new Language('en'),
+                $expectedFields
             );
 
         $this->repository->syncBackOn();

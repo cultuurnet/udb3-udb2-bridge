@@ -45,6 +45,7 @@ use CultuurNet\UDB3\Event\Events\LabelsApplied;
 use CultuurNet\UDB3\Event\Events\MajorInfoUpdated;
 use CultuurNet\UDB3\Event\Events\OrganizerDeleted;
 use CultuurNet\UDB3\Event\Events\OrganizerUpdated;
+use CultuurNet\UDB3\Event\Events\TranslationApplied;
 use CultuurNet\UDB3\Event\Events\TypicalAgeRangeDeleted;
 use CultuurNet\UDB3\Event\Events\TypicalAgeRangeUpdated;
 use CultuurNet\UDB3\Event\Events\Unlabelled;
@@ -210,6 +211,36 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
                 $domainEvent->getEventId(),
                 $domainEvent->getLanguage(),
                 $domainEvent->getDescription()
+            );
+    }
+
+    /**
+     * @param TranslationApplied $translationApplied
+     * @param DomainMessage $domainMessage
+     */
+    private function applyTranslationApplied(
+        TranslationApplied $translationApplied,
+        DomainMessage $domainMessage
+    ) {
+        $fields = [];
+
+        if ($translationApplied->getTitle()->toNative() !== null) {
+            $fields['title'] = $translationApplied->getTitle()->toNative();
+        }
+
+        if ($translationApplied->getShortDescription()->toNative() !== null) {
+            $fields['shortdescription'] = $translationApplied->getShortDescription()->toNative();
+        }
+
+        if ($translationApplied->getLongDescription()->toNative() !== null) {
+            $fields['longdescription'] = $translationApplied->getLongDescription()->toNative();
+        }
+
+        $this->createEntryAPI($domainMessage)
+            ->translate(
+                $translationApplied->getEventId()->toNative(),
+                $translationApplied->getLanguage(),
+                $fields
             );
     }
 
