@@ -18,9 +18,9 @@ use CultuurNet\UDB3\Event\ReadModel\JSONLD\OrganizerServiceInterface;
 use CultuurNet\UDB3\Event\ReadModel\JSONLD\PlaceServiceInterface;
 use CultuurNet\UDB3\EventSourcing\ExecutionContextMetadataEnricher;
 use CultuurNet\UDB3\EventXmlString;
-use CultuurNet\UDB3\KeywordsString;
 use CultuurNet\UDB3\Label;
 use CultuurNet\UDB3\Language;
+use CultuurNet\UDB3\LabelCollection;
 use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\PlaceService;
 use PHPUnit_Framework_TestCase;
@@ -333,19 +333,14 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
 
         $this->repository->save($event);
 
-        $keywordsString = new KeywordsString(
-            file_get_contents(__DIR__ . '/KeywordsStringWithTwoKeywords.txt')
-        );
-
-        $event->applyLabels(
-            $idString,
-            $keywordsString
-        );
-
         $expectedKeywords = [
             new Label('Keyword B', true),
             new Label('Keyword C', false)
         ];
+
+        $event->mergeLabels(
+            new LabelCollection($expectedKeywords)
+        );
 
         $this->entryAPI->expects($this->once())
             ->method('addKeywords')

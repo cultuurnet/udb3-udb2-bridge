@@ -84,4 +84,45 @@ class LabeledAsUDB3PlaceTest extends \PHPUnit_Framework_TestCase
             $this->spec->isSatisfiedByEvent($event)
         );
     }
+
+    public function invalidKeywordsProvider()
+    {
+        return [
+            [
+                [''],
+                false,
+            ],
+            [
+                [';'],
+                false,
+            ],
+            [
+                ['', 'udb3 place'],
+                true,
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider invalidKeywordsProvider
+     */
+    public function it_gracefully_handles_invalid_keywords(
+        $keywords,
+        $satisfied
+    )
+    {
+        $event = $this->eventWith(
+            function (Event $e) use ($keywords) {
+                foreach ($keywords as $keyword) {
+                    $e->addKeyword($keyword);
+                }
+            }
+        );
+
+        $this->assertEquals(
+            $satisfied,
+            $this->spec->isSatisfiedByEvent($event)
+        );
+    }
 }

@@ -8,6 +8,7 @@ namespace CultuurNet\UDB3\UDB2;
 use CultureFeed_Cdb_Item_Event;
 use CultuurNet\UDB3\Cdb\Event\SpecificationInterface;
 use CultuurNet\UDB3\Label;
+use InvalidArgumentException;
 
 class LabeledAsUDB3Place implements SpecificationInterface
 {
@@ -19,17 +20,36 @@ class LabeledAsUDB3Place implements SpecificationInterface
     {
         $keywords =  $event->getKeywords(true);
 
+        $labels = $this->labels($keywords);
+
         $UDB3PlaceLabel = new Label('UDB3 place');
 
-        /** @var \CultureFeed_Cdb_Data_Keyword $keyword */
-        foreach ($keywords as $keyword) {
-            $label = new Label($keyword->getValue());
-
+        foreach ($labels as $label) {
             if ($label->equals($UDB3PlaceLabel)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * @param \CultureFeed_Cdb_Data_Keyword[] $keywords
+     * @return Label[] $labels
+     */
+    private function labels($keywords)
+    {
+        $labels = [];
+
+        foreach ($keywords as $keyword) {
+            try {
+                $label = new Label($keyword->getValue());
+                $labels[] = $label;
+            } catch (\InvalidArgumentException $e) {
+                continue;
+            }
+        }
+
+        return $labels;
     }
 }
