@@ -24,6 +24,7 @@ use CultureFeed_Cdb_Default;
 use CultureFeed_Cdb_Item_Event;
 use CultuurNet\Entry\BookingPeriod;
 use CultuurNet\Entry\EntityType;
+use CultuurNet\Entry\Keyword;
 use CultuurNet\Entry\Language;
 use CultuurNet\Entry\Number;
 use CultuurNet\Entry\String;
@@ -40,6 +41,8 @@ use CultuurNet\UDB3\Event\Events\EventWasLabelled;
 use CultuurNet\UDB3\Event\Events\ImageAdded;
 use CultuurNet\UDB3\Event\Events\ImageDeleted;
 use CultuurNet\UDB3\Event\Events\ImageUpdated;
+use CultuurNet\UDB3\Event\Events\LabelsApplied;
+use CultuurNet\UDB3\Event\Events\LabelsMerged;
 use CultuurNet\UDB3\Event\Events\MajorInfoUpdated;
 use CultuurNet\UDB3\Event\Events\OrganizerDeleted;
 use CultuurNet\UDB3\Event\Events\OrganizerUpdated;
@@ -158,9 +161,9 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         DomainMessage $domainMessage
     ) {
         $this->createEntryAPI($domainMessage)
-            ->addKeyword(
+            ->addKeywords(
                 $labelled->getEventId(),
-                $labelled->getLabel()
+                array($labelled->getLabel())
             );
     }
 
@@ -667,5 +670,16 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         // Send to EntryApi UDB2.
         $this->createEntryAPI($domainMessage)
             ->updateEventFromRawXml($eventId, (string)$eventXmlStringWithCdbid);
+    }
+
+    public function applyLabelsMerged(
+        LabelsMerged $labelsMerged,
+        DomainMessage $domainMessage
+    ) {
+        $this->createEntryAPI($domainMessage)
+            ->addKeywords(
+                $labelsMerged->getEventId()->toNative(),
+                $labelsMerged->getLabels()->asArray()
+            );
     }
 }
