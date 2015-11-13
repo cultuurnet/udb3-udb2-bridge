@@ -225,15 +225,15 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
     ) {
         $fields = [];
 
-        if ($translationApplied->getTitle()->toNative() !== null) {
+        if ($translationApplied->getTitle() !== null) {
             $fields['title'] = $translationApplied->getTitle()->toNative();
         }
 
-        if ($translationApplied->getShortDescription()->toNative() !== null) {
+        if ($translationApplied->getShortDescription() !== null) {
             $fields['shortdescription'] = $translationApplied->getShortDescription()->toNative();
         }
 
-        if ($translationApplied->getLongDescription()->toNative() !== null) {
+        if ($translationApplied->getLongDescription() !== null) {
             $fields['longdescription'] = $translationApplied->getLongDescription()->toNative();
         }
 
