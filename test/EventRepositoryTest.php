@@ -374,8 +374,6 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
 
         $this->repository->save($event);
 
-
-
         $event->applyTranslation(
             $idString,
             new Language('en'),
