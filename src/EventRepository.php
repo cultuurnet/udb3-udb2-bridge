@@ -47,6 +47,7 @@ use CultuurNet\UDB3\Event\Events\MajorInfoUpdated;
 use CultuurNet\UDB3\Event\Events\OrganizerDeleted;
 use CultuurNet\UDB3\Event\Events\OrganizerUpdated;
 use CultuurNet\UDB3\Event\Events\TranslationApplied;
+use CultuurNet\UDB3\Event\Events\TranslationDeleted;
 use CultuurNet\UDB3\Event\Events\TypicalAgeRangeDeleted;
 use CultuurNet\UDB3\Event\Events\TypicalAgeRangeUpdated;
 use CultuurNet\UDB3\Event\Events\Unlabelled;
@@ -242,6 +243,21 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
                 $translationApplied->getEventId()->toNative(),
                 $translationApplied->getLanguage(),
                 $fields
+            );
+    }
+
+    /**
+     * @param TranslationDeleted $translationDeleted
+     * @param DomainMessage $domainMessage
+     */
+    private function applyTranslationDeleted(
+        TranslationDeleted $translationDeleted,
+        DomainMessage $domainMessage
+    ) {
+        $this->createEntryAPI($domainMessage)
+            ->deleteTranslation(
+                $translationDeleted->getEventId()->toNative(),
+                $translationDeleted->getLanguage()
             );
     }
 
