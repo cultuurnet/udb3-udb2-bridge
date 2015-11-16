@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d2eea936689182429d45d4dd80958a83",
-    "content-hash": "5957d10fccef55c68ebc266d22310734",
+    "hash": "efa41289cafed2d7f8d462968f60b112",
+    "content-hash": "e95a4763e3de9057418777fa953730b7",
     "packages": [
         {
             "name": "beberlei/assert",
@@ -506,22 +506,22 @@
         },
         {
             "name": "cultuurnet/entry",
-            "version": "dev-feature/III-482",
+            "version": "dev-feature/III-483",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/Entry.git",
-                "reference": "0c12006d58701d3a66afd61ab45a42b7bbd1bccd"
+                "reference": "b7b9d659f0f77afbabd1697250c2a672080c635a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/Entry/zipball/0c12006d58701d3a66afd61ab45a42b7bbd1bccd",
-                "reference": "0c12006d58701d3a66afd61ab45a42b7bbd1bccd",
+                "url": "https://api.github.com/repos/cultuurnet/Entry/zipball/b7b9d659f0f77afbabd1697250c2a672080c635a",
+                "reference": "b7b9d659f0f77afbabd1697250c2a672080c635a",
                 "shasum": ""
             },
             "require": {
                 "cultuurnet/auth": "~1.2",
                 "cultuurnet/cdb": "~2",
-                "php": ">=5.4.0"
+                "php": ">=5.5.0"
             },
             "require-dev": {
                 "guzzle/plugin-mock": "~3.9.2",
@@ -552,7 +552,7 @@
                 }
             ],
             "description": "PHP library to access CultuurNet's Entry API",
-            "time": "2015-11-13 08:40:09"
+            "time": "2015-11-16 15:46:52"
         },
         {
             "name": "cultuurnet/search",
@@ -649,16 +649,16 @@
         },
         {
             "name": "cultuurnet/udb3",
-            "version": "dev-feature/III-482",
+            "version": "dev-feature/III-483",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb3-php.git",
-                "reference": "7cbd9418476e1291d2565e0c8d2270ce01549750"
+                "reference": "0be87fd6aef999504f8ecd3514da1826d9e97799"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/7cbd9418476e1291d2565e0c8d2270ce01549750",
-                "reference": "7cbd9418476e1291d2565e0c8d2270ce01549750",
+                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/0be87fd6aef999504f8ecd3514da1826d9e97799",
+                "reference": "0be87fd6aef999504f8ecd3514da1826d9e97799",
                 "shasum": ""
             },
             "require": {
@@ -670,7 +670,7 @@
                 "cultuurnet/clock": "~0.1",
                 "cultuurnet/culturefeed-php": "~1.5",
                 "cultuurnet/deserializer": "~0.1",
-                "cultuurnet/entry": "dev-feature/III-482 as 0.1",
+                "cultuurnet/entry": "~0.1",
                 "cultuurnet/search": "~1.1",
                 "danielstjules/stringy": "~1.9",
                 "doctrine/dbal": "~2.4",
@@ -724,7 +724,7 @@
                 }
             ],
             "description": "UDB3 PHP libraries",
-            "time": "2015-11-13 15:11:45"
+            "time": "2015-11-16 15:55:21"
         },
         {
             "name": "danielstjules/stringy",
@@ -4390,13 +4390,13 @@
         {
             "alias": "0.1",
             "alias_normalized": "0.1.0.0",
-            "version": "dev-feature/III-482",
+            "version": "dev-feature/III-483",
             "package": "cultuurnet/udb3"
         },
         {
             "alias": "0.1",
             "alias_normalized": "0.1.0.0",
-            "version": "dev-feature/III-482",
+            "version": "dev-feature/III-483",
             "package": "cultuurnet/entry"
         }
     ],
