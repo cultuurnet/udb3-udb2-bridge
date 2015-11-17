@@ -510,12 +510,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/Entry.git",
-                "reference": "cbe06043ac936c50301bf98394ee0bba2673b947"
+                "reference": "bdd72cf7af24696da67399c7dab33a95dfea23b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/Entry/zipball/cbe06043ac936c50301bf98394ee0bba2673b947",
-                "reference": "cbe06043ac936c50301bf98394ee0bba2673b947",
+                "url": "https://api.github.com/repos/cultuurnet/Entry/zipball/bdd72cf7af24696da67399c7dab33a95dfea23b0",
+                "reference": "bdd72cf7af24696da67399c7dab33a95dfea23b0",
                 "shasum": ""
             },
             "require": {
@@ -552,7 +552,7 @@
                 }
             ],
             "description": "PHP library to access CultuurNet's Entry API",
-            "time": "2015-11-13 16:28:48"
+            "time": "2015-11-17 10:58:46"
         },
         {
             "name": "cultuurnet/search",
@@ -653,12 +653,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb3-php.git",
-                "reference": "2828fe0ef2d060d202b101c95a344503c62fccd9"
+                "reference": "ed8df4ac6ccb0f5a6072470632273ad2a73e50f1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/2828fe0ef2d060d202b101c95a344503c62fccd9",
-                "reference": "2828fe0ef2d060d202b101c95a344503c62fccd9",
+                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/ed8df4ac6ccb0f5a6072470632273ad2a73e50f1",
+                "reference": "ed8df4ac6ccb0f5a6072470632273ad2a73e50f1",
                 "shasum": ""
             },
             "require": {
@@ -724,7 +724,7 @@
                 }
             ],
             "description": "UDB3 PHP libraries",
-            "time": "2015-11-16 19:17:49"
+            "time": "2015-11-17 12:03:24"
         },
         {
             "name": "danielstjules/stringy",

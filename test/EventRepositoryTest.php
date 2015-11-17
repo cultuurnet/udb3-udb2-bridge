@@ -398,4 +398,40 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
         $this->repository->syncBackOn();
         $this->repository->save($event);
     }
+
+    /**
+     * @test
+     */
+    public function it_deletes_a_translation()
+    {
+        $cdbXmlNamespaceUri = self::NS;
+
+        $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
+        $idString = new String($id);
+
+        $cdbXml = file_get_contents(__DIR__ . '/eventrepositorytest_event.xml');
+        $eventXmlString = new EventXmlString($cdbXml);
+
+        $event = Event::createFromCdbXml(
+            $idString,
+            $eventXmlString,
+            new String($cdbXmlNamespaceUri)
+        );
+
+        $this->repository->save($event);
+
+        $event->deleteTranslation(
+            new Language('en')
+        );
+
+        $this->entryAPI->expects($this->once())
+            ->method('deleteTranslation')
+            ->with(
+                $id,
+                new Language('en')
+            );
+
+        $this->repository->syncBackOn();
+        $this->repository->save($event);
+    }
 }
