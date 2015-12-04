@@ -1,11 +1,9 @@
 <?php
-/**
- * @file
- */
 
 namespace CultuurNet\UDB3\UDB2;
 
-class EventNotFoundException extends \RuntimeException
-{
+use CultuurNet\UDB3\EventNotFoundException as UDB3EventNotFoundException;
 
+class EventNotFoundException extends UDB3EventNotFoundException
+{
 }
