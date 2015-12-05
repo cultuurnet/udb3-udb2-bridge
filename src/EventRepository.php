@@ -384,31 +384,43 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         $this->setCalendar($infoUpdated->getCalendar(), $event);
 
         $categories = $event->getCategories();
+        $newCategories = new CultureFeed_Cdb_Data_CategoryList();
+
+        $typesToDrop = ['eventtype', 'theme'];
         foreach ($categories as $key => $category) {
-            if ($category->getType() == 'eventtype' || $category->getType() == 'theme') {
-                $categories->delete($key);
+            $categoryHasToBeDropped = in_array(
+                $category->getType(),
+                $typesToDrop
+            );
+
+            if ($categoryHasToBeDropped) {
+                continue;
             }
+
+            $newCategories->add($category);
         }
 
-        $eventType = new CultureFeed_Cdb_Data_Category(
-            'eventtype',
-            $infoUpdated->getEventType()->getId(),
-            $infoUpdated->getEventType()->getLabel()
+        $newCategories->add(
+            new CultureFeed_Cdb_Data_Category(
+                'eventtype',
+                $infoUpdated->getEventType()->getId(),
+                $infoUpdated->getEventType()->getLabel()
+            )
         );
-        $event->getCategories()->add($eventType);
 
         if ($infoUpdated->getTheme() !== null) {
-            $theme = new CultureFeed_Cdb_Data_Category(
-                'theme',
-                $infoUpdated->getTheme()->getId(),
-                $infoUpdated->getTheme()->getLabel()
+            $newCategories->add(
+                new CultureFeed_Cdb_Data_Category(
+                    'theme',
+                    $infoUpdated->getTheme()->getId(),
+                    $infoUpdated->getTheme()->getLabel()
+                )
             );
-            $event->getCategories()->add($theme);
         }
 
+        $event->setCategories($categories);
 
         $entryApi->updateEvent($event);
-
     }
 
     /**
