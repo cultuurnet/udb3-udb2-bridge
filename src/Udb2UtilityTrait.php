@@ -8,7 +8,6 @@
 namespace CultuurNet\UDB3\UDB2;
 
 use Broadway\Domain\DomainMessage;
-use Broadway\Domain\Metadata;
 use CultureFeed_Cdb_Data_Address_PhysicalAddress;
 use CultureFeed_Cdb_Data_Calendar_BookingPeriod;
 use CultureFeed_Cdb_Data_Calendar_OpeningTime;
@@ -32,10 +31,9 @@ use CultuurNet\Entry\EntryAPI;
 use CultuurNet\UDB3\Address;
 use CultuurNet\UDB3\BookingInfo;
 use CultuurNet\UDB3\Calendar;
+use CultuurNet\UDB3\CalendarInterface;
 use CultuurNet\UDB3\ContactPoint;
-use CultuurNet\UDB3\Event\Events\EventCreated;
 use CultuurNet\UDB3\MediaObject;
-use CultuurNet\UDB3\Place\Events\PlaceCreated;
 use DateTime;
 use Zend\Validator\Exception\RuntimeException;
 
@@ -93,16 +91,13 @@ trait Udb2UtilityTrait
     }
 
     /**
-     * Set the calendar on the cdb event based on an eventCreated event.
+     * Set the Calendar on the cdb event.
      *
-     * @param EventCreated|PlaceCreated $createdEvent
+     * @param CalendarInterface $eventCalendar
      * @param CultureFeed_Cdb_Item_Event $cdbEvent
      */
-    public function setCalendarForItemCreated($createdEvent, CultureFeed_Cdb_Item_Event $cdbEvent)
+    public function setCalendar(CalendarInterface $eventCalendar, CultureFeed_Cdb_Item_Event $cdbEvent)
     {
-
-        $eventCalendar = $createdEvent->getCalendar();
-
         // Store opening hours.
         $openingHours = $eventCalendar->getOpeningHours();
         $weekScheme = null;

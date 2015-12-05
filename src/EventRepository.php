@@ -53,6 +53,7 @@ use CultuurNet\UDB3\Event\Events\TypicalAgeRangeUpdated;
 use CultuurNet\UDB3\Event\Events\Unlabelled;
 use CultuurNet\UDB3\Event\TitleTranslated;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
+use CultuurNet\UDB3\Location;
 use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\PlaceService;
 use Psr\Log\LoggerAwareInterface;
@@ -325,8 +326,8 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         $event->setDetails($details);
 
         // Set location and calendar info.
-        $this->setLocationForEventCreated($eventCreated, $event);
-        $this->setCalendarForItemCreated($eventCreated, $event);
+        $this->setLocation($eventCreated->getLocation(), $event);
+        $this->setCalendar($eventCreated->getCalendar(), $event);
 
         // Set event type and theme.
         $event->setCategories(new CultureFeed_Cdb_Data_CategoryList());
@@ -376,14 +377,12 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         MajorInfoUpdated $infoUpdated,
         DomainMessage $domainMessage
     ) {
-
         $entryApi = $this->createEntryAPI($domainMessage);
         $event = $entryApi->getEvent($infoUpdated->getEventId());
 
-        $this->setLocationForEventCreated($infoUpdated, $event);
-        $this->setCalendarForItemCreated($infoUpdated, $event);
+        $this->setLocation($infoUpdated->getLocation(), $event);
+        $this->setCalendar($infoUpdated->getCalendar(), $event);
 
-        // Set event type and theme.
         $categories = $event->getCategories();
         foreach ($categories as $key => $category) {
             if ($category->getType() == 'eventtype' || $category->getType() == 'theme') {
@@ -641,16 +640,14 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
     /**
      * Set the location on the cdb event based on an eventCreated event.
      *
-     * @param EventCreated $eventCreated
+     * @param Location $eventLocation
      * @param CultureFeed_Cdb_Item_Event $cdbEvent
+     * @throws \CultuurNet\UDB3\EntityNotFoundException
      */
-    private function setLocationForEventCreated(EventCreated $eventCreated, CultureFeed_Cdb_Item_Event $cdbEvent)
+    private function setLocation(Location $eventLocation, CultureFeed_Cdb_Item_Event $cdbEvent)
     {
-
-        $placeEntity = $this->placeService->getEntity($eventCreated->getLocation()->getCdbid());
+        $placeEntity = $this->placeService->getEntity($eventLocation->getCdbid());
         $place = json_decode($placeEntity);
-
-        $eventLocation = $eventCreated->getLocation();
 
         $physicalAddress = new CultureFeed_Cdb_Data_Address_PhysicalAddress();
         $physicalAddress->setCountry($place->address->addressCountry);

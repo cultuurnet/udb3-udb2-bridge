@@ -158,7 +158,6 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
      */
     public function applyPlaceCreated(PlaceCreated $placeCreated, DomainMessage $domainMessage)
     {
-
         $event = new CultureFeed_Cdb_Item_Event();
         $event->setCdbId($placeCreated->getPlaceId());
         $event->addKeyword('UDB3 place');
@@ -173,7 +172,7 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
 
         // Set location and calendar info.
         $this->setLocationForPlaceCreated($placeCreated, $event);
-        $this->setCalendarForItemCreated($placeCreated, $event);
+        $this->setCalendar($placeCreated->getCalendar(), $event);
 
         // Set event type and theme.
         $event->setCategories(new CultureFeed_Cdb_Data_CategoryList());
@@ -245,7 +244,7 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
         $entryApi = $this->createEntryAPI($domainMessage);
         $event = $entryApi->getEvent($infoUpdated->getPlaceId());
 
-        $this->setCalendarForItemCreated($infoUpdated, $event);
+        $this->setCalendar($infoUpdated->getCalendar(), $event);
 
         // Set event type and theme.
         $categories = $event->getCategories();
