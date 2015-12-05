@@ -8,7 +8,6 @@ namespace CultuurNet\UDB3\UDB2;
 use Broadway\Domain\AggregateRoot;
 use Broadway\Domain\DomainEventStream;
 use Broadway\Domain\DomainMessage;
-use Broadway\Domain\Metadata;
 use Broadway\EventSourcing\EventStreamDecoratorInterface;
 use Broadway\Repository\AggregateNotFoundException;
 use Broadway\Repository\RepositoryInterface;
@@ -20,11 +19,9 @@ use CultureFeed_Cdb_Data_ContactInfo;
 use CultureFeed_Cdb_Data_EventDetail;
 use CultureFeed_Cdb_Data_EventDetailList;
 use CultureFeed_Cdb_Data_Location;
-use CultureFeed_Cdb_Default;
 use CultureFeed_Cdb_Item_Event;
 use CultuurNet\Entry\BookingPeriod;
 use CultuurNet\Entry\EntityType;
-use CultuurNet\Entry\Keyword;
 use CultuurNet\Entry\Language;
 use CultuurNet\Entry\Number;
 use CultuurNet\Entry\String;
@@ -418,7 +415,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
             );
         }
 
-        $event->setCategories($categories);
+        $event->setCategories($newCategories);
 
         $entryApi->updateEvent($event);
     }
