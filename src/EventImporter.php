@@ -5,8 +5,8 @@
 
 namespace CultuurNet\UDB3\UDB2;
 
-use Broadway\Domain\DomainMessage;
 use Broadway\EventHandling\EventListenerInterface;
+use Broadway\EventStore\EventStoreException;
 use Broadway\Repository\AggregateNotFoundException;
 use Broadway\Repository\RepositoryInterface;
 use CultuurNet\UDB2DomainEvents\EventCreated;
@@ -19,7 +19,6 @@ use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\PlaceService;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use Psr\Log\LoggerTrait;
 use Psr\Log\NullLogger;
 
 /**
@@ -134,12 +133,23 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
 
         $this->importDependencies($eventXml);
 
-        $event->updateWithCdbXml(
-            $eventXml,
-            $this->cdbXmlService->getCdbXmlNamespaceUri()
-        );
+        $updated = false;
+        do {
+            try {
+                $event->updateWithCdbXml(
+                    $eventXml,
+                    $this->cdbXmlService->getCdbXmlNamespaceUri()
+                );
 
-        $this->repository->save($event);
+                $this->repository->save($event);
+
+                $updated = true;
+            } catch (EventStoreException $e) {
+                // Collision with another change. Reload the event from the
+                // event store and retry.
+                $event = $this->loadEvent($eventId);
+            }
+        } while (!$updated);
 
         $this->logger->info(
             'Event updated in UDB3',
