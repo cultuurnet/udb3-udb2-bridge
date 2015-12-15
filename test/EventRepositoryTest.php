@@ -256,18 +256,9 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
             ->method('createEventFromRawXml')
             ->with($expectedXmlStringArgument);
 
-        $cdbXmlNamespaceUri = new String(self::NS);
-
-        $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $idString = new String($id);
-
-        $cdbXml = file_get_contents(__DIR__ . '/eventrepositorytest_event.xml');
-        $eventXmlString = new EventXmlString($cdbXml);
-
-        $event = Event::createFromCdbXml(
-            $idString,
-            $eventXmlString,
-            $cdbXmlNamespaceUri
+        $event = $this->createEvent(
+            'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1',
+            'eventrepositorytest_event.xml'
         );
 
         $this->repository->syncBackOn();
@@ -279,33 +270,28 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
      */
     public function it_updates_an_event_from_cdbxml()
     {
-        $expectedEventId = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
+        $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
+
         $expectedXmlStringArgument = file_get_contents(__DIR__ . '/eventrepositorytest_event_with_cdbid.xml');
 
-        $cdbXmlNamespaceUri = new String(self::NS);
-
-        $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $idString = new String($id);
+        $this->entryAPI->expects($this->once())
+            ->method('updateEventFromRawXml')
+            ->with($id, $expectedXmlStringArgument);
 
         $cdbXml = file_get_contents(__DIR__ . '/eventrepositorytest_event.xml');
-        $eventXmlString = new EventXmlString($cdbXml);
 
         $event = Event::createFromCdbXml(
-            $idString,
-            $eventXmlString,
-            $cdbXmlNamespaceUri
+            new String($id),
+            new EventXmlString($cdbXml),
+            new String(self::NS)
         );
 
         $this->repository->save($event);
 
-        $this->entryAPI->expects($this->once())
-            ->method('updateEventFromRawXml')
-            ->with($expectedEventId, $expectedXmlStringArgument);
-
         $event->updateFromCdbXml(
-            $idString,
-            $eventXmlString,
-            $cdbXmlNamespaceUri
+            new String($id),
+            new EventXmlString($cdbXml),
+            new String(self::NS)
         );
 
         $this->repository->syncBackOn();
@@ -317,19 +303,8 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
      */
     public function it_applies_labels()
     {
-        $cdbXmlNamespaceUri = self::NS;
-
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $idString = new String($id);
-
-        $cdbXml = file_get_contents(__DIR__ . '/eventrepositorytest_event.xml');
-        $eventXmlString = new EventXmlString($cdbXml);
-
-        $event = Event::createFromCdbXml(
-            $idString,
-            $eventXmlString,
-            new String($cdbXmlNamespaceUri)
-        );
+        $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
 
         $this->repository->save($event);
 
@@ -358,19 +333,8 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
      */
     public function it_applies_a_translation()
     {
-        $cdbXmlNamespaceUri = self::NS;
-
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $idString = new String($id);
-
-        $cdbXml = file_get_contents(__DIR__ . '/eventrepositorytest_event.xml');
-        $eventXmlString = new EventXmlString($cdbXml);
-
-        $event = Event::createFromCdbXml(
-            $idString,
-            $eventXmlString,
-            new String($cdbXmlNamespaceUri)
-        );
+        $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
 
         $this->repository->save($event);
 
@@ -404,19 +368,8 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
      */
     public function it_deletes_a_translation()
     {
-        $cdbXmlNamespaceUri = self::NS;
-
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $idString = new String($id);
-
-        $cdbXml = file_get_contents(__DIR__ . '/eventrepositorytest_event.xml');
-        $eventXmlString = new EventXmlString($cdbXml);
-
-        $event = Event::createFromCdbXml(
-            $idString,
-            $eventXmlString,
-            new String($cdbXmlNamespaceUri)
-        );
+        $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
 
         $event->applyTranslation(
             new Language('en'),
@@ -438,5 +391,25 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
 
         $this->repository->syncBackOn();
         $this->repository->save($event);
+    }
+
+    /**
+     * @param string $id
+     * @param string $xmlFile
+     * @param string $ns
+     * @return Event
+     */
+    private function createEvent(
+        $id,
+        $xmlFile,
+        $ns = self::NS
+    ) {
+        $cdbXml = file_get_contents(__DIR__ . '/' . $xmlFile);
+
+        return Event::createFromCdbXml(
+            new String((string) $id),
+            new EventXmlString($cdbXml),
+            new String((string) $ns)
+        );
     }
 }
