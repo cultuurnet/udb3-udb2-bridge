@@ -12,6 +12,7 @@ use CultuurNet\Auth\TokenCredentials;
 use CultuurNet\Entry\EntryAPI;
 use CultuurNet\UDB3\BookingInfo;
 use CultuurNet\UDB3\Cdb\EventItemFactory;
+use CultuurNet\UDB3\CollaborationData;
 use CultuurNet\UDB3\EntityServiceInterface;
 use CultuurNet\UDB3\Event\Event;
 use CultuurNet\UDB3\Event\ReadModel\JSONLD\OrganizerServiceInterface;
@@ -26,6 +27,7 @@ use CultuurNet\UDB3\PlaceService;
 use PHPUnit_Framework_TestCase;
 use CultureFeed_Cdb_Data_ContactInfo;
 use ValueObjects\String\String;
+use ValueObjects\Web\Url;
 
 class EventRepositoryTest extends PHPUnit_Framework_TestCase
 {
@@ -387,6 +389,55 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
             ->with(
                 $id,
                 new Language('en')
+            );
+
+        $this->repository->syncBackOn();
+        $this->repository->save($event);
+    }
+
+    /**
+     * @test
+     */
+    public function it_adds_collaboration_data()
+    {
+        $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
+        $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
+
+        $this->repository->save($event);
+
+        $collaborationData = (new CollaborationData(
+            new String('sub-brand-foo')
+        ))
+            ->withTitle(new String('Title'))
+            ->withText(new String('Text'))
+            ->withArticle(new String('Article'))
+            ->withKeyword(new String('Keyword'))
+            ->withImage(new String('Image'))
+            ->withLink(Url::fromNative('http://google.com'))
+            ->withCopyright(new String('Copyright'));
+
+        $event->addCollaborationData(
+            new Language('en'),
+            $collaborationData
+        );
+
+        $expectedDescription = [
+            'text' => 'Text',
+            'keyword' => 'Keyword',
+            'article' => 'Article',
+            'image' => 'Image',
+        ];
+
+        $this->entryAPI->expects($this->once())
+            ->method('createCollaborationLink')
+            ->with(
+                $id,
+                'en',
+                'sub-brand-foo',
+                json_encode($expectedDescription),
+                'Title',
+                'Copyright',
+                'http://google.com'
             );
 
         $this->repository->syncBackOn();

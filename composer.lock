@@ -4,9 +4,59 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6c82628321f97a1e93f4b5e47d9e0f5e",
-    "content-hash": "21b913ffed9de1232feb566e6c2ba426",
+    "hash": "d13993d7989722a4d9f78af5baed6733",
+    "content-hash": "76b810df092dd12e2a2f1fe98a021b7e",
     "packages": [
+        {
+            "name": "2dotstwice/collection",
+            "version": "dev-feature/III-484",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/2dotstwice/php-collection.git",
+                "reference": "87b27bee8e14771414233ba4c857d63101d97b67"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/2dotstwice/php-collection/zipball/87b27bee8e14771414233ba4c857d63101d97b67",
+                "reference": "87b27bee8e14771414233ba4c857d63101d97b67",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5"
+            },
+            "require-dev": {
+                "phing/phing": "~2.11",
+                "phpunit/php-token-stream": "1.4.6",
+                "phpunit/phpunit": "~4.8",
+                "satooshi/php-coveralls": "~0.7",
+                "squizlabs/php_codesniffer": "~2.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "TwoDotsTwice\\Collection\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Bert Ramakers",
+                    "email": "bert@2dotstwice.be",
+                    "homepage": "http://2dotstwice.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": " Library for creating collection classes with strict typing.",
+            "time": "2015-12-14 15:21:02"
+        },
         {
             "name": "beberlei/assert",
             "version": "v2.4",
@@ -506,16 +556,16 @@
         },
         {
             "name": "cultuurnet/entry",
-            "version": "dev-master",
+            "version": "dev-feature/III-484",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/Entry.git",
-                "reference": "bdd72cf7af24696da67399c7dab33a95dfea23b0"
+                "reference": "5961f43ba9adb8a3ce28f4b90619995fc2980dfe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/Entry/zipball/bdd72cf7af24696da67399c7dab33a95dfea23b0",
-                "reference": "bdd72cf7af24696da67399c7dab33a95dfea23b0",
+                "url": "https://api.github.com/repos/cultuurnet/Entry/zipball/5961f43ba9adb8a3ce28f4b90619995fc2980dfe",
+                "reference": "5961f43ba9adb8a3ce28f4b90619995fc2980dfe",
                 "shasum": ""
             },
             "require": {
@@ -552,7 +602,7 @@
                 }
             ],
             "description": "PHP library to access CultuurNet's Entry API",
-            "time": "2015-11-17 10:58:46"
+            "time": "2015-12-15 16:34:04"
         },
         {
             "name": "cultuurnet/search",
@@ -649,19 +699,20 @@
         },
         {
             "name": "cultuurnet/udb3",
-            "version": "dev-master",
+            "version": "dev-feature/III-484",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb3-php.git",
-                "reference": "b0fe8918c6dbefcbea57906365e96578ba3692a4"
+                "reference": "3fa02b2c4c8421b379d7331667a1be0bdc07c179"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/b0fe8918c6dbefcbea57906365e96578ba3692a4",
-                "reference": "b0fe8918c6dbefcbea57906365e96578ba3692a4",
+                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/3fa02b2c4c8421b379d7331667a1be0bdc07c179",
+                "reference": "3fa02b2c4c8421b379d7331667a1be0bdc07c179",
                 "shasum": ""
             },
             "require": {
+                "2dotstwice/collection": "dev-feature/III-484 as 1.0",
                 "broadway/broadway": "~0.5.2",
                 "chrisboulton/php-resque": "~1.2",
                 "cultuurnet/auth": "~1.2",
@@ -724,7 +775,7 @@
                 }
             ],
             "description": "UDB3 PHP libraries",
-            "time": "2015-12-11 11:57:40"
+            "time": "2015-12-14 16:30:45"
         },
         {
             "name": "danielstjules/stringy",
@@ -4173,9 +4224,25 @@
             "time": "2015-11-30 12:36:17"
         }
     ],
-    "aliases": [],
+    "aliases": [
+        {
+            "alias": "0.1",
+            "alias_normalized": "0.1.0.0",
+            "version": "dev-feature/III-484",
+            "package": "cultuurnet/udb3"
+        },
+        {
+            "alias": "0.1",
+            "alias_normalized": "0.1.0.0",
+            "version": "dev-feature/III-484",
+            "package": "cultuurnet/entry"
+        }
+    ],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "cultuurnet/udb3": 20,
+        "cultuurnet/entry": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
