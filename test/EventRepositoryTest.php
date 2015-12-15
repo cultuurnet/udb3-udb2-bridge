@@ -418,6 +418,11 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
             new String($cdbXmlNamespaceUri)
         );
 
+        $event->applyTranslation(
+            new Language('en'),
+            new String('Some english translated title')
+        );
+
         $this->repository->save($event);
 
         $event->deleteTranslation(
