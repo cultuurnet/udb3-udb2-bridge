@@ -287,6 +287,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
                 $collaborationDataAdded->getLanguage()->getCode(),
                 (string) $collaborationData->getSubBrand(),
                 $encodedDescription,
+                (string) $collaborationData->getPlainText(),
                 (string) $collaborationData->getTitle(),
                 (string) $collaborationData->getCopyright(),
                 (string) $collaborationData->getLink()
