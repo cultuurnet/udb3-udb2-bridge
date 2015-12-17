@@ -406,7 +406,8 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
         $this->repository->save($event);
 
         $collaborationData = (new CollaborationData(
-            new String('sub-brand-foo')
+            new String('sub-brand-foo'),
+            new String('some plain text')
         ))
             ->withTitle(new String('Title'))
             ->withText(new String('Text'))
@@ -435,6 +436,7 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
                 'en',
                 'sub-brand-foo',
                 json_encode($expectedDescription),
+                'some plain text',
                 'Title',
                 'Copyright',
                 'http://google.com'

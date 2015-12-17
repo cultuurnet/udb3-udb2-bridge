@@ -9,16 +9,16 @@
     "packages": [
         {
             "name": "2dotstwice/collection",
-            "version": "dev-feature/III-484",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/2dotstwice/php-collection.git",
-                "reference": "87b27bee8e14771414233ba4c857d63101d97b67"
+                "reference": "d681e91e6441b68e6abad4f2634cda869cefafc9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/2dotstwice/php-collection/zipball/87b27bee8e14771414233ba4c857d63101d97b67",
-                "reference": "87b27bee8e14771414233ba4c857d63101d97b67",
+                "url": "https://api.github.com/repos/2dotstwice/php-collection/zipball/d681e91e6441b68e6abad4f2634cda869cefafc9",
+                "reference": "d681e91e6441b68e6abad4f2634cda869cefafc9",
                 "shasum": ""
             },
             "require": {
@@ -55,7 +55,7 @@
                 }
             ],
             "description": " Library for creating collection classes with strict typing.",
-            "time": "2015-12-14 15:21:02"
+            "time": "2015-12-16 09:28:40"
         },
         {
             "name": "beberlei/assert",
@@ -560,12 +560,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/Entry.git",
-                "reference": "5961f43ba9adb8a3ce28f4b90619995fc2980dfe"
+                "reference": "90f6a5d7efed54d5b105da4c22411f6f82df0edc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/Entry/zipball/5961f43ba9adb8a3ce28f4b90619995fc2980dfe",
-                "reference": "5961f43ba9adb8a3ce28f4b90619995fc2980dfe",
+                "url": "https://api.github.com/repos/cultuurnet/Entry/zipball/90f6a5d7efed54d5b105da4c22411f6f82df0edc",
+                "reference": "90f6a5d7efed54d5b105da4c22411f6f82df0edc",
                 "shasum": ""
             },
             "require": {
@@ -602,7 +602,7 @@
                 }
             ],
             "description": "PHP library to access CultuurNet's Entry API",
-            "time": "2015-12-15 16:34:04"
+            "time": "2015-12-17 12:05:06"
         },
         {
             "name": "cultuurnet/search",
@@ -703,16 +703,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb3-php.git",
-                "reference": "3fa02b2c4c8421b379d7331667a1be0bdc07c179"
+                "reference": "ac88e334d3a071c7c408e7cfa854bf62659a008c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/3fa02b2c4c8421b379d7331667a1be0bdc07c179",
-                "reference": "3fa02b2c4c8421b379d7331667a1be0bdc07c179",
+                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/ac88e334d3a071c7c408e7cfa854bf62659a008c",
+                "reference": "ac88e334d3a071c7c408e7cfa854bf62659a008c",
                 "shasum": ""
             },
             "require": {
-                "2dotstwice/collection": "dev-feature/III-484 as 1.0",
+                "2dotstwice/collection": "~1.1",
                 "broadway/broadway": "~0.5.2",
                 "chrisboulton/php-resque": "~1.2",
                 "cultuurnet/auth": "~1.2",
@@ -775,7 +775,7 @@
                 }
             ],
             "description": "UDB3 PHP libraries",
-            "time": "2015-12-14 16:30:45"
+            "time": "2015-12-17 12:19:50"
         },
         {
             "name": "danielstjules/stringy",
