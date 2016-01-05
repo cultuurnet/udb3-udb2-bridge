@@ -28,6 +28,7 @@ use CultuurNet\Entry\String;
 use CultuurNet\UDB3\Event\DescriptionTranslated;
 use CultuurNet\UDB3\Event\Event;
 use CultuurNet\UDB3\Event\Events\BookingInfoUpdated;
+use CultuurNet\UDB3\Event\Events\CollaborationDataAdded;
 use CultuurNet\UDB3\Event\Events\ContactPointUpdated;
 use CultuurNet\UDB3\Event\Events\DescriptionUpdated;
 use CultuurNet\UDB3\Event\Events\EventCreated;
@@ -256,6 +257,40 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
             ->deleteTranslation(
                 $translationDeleted->getEventId()->toNative(),
                 $translationDeleted->getLanguage()
+            );
+    }
+
+    /**
+     * @param CollaborationDataAdded $collaborationDataAdded
+     * @param DomainMessage $domainMessage
+     */
+    private function applyCollaborationDataAdded(
+        CollaborationDataAdded $collaborationDataAdded,
+        DomainMessage $domainMessage
+    ) {
+        $collaborationData = $collaborationDataAdded->getCollaborationData();
+
+        // EntryAPI on UDB2 does not have separate properties for text,
+        // keyword, article and image, but expects them to be a single encoded
+        // json string.
+        $description = [
+            'text' => (string) $collaborationData->getText(),
+            'keyword' => (string) $collaborationData->getKeyword(),
+            'article' => (string) $collaborationData->getArticle(),
+            'image' => (string) $collaborationData->getImage(),
+        ];
+        $encodedDescription = json_encode($description);
+
+        $this->createEntryAPI($domainMessage)
+            ->createCollaborationLink(
+                (string) $collaborationDataAdded->getEventId(),
+                $collaborationDataAdded->getLanguage()->getCode(),
+                (string) $collaborationData->getSubBrand(),
+                $encodedDescription,
+                (string) $collaborationData->getPlainText(),
+                (string) $collaborationData->getTitle(),
+                (string) $collaborationData->getCopyright(),
+                (string) $collaborationData->getLink()
             );
     }
 
