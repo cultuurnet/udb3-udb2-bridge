@@ -71,7 +71,7 @@ class PlaceCdbXmlImporterTest extends \PHPUnit_Framework_TestCase
 
         $placeId = '404EE8DE-E828-9C07-FE7D12DC4EB24480';
 
-        $cdbXml = file_get_contents(__DIR__ . '/samples/place.xml');
+        $cdbXml = file_get_contents(__DIR__ . '/samples/actor.xml');
         $cdbXmlNamespaceUri = 'http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL';
 
         $this->actorCdbXmlService->expects($this->once())
