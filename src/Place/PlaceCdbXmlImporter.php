@@ -90,11 +90,11 @@ class PlaceCdbXmlImporter implements PlaceImporterInterface, LoggerAwareInterfac
         ];
 
         $place = null;
-        foreach($sources as $type => $source) {
+        foreach ($sources as $type => $source) {
             try {
                 $place = $source($placeId);
 
-                if($place) {
+                if ($place) {
                     break;
                 }
             } catch (\Exception $e) {
@@ -111,7 +111,7 @@ class PlaceCdbXmlImporter implements PlaceImporterInterface, LoggerAwareInterfac
         }
 
         try {
-            if($place) {
+            if ($place) {
                 $this->repository->save($place);
             }
         } catch (\Exception $e) {
