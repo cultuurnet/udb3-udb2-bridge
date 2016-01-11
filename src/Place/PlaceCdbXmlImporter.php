@@ -22,7 +22,7 @@ class PlaceCdbXmlImporter implements PlaceImporterInterface, LoggerAwareInterfac
     /**
      * @var ActorCdbXmlServiceInterface
      */
-    protected $cdbXmlService;
+    protected $actorCdbXmlService;
 
     /**
      * @var EventCdbXmlServiceInterface
@@ -35,16 +35,16 @@ class PlaceCdbXmlImporter implements PlaceImporterInterface, LoggerAwareInterfac
     protected $repository;
 
     /**
-     * @param ActorCdbXmlServiceInterface $cdbXmlService
      * @param RepositoryInterface         $repository
+     * @param ActorCdbXmlServiceInterface $actorCdbXmlService
      * @param EventCdbXmlServiceInterface $eventCdbXmlService
      */
     public function __construct(
-        ActorCdbXmlServiceInterface $cdbXmlService,
         RepositoryInterface $repository,
+        ActorCdbXmlServiceInterface $actorCdbXmlService,
         EventCdbXmlServiceInterface $eventCdbXmlService
     ) {
-        $this->cdbXmlService = $cdbXmlService;
+        $this->actorCdbXmlService = $actorCdbXmlService;
         $this->repository = $repository;
         $this->eventCdbXmlService = $eventCdbXmlService;
     }
@@ -60,12 +60,12 @@ class PlaceCdbXmlImporter implements PlaceImporterInterface, LoggerAwareInterfac
 
     private function createPlaceFromActor($placeId)
     {
-        $placeXml = $this->cdbXmlService->getCdbXmlOfActor($placeId);
+        $placeXml = $this->actorCdbXmlService->getCdbXmlOfActor($placeId);
 
         $place = Place::importFromUDB2Actor(
             $placeId,
             $placeXml,
-            $this->cdbXmlService->getCdbXmlNamespaceUri()
+            $this->actorCdbXmlService->getCdbXmlNamespaceUri()
         );
 
         return $place;

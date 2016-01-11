@@ -66,8 +66,8 @@ class PlaceCdbXmlImporterTest extends \PHPUnit_Framework_TestCase
         $this->eventCdbXmlService = $this->getMock(EventCdbXmlServiceInterface::class);
 
         $this->importer = new PlaceCdbXmlImporter(
-            $this->actorCdbXmlService,
             $this->repository,
+            $this->actorCdbXmlService,
             $this->eventCdbXmlService
         );
 
