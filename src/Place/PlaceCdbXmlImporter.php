@@ -58,6 +58,32 @@ class PlaceCdbXmlImporter implements PlaceImporterInterface, LoggerAwareInterfac
 
     }
 
+    private function createPlaceFromActor($placeId)
+    {
+        $placeXml = $this->cdbXmlService->getCdbXmlOfActor($placeId);
+
+        $place = Place::importFromUDB2Actor(
+            $placeId,
+            $placeXml,
+            $this->cdbXmlService->getCdbXmlNamespaceUri()
+        );
+
+        return $place;
+    }
+
+    private function createPlaceFromEvent($placeId)
+    {
+        $placeXml = $this->eventCdbXmlService->getCdbXmlOfEvent($placeId);
+
+        $place = Place::importFromUDB2Event(
+            $placeId,
+            $placeXml,
+            $this->eventCdbXmlService->getCdbXmlNamespaceUri()
+        );
+
+        return $place;
+    }
+
     /**
      * @param string $placeId
      * @return Place|null
@@ -65,34 +91,14 @@ class PlaceCdbXmlImporter implements PlaceImporterInterface, LoggerAwareInterfac
     public function createPlaceFromUDB2($placeId)
     {
         $sources = [
-            'Actor' => function ($placeId) {
-                $placeXml = $this->cdbXmlService->getCdbXmlOfActor($placeId);
-
-                $place = Place::importFromUDB2Actor(
-                    $placeId,
-                    $placeXml,
-                    $this->cdbXmlService->getCdbXmlNamespaceUri()
-                );
-
-                return $place;
-            },
-            'Event' => function ($placeId) {
-                $placeXml = $this->eventCdbXmlService->getCdbXmlOfEvent($placeId);
-
-                $place = Place::importFromUDB2Event(
-                    $placeId,
-                    $placeXml,
-                    $this->eventCdbXmlService->getCdbXmlNamespaceUri()
-                );
-
-                return $place;
-            }
+            'Actor' => array($this, 'createPlaceFromActor'),
+            'Event' => array($this, 'createPlaceFromEvent')
         ];
 
         $place = null;
         foreach ($sources as $type => $source) {
             try {
-                $place = $source($placeId);
+                $place = call_user_func($source, $placeId);
 
                 if ($place) {
                     break;
