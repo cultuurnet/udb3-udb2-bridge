@@ -9,10 +9,13 @@ use Broadway\EventHandling\EventBusInterface;
 use Broadway\EventStore\InMemoryEventStore;
 use Broadway\EventStore\TraceableEventStore;
 use CultuurNet\UDB3\Place\Events\PlaceImportedFromUDB2;
+use CultuurNet\UDB3\Place\Events\PlaceImportedFromUDB2Event;
 use CultuurNet\UDB3\Place\Place;
 use CultuurNet\UDB3\Place\PlaceRepository;
 use CultuurNet\UDB3\UDB2\ActorCdbXmlServiceInterface;
 use CultuurNet\UDB3\UDB2\ActorNotFoundException;
+use CultuurNet\UDB3\UDB2\EventCdbXmlServiceInterface;
+use CultuurNet\UDB3\UDB2\EventNotFoundException;
 use Psr\Log\LoggerInterface;
 
 class PlaceCdbXmlImporterTest extends \PHPUnit_Framework_TestCase
@@ -31,6 +34,11 @@ class PlaceCdbXmlImporterTest extends \PHPUnit_Framework_TestCase
      * @var ActorCdbXmlServiceInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $actorCdbXmlService;
+
+    /**
+     * @var EventCdbXmlServiceInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $eventCdbXmlService;
 
     /**
      * @var TraceableEventStore
@@ -55,11 +63,14 @@ class PlaceCdbXmlImporterTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->actorCdbXmlService = $this->getMock(ActorCdbXmlServiceInterface::class);
+        $this->eventCdbXmlService = $this->getMock(EventCdbXmlServiceInterface::class);
 
         $this->importer = new PlaceCdbXmlImporter(
             $this->actorCdbXmlService,
-            $this->repository
+            $this->repository,
+            $this->eventCdbXmlService
         );
+
     }
 
     /**
@@ -100,11 +111,54 @@ class PlaceCdbXmlImporterTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function it_creates_a_place_from_cdbxml_event()
+    {
+        $this->store->trace();
+
+        $placeId = '764066ab-826f-48c2-897d-a329ebce953f';
+
+        $cdbXml = file_get_contents(__DIR__ . '/samples/event.xml');
+        $cdbXmlNamespaceUri = 'http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL';
+
+        $this->actorCdbXmlService->expects($this->once())
+            ->method('getCdbXmlOfActor')
+            ->willThrowException(new ActorNotFoundException());
+
+        $this->eventCdbXmlService->expects($this->once())
+            ->method('getCdbXmlOfEvent')
+            ->willReturn($cdbXml);
+
+        $this->eventCdbXmlService->expects($this->atLeastOnce())
+            ->method('getCdbXmlNamespaceUri')
+            ->willReturn($cdbXmlNamespaceUri);
+
+        $place = $this->importer->createPlaceFromUDB2($placeId);
+
+        $this->assertInstanceOf(Place::class, $place);
+
+        $this->assertTracedEvents(
+            [
+                new PlaceImportedFromUDB2Event(
+                    $placeId,
+                    $cdbXml,
+                    $cdbXmlNamespaceUri
+                ),
+            ]
+        );
+    }
+
+    /**
+     * @test
+     */
     public function it_returns_nothing_if_creation_failed()
     {
         $this->actorCdbXmlService->expects($this->once())
             ->method('getCdbXmlOfActor')
             ->willThrowException(new ActorNotFoundException());
+
+        $this->eventCdbXmlService->expects($this->once())
+            ->method('getCdbXmlOfEvent')
+            ->willThrowException(new EventNotFoundException());
 
         $place = $this->importer->createPlaceFromUDB2('foo');
 
