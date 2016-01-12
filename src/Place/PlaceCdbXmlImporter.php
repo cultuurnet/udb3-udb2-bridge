@@ -8,6 +8,7 @@ namespace CultuurNet\UDB3\UDB2\Place;
 use Broadway\Repository\RepositoryInterface;
 use CultuurNet\UDB3\Place\Place;
 use CultuurNet\UDB3\UDB2\ActorCdbXmlServiceInterface;
+use CultuurNet\UDB3\UDB2\EventCdbXmlServiceInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
@@ -21,7 +22,12 @@ class PlaceCdbXmlImporter implements PlaceImporterInterface, LoggerAwareInterfac
     /**
      * @var ActorCdbXmlServiceInterface
      */
-    protected $cdbXmlService;
+    protected $actorCdbXmlService;
+
+    /**
+     * @var EventCdbXmlServiceInterface
+     */
+    protected $eventCdbXmlService;
 
     /**
      * @var RepositoryInterface
@@ -29,15 +35,18 @@ class PlaceCdbXmlImporter implements PlaceImporterInterface, LoggerAwareInterfac
     protected $repository;
 
     /**
-     * @param ActorCdbXmlServiceInterface $cdbXmlService
-     * @param RepositoryInterface $repository
+     * @param RepositoryInterface         $repository
+     * @param ActorCdbXmlServiceInterface $actorCdbXmlService
+     * @param EventCdbXmlServiceInterface $eventCdbXmlService
      */
     public function __construct(
-        ActorCdbXmlServiceInterface $cdbXmlService,
-        RepositoryInterface $repository
+        RepositoryInterface $repository,
+        ActorCdbXmlServiceInterface $actorCdbXmlService,
+        EventCdbXmlServiceInterface $eventCdbXmlService
     ) {
-        $this->cdbXmlService = $cdbXmlService;
+        $this->actorCdbXmlService = $actorCdbXmlService;
         $this->repository = $repository;
+        $this->eventCdbXmlService = $eventCdbXmlService;
     }
 
     /**
@@ -49,24 +58,68 @@ class PlaceCdbXmlImporter implements PlaceImporterInterface, LoggerAwareInterfac
 
     }
 
+    private function createPlaceFromActor($placeId)
+    {
+        $placeXml = $this->actorCdbXmlService->getCdbXmlOfActor($placeId);
+
+        $place = Place::importFromUDB2Actor(
+            $placeId,
+            $placeXml,
+            $this->actorCdbXmlService->getCdbXmlNamespaceUri()
+        );
+
+        return $place;
+    }
+
+    private function createPlaceFromEvent($placeId)
+    {
+        $placeXml = $this->eventCdbXmlService->getCdbXmlOfEvent($placeId);
+
+        $place = Place::importFromUDB2Event(
+            $placeId,
+            $placeXml,
+            $this->eventCdbXmlService->getCdbXmlNamespaceUri()
+        );
+
+        return $place;
+    }
+
     /**
      * @param string $placeId
      * @return Place|null
      */
     public function createPlaceFromUDB2($placeId)
     {
+        $sources = [
+            'Actor' => array($this, 'createPlaceFromActor'),
+            'Event' => array($this, 'createPlaceFromEvent')
+        ];
+
+        $place = null;
+        foreach ($sources as $type => $source) {
+            try {
+                $place = call_user_func($source, $placeId);
+
+                if ($place) {
+                    break;
+                }
+            } catch (\Exception $e) {
+                if ($this->logger) {
+                    $this->logger->notice(
+                        "Place creation in UDB3 failed with an exception",
+                        [
+                            'exception' => $e,
+                            'placeId' => $placeId
+                        ]
+                    );
+                }
+            }
+        }
+
         try {
-            $placeXml = $this->cdbXmlService->getCdbXmlOfActor($placeId);
-
-            $place = Place::importFromUDB2(
-                $placeId,
-                $placeXml,
-                $this->cdbXmlService->getCdbXmlNamespaceUri()
-            );
-
-            $this->repository->save($place);
-
-            return $place;
+            if ($place) {
+                $this->repository->save($place);
+            }
         } catch (\Exception $e) {
             if ($this->logger) {
                 $this->logger->notice(
@@ -78,5 +131,7 @@ class PlaceCdbXmlImporter implements PlaceImporterInterface, LoggerAwareInterfac
                 );
             }
         }
+
+        return $place;
     }
 }
