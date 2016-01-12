@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "51cd468ead6c1d80dc88bc7c96bbcb3c",
-    "content-hash": "86db128eefe47a86cd7d368550f881fa",
+    "hash": "6c82628321f97a1e93f4b5e47d9e0f5e",
+    "content-hash": "21b913ffed9de1232feb566e6c2ba426",
     "packages": [
         {
             "name": "2dotstwice/collection",
@@ -442,16 +442,16 @@
         },
         {
             "name": "cultuurnet/culturefeed-php",
-            "version": "v1.6.0",
+            "version": "v1.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/culturefeed-php.git",
-                "reference": "d28345855cd4af172d5398b6f858585a3b8a0847"
+                "reference": "aa0656aa939fdff13ec3770d0cc8229c32d0278a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/culturefeed-php/zipball/d28345855cd4af172d5398b6f858585a3b8a0847",
-                "reference": "d28345855cd4af172d5398b6f858585a3b8a0847",
+                "url": "https://api.github.com/repos/cultuurnet/culturefeed-php/zipball/aa0656aa939fdff13ec3770d0cc8229c32d0278a",
+                "reference": "aa0656aa939fdff13ec3770d0cc8229c32d0278a",
                 "shasum": ""
             },
             "require": {
@@ -505,7 +505,7 @@
                 }
             ],
             "description": "Culturefeed PHP library",
-            "time": "2015-12-17 12:56:38"
+            "time": "2016-01-08 12:08:20"
         },
         {
             "name": "cultuurnet/deserializer",
@@ -699,16 +699,16 @@
         },
         {
             "name": "cultuurnet/udb3",
-            "version": "dev-feature/III-648",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb3-php.git",
-                "reference": "3a3d8d6af4dd1300ed37922540e47fb4214b4193"
+                "reference": "8da0c80426caef5483cae4c0f2c493112727c098"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/3a3d8d6af4dd1300ed37922540e47fb4214b4193",
-                "reference": "3a3d8d6af4dd1300ed37922540e47fb4214b4193",
+                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/8da0c80426caef5483cae4c0f2c493112727c098",
+                "reference": "8da0c80426caef5483cae4c0f2c493112727c098",
                 "shasum": ""
             },
             "require": {
@@ -775,7 +775,7 @@
                 }
             ],
             "description": "UDB3 PHP libraries",
-            "time": "2016-01-07 14:21:59"
+            "time": "2016-01-12 16:04:21"
         },
         {
             "name": "danielstjules/stringy",
@@ -2592,16 +2592,16 @@
         },
         {
             "name": "twig/twig",
-            "version": "v1.23.1",
+            "version": "v1.23.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "d9b6333ae8dd2c8e3fd256e127548def0bc614c6"
+                "reference": "ae53fc2c312fdee63773b75cb570304f85388b08"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/d9b6333ae8dd2c8e3fd256e127548def0bc614c6",
-                "reference": "d9b6333ae8dd2c8e3fd256e127548def0bc614c6",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/ae53fc2c312fdee63773b75cb570304f85388b08",
+                "reference": "ae53fc2c312fdee63773b75cb570304f85388b08",
                 "shasum": ""
             },
             "require": {
@@ -2649,7 +2649,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2015-11-05 12:49:06"
+            "time": "2016-01-11 14:02:19"
         },
         {
             "name": "willdurand/geocoder",
@@ -4227,18 +4227,9 @@
             "time": "2015-12-26 13:39:53"
         }
     ],
-    "aliases": [
-        {
-            "alias": "0.1",
-            "alias_normalized": "0.1.0.0",
-            "version": "dev-feature/III-648",
-            "package": "cultuurnet/udb3"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "cultuurnet/udb3": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
