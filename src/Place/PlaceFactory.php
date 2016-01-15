@@ -18,7 +18,7 @@ class PlaceFactory implements ActorFactoryInterface
      */
     public function createFromCdbXml($id, $cdbXml, $cdbXmlNamespaceUri)
     {
-        return Place::importFromUDB2(
+        return Place::importFromUDB2Actor(
             $id,
             $cdbXml,
             $cdbXmlNamespaceUri

@@ -22,10 +22,14 @@ use CultuurNet\UDB3\EventXmlString;
 use CultuurNet\UDB3\Label;
 use CultuurNet\UDB3\Language;
 use CultuurNet\UDB3\LabelCollection;
+use CultuurNet\UDB3\Media\Image;
+use CultuurNet\UDB3\Media\MediaObject;
+use CultuurNet\UDB3\Media\Properties\MIMEType;
 use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\PlaceService;
 use PHPUnit_Framework_TestCase;
 use CultureFeed_Cdb_Data_ContactInfo;
+use ValueObjects\Identity\UUID;
 use ValueObjects\String\String;
 use ValueObjects\Web\Url;
 
@@ -441,6 +445,47 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
                 'Copyright',
                 'http://google.com'
             );
+
+        $this->repository->syncBackOn();
+        $this->repository->save($event);
+    }
+
+    /**
+     * @test
+     */
+    public function it_adds_a_media_object_when_adding_an_image()
+    {
+        $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
+        $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
+
+        $this->repository->save($event);
+
+        $image = new Image(
+            new UUID('de305d54-75b4-431b-adb2-eb6b9e546014'),
+            new MIMEType('image/png'),
+            new String('sexy ladies without clothes'),
+            new String('Bart Ramakers'),
+            Url::fromNative('http://foo.bar/media/de305d54-75b4-431b-adb2-eb6b9e546014.png')
+        );
+
+        $cdbXmlNamespaceUri = self::NS;
+
+        $cdbXml = file_get_contents(__DIR__ . '/event.xml');
+
+        $udb2Event = EventItemFactory::createEventFromCdbXml(
+            $cdbXmlNamespaceUri,
+            $cdbXml
+        );
+
+        $event->addImage($image);
+
+        $this->entryAPI->expects($this->once())
+            ->method('getEvent')
+            ->with($id)
+            ->willReturn($udb2Event);
+
+        $this->entryAPI->expects($this->once())
+            ->method('updateEvent');
 
         $this->repository->syncBackOn();
         $this->repository->save($event);

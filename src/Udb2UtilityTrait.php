@@ -33,6 +33,7 @@ use CultuurNet\UDB3\BookingInfo;
 use CultuurNet\UDB3\Calendar;
 use CultuurNet\UDB3\CalendarInterface;
 use CultuurNet\UDB3\ContactPoint;
+use CultuurNet\UDB3\Media\Image;
 use CultuurNet\UDB3\Media\MediaObject;
 use DateTime;
 use Zend\Validator\Exception\RuntimeException;
@@ -411,7 +412,7 @@ trait Udb2UtilityTrait
      */
     private function addImageToCdbItem(
         CultureFeed_Cdb_Item_Base $cdbItem,
-        MediaObject $mediaObject
+        Image $image
     ) {
 
         $details = $cdbItem->getDetails();
@@ -430,7 +431,7 @@ trait Udb2UtilityTrait
             $details->add($detail);
         }
 
-        $sourceUri = (string) $mediaObject->getSourceLocation();
+        $sourceUri = (string) $image->getSourceLocation();
         $uriParts = explode('/', $sourceUri);
 
         $file = new CultureFeed_Cdb_Data_File();
@@ -448,8 +449,8 @@ trait Udb2UtilityTrait
         $file->setFileType($extension);
         $file->setFileName($filename);
 
-        $file->setCopyright($mediaObject->getCopyrightHolder());
-        $file->setTitle($mediaObject->getDescription());
+        $file->setCopyright($image->getCopyrightHolder());
+        $file->setTitle($image->getDescription());
         $detail->getMedia()->add($file);
 
     }

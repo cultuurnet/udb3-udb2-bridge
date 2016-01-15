@@ -58,7 +58,7 @@ class PlaceCdbXmlImporter implements PlaceImporterInterface, LoggerAwareInterfac
         try {
             $placeXml = $this->cdbXmlService->getCdbXmlOfActor($placeId);
 
-            $place = Place::importFromUDB2(
+            $place = Place::importFromUDB2Actor(
                 $placeId,
                 $placeXml,
                 $this->cdbXmlService->getCdbXmlNamespaceUri()
