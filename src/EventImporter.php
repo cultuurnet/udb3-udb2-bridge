@@ -273,14 +273,10 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
                 $this->placeService->getEntity($location->getCdbid());
             }
         } catch (EntityNotFoundException $e) {
-            if ($this->logger) {
-                $this->logger->error(
-                    "Unable to retrieve location with ID {$location->getCdbid(
-                    )}, of event {$udb2Event->getCdbId()}."
-                );
-            } else {
-                throw $e;
-            }
+            $this->logger->error(
+                "Unable to retrieve location with ID {$location->getCdbid(
+                )}, of event {$udb2Event->getCdbId()}."
+            );
         }
 
         try {
@@ -291,14 +287,10 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
                 $this->organizerService->getEntity($organizer->getCdbid());
             }
         } catch (EntityNotFoundException $e) {
-            if ($this->logger) {
-                $this->logger->error(
-                    "Unable to retrieve organizer with ID {$organizer->getCdbid(
-                    )}, of event {$udb2Event->getCdbId()}."
-                );
-            } else {
-                throw $e;
-            }
+            $this->logger->error(
+                "Unable to retrieve organizer with ID {$organizer->getCdbid(
+                )}, of event {$udb2Event->getCdbId()}."
+            );
         }
     }
 }
