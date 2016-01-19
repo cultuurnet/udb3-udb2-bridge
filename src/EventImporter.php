@@ -105,25 +105,21 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
             $event = $this->loadEvent($eventId);
         } catch (AggregateNotFoundException $e) {
             if ($fallbackToCreate) {
-                if ($this->logger) {
-                    $this->logger->notice(
-                        "Could not update event because it does not exist yet on UDB3, will attempt to create the event instead",
-                        [
-                            'eventId' => $eventId
-                        ]
-                    );
-                }
+                $this->logger->notice(
+                    "Could not update event because it does not exist yet on UDB3, will attempt to create the event instead",
+                    [
+                        'eventId' => $eventId
+                    ]
+                );
 
                 return $this->create($eventId, false);
             } else {
-                if ($this->logger) {
-                    $this->logger->error(
-                        "Could not update event because it does not exist yet on UDB3",
-                        [
-                            'eventId' => $eventId
-                        ]
-                    );
-                }
+                $this->logger->error(
+                    "Could not update event because it does not exist yet on UDB3",
+                    [
+                        'eventId' => $eventId
+                    ]
+                );
 
                 return;
             }
@@ -223,29 +219,25 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
             );
         } catch (\Exception $e) {
             if ($fallbackToUpdate) {
-                if ($this->logger) {
-                    $this->logger->notice(
-                        "Event creation in UDB3 failed with an exception, will attempt to update the event instead",
-                        [
-                            'exception' => $e,
-                            'eventId' => $eventId
-                        ]
-                    );
-                }
+                $this->logger->notice(
+                    "Event creation in UDB3 failed with an exception, will attempt to update the event instead",
+                    [
+                        'exception' => $e,
+                        'eventId' => $eventId
+                    ]
+                );
                 // @todo Differentiate between event exists locally already
                 // (same event arriving twice, event created on UDB3 first)
                 // and a real error while saving.
                 return $this->update($eventId, false);
             } else {
-                if ($this->logger) {
-                    $this->logger->error(
-                        "Event creation in UDB3 failed with an exception",
-                        [
-                            'exception' => $e,
-                            'eventId' => $eventId
-                        ]
-                    );
-                }
+                $this->logger->error(
+                    "Event creation in UDB3 failed with an exception",
+                    [
+                        'exception' => $e,
+                        'eventId' => $eventId
+                    ]
+                );
                 return;
             }
         }
