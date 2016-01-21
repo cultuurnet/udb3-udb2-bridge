@@ -36,6 +36,8 @@ use CultuurNet\UDB3\ContactPoint;
 use CultuurNet\UDB3\Media\Image;
 use CultuurNet\UDB3\Media\MediaObject;
 use DateTime;
+use ValueObjects\Identity\UUID;
+use ValueObjects\String\String;
 use Zend\Validator\Exception\RuntimeException;
 
 /**
@@ -408,13 +410,14 @@ trait Udb2UtilityTrait
     }
 
     /**
-     * Add an image to the cdb item.
+     * Get the media for a CDB item.
+     *
+     * If the items does not have any detials, one will be created.
+     *
+     * @param \CultureFeed_Cdb_Item_Base $cdbItem
      */
-    private function addImageToCdbItem(
-        CultureFeed_Cdb_Item_Base $cdbItem,
-        Image $image
-    ) {
-
+    private function getCdbItemMedia(CultureFeed_Cdb_Item_Base $cdbItem)
+    {
         $details = $cdbItem->getDetails();
 
         // Get the first detail.
@@ -431,6 +434,16 @@ trait Udb2UtilityTrait
             $details->add($detail);
         }
 
+        return $detail->getMedia();
+    }
+
+    /**
+     * Add an image to the cdb item.
+     */
+    private function addImageToCdbItem(
+        CultureFeed_Cdb_Item_Base $cdbItem,
+        Image $image
+    ) {
         $sourceUri = (string) $image->getSourceLocation();
         $uriParts = explode('/', $sourceUri);
 
@@ -451,68 +464,42 @@ trait Udb2UtilityTrait
 
         $file->setCopyright($image->getCopyrightHolder());
         $file->setTitle($image->getDescription());
-        $detail->getMedia()->add($file);
 
+        $this->getCdbItemMedia($cdbItem)->add($file);
     }
 
     /**
      * Update an existing image on the cdb item.
      *
-     * @param CultureFeed_Cdb_Item_Base $cdbItem
-     * @param int $indexToUpdate
-     * @param MediaObject $mediaObject
+     * @param \CultureFeed_Cdb_Item_Base $cdbItem
+     * @param UUID $mediaObjectId
+     * @param \ValueObjects\String\String $description
+     * @param \ValueObjects\String\String $copytightHolder
      */
     private function updateImageOnCdbItem(
         CultureFeed_Cdb_Item_Base $cdbItem,
-        $indexToUpdate,
-        MediaObject $mediaObject
+        UUID $mediaObjectId,
+        String $description,
+        String $copyrightHolder
     ) {
+        $media = $this->getCdbItemMedia($cdbItem);
 
-        $details = $cdbItem->getDetails();
-
-        // Get the first detail.
-        $detail = null;
-        foreach ($details as $languageDetail) {
-            if (!$detail) {
-                $detail = $languageDetail;
-            }
-        }
-
-        // Make sure a detail exists.
-        if (empty($detail)) {
-            $detail = new CultureFeed_Cdb_Data_EventDetail();
-            $details->add($detail);
-        }
-
-        $media = $detail->getMedia();
-        $index = 0;
-        // Loop over all files and count own index.
         foreach ($media as $file) {
-            if ($file->getMediatype === CultureFeed_Cdb_Data_File::MEDIA_TYPE_IMAGEWEB && $file->isMain()) {
-                // If the index matches, delete the file.
-                if ($index === $indexToUpdate) {
-                    $uriParts = explode('/', $mediaObject->getUrl());
+            if ($file->getMediatype() === CultureFeed_Cdb_Data_File::MEDIA_TYPE_IMAGEWEB) {
+                $file->setMain();
+                // Matching against the CDBID in the name of the image because
+                // that's the only reference in UDB2 we have.
+                $fileUpdated = (strpos(
+                    $file->getHLink(),
+                    (string) $mediaObjectId
+                ) > 0);
 
-                    $file->setHLink($mediaObject->getUrl());
-
-                    $filename = end($uriParts);
-                    $fileparts = explode('.', $filename);
-                    $extension = end($fileparts);
-                    if ($extension === 'jpg') {
-                        $extension = 'jpeg';
-                    }
-
-                    $file->setFileType($extension);
-                    $file->setFileName($filename);
-                    $file->setCopyright($mediaObject->getCopyrightHolder());
-                    $file->setTitle($mediaObject->getDescription());
-
-                    break;
+                if ($fileUpdated) {
+                    $file->setTitle((string) $description);
+                    $file->setCopyright((string) $copyrightHolder);
                 }
-                $index++;
             }
         }
-
     }
 
     /**
