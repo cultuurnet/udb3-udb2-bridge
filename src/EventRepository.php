@@ -640,7 +640,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         $entryApi = $this->createEntryAPI($domainMessage);
         $event = $entryApi->getEvent($domainEvent->getEventId());
 
-        $this->addImageToCdbItem($event, $domainEvent->getMediaObject());
+        $this->addImageToCdbItem($event, $domainEvent->getImage());
         $entryApi->updateEvent($event);
 
     }
