@@ -5,8 +5,8 @@
 
 namespace CultuurNet\UDB3\UDB2;
 
-use Broadway\Domain\DomainMessage;
 use Broadway\EventHandling\EventListenerInterface;
+use Broadway\EventStore\EventStoreException;
 use Broadway\Repository\AggregateNotFoundException;
 use Broadway\Repository\RepositoryInterface;
 use CultuurNet\UDB2DomainEvents\EventCreated;
@@ -19,7 +19,6 @@ use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\PlaceService;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use Psr\Log\LoggerTrait;
 use Psr\Log\NullLogger;
 
 /**
@@ -106,25 +105,21 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
             $event = $this->loadEvent($eventId);
         } catch (AggregateNotFoundException $e) {
             if ($fallbackToCreate) {
-                if ($this->logger) {
-                    $this->logger->notice(
-                        "Could not update event because it does not exist yet on UDB3, will attempt to create the event instead",
-                        [
-                            'eventId' => $eventId
-                        ]
-                    );
-                }
+                $this->logger->notice(
+                    "Could not update event because it does not exist yet on UDB3, will attempt to create the event instead",
+                    [
+                        'eventId' => $eventId
+                    ]
+                );
 
                 return $this->create($eventId, false);
             } else {
-                if ($this->logger) {
-                    $this->logger->error(
-                        "Could not update event because it does not exist yet on UDB3",
-                        [
-                            'eventId' => $eventId
-                        ]
-                    );
-                }
+                $this->logger->error(
+                    "Could not update event because it does not exist yet on UDB3",
+                    [
+                        'eventId' => $eventId
+                    ]
+                );
 
                 return;
             }
@@ -134,12 +129,23 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
 
         $this->importDependencies($eventXml);
 
-        $event->updateWithCdbXml(
-            $eventXml,
-            $this->cdbXmlService->getCdbXmlNamespaceUri()
-        );
+        $updated = false;
+        do {
+            try {
+                $event->updateWithCdbXml(
+                    $eventXml,
+                    $this->cdbXmlService->getCdbXmlNamespaceUri()
+                );
 
-        $this->repository->save($event);
+                $this->repository->save($event);
+
+                $updated = true;
+            } catch (EventStoreException $e) {
+                // Collision with another change. Reload the event from the
+                // event store and retry.
+                $event = $this->loadEvent($eventId);
+            }
+        } while (!$updated);
 
         $this->logger->info(
             'Event updated in UDB3',
@@ -213,29 +219,25 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
             );
         } catch (\Exception $e) {
             if ($fallbackToUpdate) {
-                if ($this->logger) {
-                    $this->logger->notice(
-                        "Event creation in UDB3 failed with an exception, will attempt to update the event instead",
-                        [
-                            'exception' => $e,
-                            'eventId' => $eventId
-                        ]
-                    );
-                }
+                $this->logger->notice(
+                    "Event creation in UDB3 failed with an exception, will attempt to update the event instead",
+                    [
+                        'exception' => $e,
+                        'eventId' => $eventId
+                    ]
+                );
                 // @todo Differentiate between event exists locally already
                 // (same event arriving twice, event created on UDB3 first)
                 // and a real error while saving.
                 return $this->update($eventId, false);
             } else {
-                if ($this->logger) {
-                    $this->logger->error(
-                        "Event creation in UDB3 failed with an exception",
-                        [
-                            'exception' => $e,
-                            'eventId' => $eventId
-                        ]
-                    );
-                }
+                $this->logger->error(
+                    "Event creation in UDB3 failed with an exception",
+                    [
+                        'exception' => $e,
+                        'eventId' => $eventId
+                    ]
+                );
                 return;
             }
         }
@@ -271,14 +273,10 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
                 $this->placeService->getEntity($location->getCdbid());
             }
         } catch (EntityNotFoundException $e) {
-            if ($this->logger) {
-                $this->logger->error(
-                    "Unable to retrieve location with ID {$location->getCdbid(
-                    )}, of event {$udb2Event->getCdbId()}."
-                );
-            } else {
-                throw $e;
-            }
+            $this->logger->error(
+                "Unable to retrieve location with ID {$location->getCdbid(
+                )}, of event {$udb2Event->getCdbId()}."
+            );
         }
 
         try {
@@ -289,14 +287,10 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
                 $this->organizerService->getEntity($organizer->getCdbid());
             }
         } catch (EntityNotFoundException $e) {
-            if ($this->logger) {
-                $this->logger->error(
-                    "Unable to retrieve organizer with ID {$organizer->getCdbid(
-                    )}, of event {$udb2Event->getCdbId()}."
-                );
-            } else {
-                throw $e;
-            }
+            $this->logger->error(
+                "Unable to retrieve organizer with ID {$organizer->getCdbid(
+                )}, of event {$udb2Event->getCdbId()}."
+            );
         }
     }
 }
