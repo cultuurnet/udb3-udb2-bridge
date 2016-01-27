@@ -596,7 +596,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
     ) {
 
         $entryApi = $this->createEntryAPI($domainMessage);
-        $event = $entryApi->getEvent($domainEvent->getEventId());
+        $event = $entryApi->getEvent($domainEvent->getItemId());
         $bookingInfo = $domainEvent->getBookingInfo();
 
         $entityType = new EntityType('event');
@@ -605,7 +605,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
 
         // Save contact info.
         $entryApi->updateContactInfo(
-            $domainEvent->getEventId(),
+            $domainEvent->getItemId(),
             $entityType,
             $event->getContactInfo()
         );
@@ -620,7 +620,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
             );
 
             $entryApi->updateBookingPeriod(
-                $domainEvent->getEventId(),
+                $domainEvent->getItemId(),
                 $bookingPeriod
             );
         }
@@ -638,7 +638,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
     ) {
 
         $entryApi = $this->createEntryAPI($domainMessage);
-        $event = $entryApi->getEvent($domainEvent->getEventId());
+        $event = $entryApi->getEvent($domainEvent->getItemId());
 
         $this->addImageToCdbItem($event, $domainEvent->getImage());
         $entryApi->updateEvent($event);
@@ -656,7 +656,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
     ) {
 
         $entryApi = $this->createEntryAPI($domainMessage);
-        $event = $entryApi->getEvent($domainEvent->getEventId());
+        $event = $entryApi->getEvent($domainEvent->getItemId());
 
         $this->updateImageOnCdbItem($event, $domainEvent->getIndexToUpdate(), $domainEvent->getMediaObject());
         $entryApi->updateEvent($event);
@@ -674,7 +674,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
     ) {
 
         $entryApi = $this->createEntryAPI($domainMessage);
-        $event = $entryApi->getEvent($domainEvent->getEventId());
+        $event = $entryApi->getEvent($domainEvent->getItemId());
 
         $this->deleteImageOnCdbItem($event, $domainEvent->getIndexToDelete());
         $entryApi->updateEvent($event);
