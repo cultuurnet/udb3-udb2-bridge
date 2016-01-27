@@ -35,7 +35,7 @@ use CultuurNet\UDB3\Event\Events\EventCreated;
 use CultuurNet\UDB3\Event\Events\EventCreatedFromCdbXml;
 use CultuurNet\UDB3\Event\Events\EventDeleted;
 use CultuurNet\UDB3\Event\Events\EventUpdatedFromCdbXml;
-use CultuurNet\UDB3\Event\Events\EventWasLabelled;
+use CultuurNet\UDB3\Event\Events\LabelAdded;
 use CultuurNet\UDB3\Event\Events\ImageAdded;
 use CultuurNet\UDB3\Event\Events\ImageDeleted;
 use CultuurNet\UDB3\Event\Events\ImageUpdated;
@@ -48,7 +48,7 @@ use CultuurNet\UDB3\Event\Events\TranslationApplied;
 use CultuurNet\UDB3\Event\Events\TranslationDeleted;
 use CultuurNet\UDB3\Event\Events\TypicalAgeRangeDeleted;
 use CultuurNet\UDB3\Event\Events\TypicalAgeRangeUpdated;
-use CultuurNet\UDB3\Event\Events\Unlabelled;
+use CultuurNet\UDB3\Event\Events\LabelDeleted;
 use CultuurNet\UDB3\Event\TitleTranslated;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\Location;
@@ -158,7 +158,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
      * @param DomainMessage $domainMessage
      */
     private function applyEventWasLabelled(
-        EventWasLabelled $labelled,
+        LabelAdded $labelled,
         DomainMessage $domainMessage
     ) {
         $this->createEntryAPI($domainMessage)
@@ -173,7 +173,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
      * @param DomainMessage $domainMessage
      */
     private function applyUnlabelled(
-        Unlabelled $unlabelled,
+        LabelDeleted $unlabelled,
         DomainMessage $domainMessage
     ) {
         $this->createEntryAPI($domainMessage)
