@@ -487,14 +487,8 @@ trait Udb2UtilityTrait
         foreach ($media as $file) {
             if ($file->getMediatype() === CultureFeed_Cdb_Data_File::MEDIA_TYPE_IMAGEWEB) {
                 $file->setMain();
-                // Matching against the CDBID in the name of the image because
-                // that's the only reference in UDB2 we have.
-                $fileUpdated = (strpos(
-                    $file->getHLink(),
-                    (string) $mediaObjectId
-                ) > 0);
 
-                if ($fileUpdated) {
+                if ($this->fileMatchesMediaObject($file, $mediaObjectId)) {
                     $file->setTitle((string) $description);
                     $file->setCopyright((string) $copyrightHolder);
                 }
@@ -503,43 +497,42 @@ trait Udb2UtilityTrait
     }
 
     /**
+     * @param CultureFeed_Cdb_Data_File $file
+     * @param UUID $mediaObjectId
+     * @return bool
+     */
+    private function fileMatchesMediaObject(
+        CultureFeed_Cdb_Data_File $file,
+        UUID $mediaObjectId
+    ) {
+        // Matching against the CDBID in the name of the image because
+        // that's the only reference in UDB2 we have.
+        return !!strpos($file->getHLink(), (string) $mediaObjectId);
+    }
+
+    /**
      * Delete a given index on the cdb item.
      *
      * @param CultureFeed_Cdb_Item_Base $cdbItem
-     * @param int $indexToDelete
-     * @param MediaObject $mediaObject
+     * @param Image $image
      */
-    private function deleteImageOnCdbItem(
+    private function removeImageFromCdbItem(
         CultureFeed_Cdb_Item_Base $cdbItem,
-        $indexToDelete
+        Image $image
     ) {
 
         $details = $cdbItem->getDetails();
-
-        // Get the first detail.
-        $detail = null;
-        foreach ($details as $languageDetail) {
-            if (!$detail) {
-                $detail = $languageDetail;
-            }
-        }
+        $details->rewind();
 
         // No detail = nothing to delete.
-        if (empty($detail)) {
+        if (!$details->valid()) {
             return;
         }
 
-        $media = $detail->getMedia();
-        $index = 0;
-        // Loop over all files and count own index.
+        $media = $details->current()->getMedia();
         foreach ($media as $key => $file) {
-            if ($file->getMediatype === CultureFeed_Cdb_Data_File::MEDIA_TYPE_IMAGEWEB && $file->isMain()) {
-                // If the index matches, delete the file.
-                if ($index === $indexToDelete) {
-                    $media->remove($key);
-                    break;
-                }
-                $index++;
+            if ($this->fileMatchesMediaObject($file, $image->getMediaObjectId())) {
+                $media->remove($key);
             }
         }
 
