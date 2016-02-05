@@ -6,6 +6,7 @@
 namespace CultuurNet\UDB3\UDB2;
 
 use Broadway\Domain\Metadata;
+use Broadway\EventSourcing\EventSourcedAggregateRoot;
 use Broadway\EventSourcing\MetadataEnrichment\MetadataEnrichingEventStreamDecorator;
 use Broadway\Repository\RepositoryInterface;
 use CultuurNet\Auth\TokenCredentials;
@@ -76,6 +77,14 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->decoratedRepository = $this->getMock(RepositoryInterface::class);
+        $this->decoratedRepository->expects($this->any())
+            ->method('save')
+            ->willReturnCallback(
+                function (EventSourcedAggregateRoot $aggregateRoot) {
+                    // Clear the uncommitted events.
+                    $aggregateRoot->getUncommittedEvents();
+                }
+            );
 
         $this->entryAPIImprovedFactory = $this->getMock(
             EntryAPIImprovedFactoryInterface::class
@@ -511,9 +520,6 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
     public function it_deletes_a_media_file_when_removing_an_image()
     {
         $itemId = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $event = $this->createEvent($itemId, 'eventrepositorytest_event.xml');
-
-        $this->repository->save($event);
 
         $image = new Image(
             new UUID('9554d6f6-bed1-4303-8d42-3fcec4601e0e'),
@@ -522,6 +528,11 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
             new String('Karbido Ensemble'),
             Url::fromNative('http://foo.bar/media/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg')
         );
+
+        $event = $this->createEvent($itemId, 'eventrepositorytest_event.xml');
+        $event->addImage($image);
+
+        $this->repository->save($event);
 
         $cdbXmlNamespaceUri = self::NS;
 
