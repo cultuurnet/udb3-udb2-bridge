@@ -501,8 +501,8 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
                 $media = $details->current()->getMedia();
 
                 $newFiles = [];
-                foreach($media as $key => $file) {
-                    if($file->getHLink() === 'http://foo.bar/media/de305d54-75b4-431b-adb2-eb6b9e546014.png') {
+                foreach ($media as $key => $file) {
+                    if ($file->getHLink() === 'http://foo.bar/media/de305d54-75b4-431b-adb2-eb6b9e546014.png') {
                         $newFiles[] = $file;
                     }
                 };
@@ -559,8 +559,8 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
                 $media = $details->current()->getMedia();
 
                 $removedFiles = [];
-                foreach($media as $key => $file) {
-                    if($file->getHLink() === 'http://85.255.197.172/images/20140108/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg') {
+                foreach ($media as $key => $file) {
+                    if ($file->getHLink() === 'http://85.255.197.172/images/20140108/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg') {
                         $removedFiles[] = $file;
                     }
                 };
