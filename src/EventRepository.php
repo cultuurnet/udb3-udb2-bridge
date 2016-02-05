@@ -37,7 +37,7 @@ use CultuurNet\UDB3\Event\Events\EventDeleted;
 use CultuurNet\UDB3\Event\Events\EventUpdatedFromCdbXml;
 use CultuurNet\UDB3\Event\Events\EventWasLabelled;
 use CultuurNet\UDB3\Event\Events\ImageAdded;
-use CultuurNet\UDB3\Event\Events\ImageDeleted;
+use CultuurNet\UDB3\Event\Events\ImageRemoved;
 use CultuurNet\UDB3\Event\Events\ImageUpdated;
 use CultuurNet\UDB3\Event\Events\LabelsApplied;
 use CultuurNet\UDB3\Event\Events\LabelsMerged;
@@ -668,19 +668,18 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
     }
 
     /**
-     * Apply the imageDeleted event to udb2.
-     * @param ImageDeleted $domainEvent
+     * @param ImageRemoved $domainEvent
      * @param DomainMessage $domainMessage
      */
-    private function applyImageDeleted(
-        ImageDeleted $domainEvent,
+    private function applyImageRemoved(
+        ImageRemoved $domainEvent,
         DomainMessage $domainMessage
     ) {
 
         $entryApi = $this->createEntryAPI($domainMessage);
-        $event = $entryApi->getEvent($domainEvent->getEventId());
+        $event = $entryApi->getEvent($domainEvent->getItemId());
 
-        $this->deleteImageOnCdbItem($event, $domainEvent->getIndexToDelete());
+        $this->removeImageFromCdbItem($event, $domainEvent->getImage());
         $entryApi->updateEvent($event);
 
     }
