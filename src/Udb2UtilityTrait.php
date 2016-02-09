@@ -305,7 +305,7 @@ trait Udb2UtilityTrait
      * @param CultureFeed_Cdb_Item_Event $cdbItem
      * @param BookingInfo $bookingInfo
      */
-    private function updateCdbItemByBookingInfo(
+    protected function updateCdbItemByBookingInfo(
         CultureFeed_Cdb_Item_Event $cdbItem,
         BookingInfo $bookingInfo
     ) {
