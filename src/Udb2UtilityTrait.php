@@ -256,7 +256,7 @@ trait Udb2UtilityTrait
      * @param CultureFeed_Cdb_Item_Base $cdbItem
      * @param \CultuurNet\UDB3\UDB2\ContactPoint $contactPoint
      */
-    private function updateCdbItemByContactPoint(
+    protected function updateCdbItemByContactPoint(
         CultureFeed_Cdb_Item_Base $cdbItem,
         ContactPoint $contactPoint
     ) {
