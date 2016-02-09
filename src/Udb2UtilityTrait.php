@@ -440,7 +440,7 @@ trait Udb2UtilityTrait
     /**
      * Add an image to the cdb item.
      */
-    private function addImageToCdbItem(
+    protected function addImageToCdbItem(
         CultureFeed_Cdb_Item_Base $cdbItem,
         Image $image
     ) {
@@ -476,7 +476,7 @@ trait Udb2UtilityTrait
      * @param \ValueObjects\String\String $description
      * @param \ValueObjects\String\String $copytightHolder
      */
-    private function updateImageOnCdbItem(
+    protected function updateImageOnCdbItem(
         CultureFeed_Cdb_Item_Base $cdbItem,
         UUID $mediaObjectId,
         String $description,
