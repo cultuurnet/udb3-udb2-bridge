@@ -154,32 +154,32 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
     }
 
     /**
-     * @param EventWasLabelled $labelled
+     * @param LabelAdded $labelAdded
      * @param DomainMessage $domainMessage
      */
-    private function applyEventWasLabelled(
-        LabelAdded $labelled,
+    private function applyLabelAdded(
+        LabelAdded $labelAdded,
         DomainMessage $domainMessage
     ) {
         $this->createEntryAPI($domainMessage)
             ->addKeywords(
-                $labelled->getEventId(),
-                array($labelled->getLabel())
+                $labelAdded->getItemId(),
+                array($labelAdded->getLabel())
             );
     }
 
     /**
-     * @param Unlabelled $unlabelled
+     * @param LabelDeleted $labelDeleted
      * @param DomainMessage $domainMessage
      */
-    private function applyUnlabelled(
-        LabelDeleted $unlabelled,
+    private function applyLabelDeleted(
+        LabelDeleted $labelDeleted,
         DomainMessage $domainMessage
     ) {
         $this->createEntryAPI($domainMessage)
             ->deleteKeyword(
-                $unlabelled->getEventId(),
-                $unlabelled->getLabel()
+                $labelDeleted->getItemId(),
+                $labelDeleted->getLabel()
             );
     }
 
@@ -195,7 +195,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
             ->translateEventTitle(
                 $domainEvent->getItemId(),
                 $domainEvent->getLanguage(),
-                $domainEvent->getTitle()
+                $domainEvent->getTitle()->toNative()
             );
     }
 
@@ -211,7 +211,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
             ->translateEventDescription(
                 $domainEvent->getItemId(),
                 $domainEvent->getLanguage(),
-                $domainEvent->getDescription()
+                $domainEvent->getDescription()->toNative()
             );
     }
 
