@@ -55,7 +55,7 @@ class SpecificationDecoratedEventCdbXml implements EventCdbXmlServiceInterface
         }
 
         throw new EventNotFoundException(
-            'CDBXML was found, but it does not qualify as an event.'
+            'CDBXML was found for id: '. $event->getCdbId() .', but it does not qualify as an event.'
         );
     }
 

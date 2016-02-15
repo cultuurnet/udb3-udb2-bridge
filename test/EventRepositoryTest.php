@@ -6,6 +6,7 @@
 namespace CultuurNet\UDB3\UDB2;
 
 use Broadway\Domain\Metadata;
+use Broadway\EventSourcing\EventSourcedAggregateRoot;
 use Broadway\EventSourcing\MetadataEnrichment\MetadataEnrichingEventStreamDecorator;
 use Broadway\Repository\RepositoryInterface;
 use CultuurNet\Auth\TokenCredentials;
@@ -76,6 +77,14 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->decoratedRepository = $this->getMock(RepositoryInterface::class);
+        $this->decoratedRepository->expects($this->any())
+            ->method('save')
+            ->willReturnCallback(
+                function (EventSourcedAggregateRoot $aggregateRoot) {
+                    // Clear the uncommitted events.
+                    $aggregateRoot->getUncommittedEvents();
+                }
+            );
 
         $this->entryAPIImprovedFactory = $this->getMock(
             EntryAPIImprovedFactoryInterface::class
@@ -594,7 +603,7 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function it_adds_a_media_object_when_adding_an_image()
+    public function it_adds_a_media_file_when_adding_an_image()
     {
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
         $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
@@ -626,7 +635,79 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
             ->willReturn($udb2Event);
 
         $this->entryAPI->expects($this->once())
-            ->method('updateEvent');
+            ->method('updateEvent')
+            ->with($this->callback(function ($cdbItem) {
+                $details = $cdbItem->getDetails();
+                $details->rewind();
+                $media = $details->current()->getMedia();
+
+                $newFiles = [];
+                foreach ($media as $key => $file) {
+                    if ($file->getHLink() === 'http://foo.bar/media/de305d54-75b4-431b-adb2-eb6b9e546014.png') {
+                        $newFiles[] = $file;
+                    }
+                };
+
+                return !empty($newFiles);
+            }));
+
+        $this->repository->syncBackOn();
+        $this->repository->save($event);
+    }
+
+    /**
+     * @test
+     */
+    public function it_deletes_a_media_file_when_removing_an_image()
+    {
+        $itemId = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
+
+        $image = new Image(
+            new UUID('9554d6f6-bed1-4303-8d42-3fcec4601e0e'),
+            new MIMEType('image/jpg'),
+            new String('duckfaceplant'),
+            new String('Karbido Ensemble'),
+            Url::fromNative('http://foo.bar/media/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg')
+        );
+
+        $event = $this->createEvent($itemId, 'eventrepositorytest_event.xml');
+        $event->addImage($image);
+
+        $this->repository->save($event);
+
+        $cdbXmlNamespaceUri = self::NS;
+
+        $cdbXml = file_get_contents(__DIR__ . '/event.xml');
+
+        $udb2Event = EventItemFactory::createEventFromCdbXml(
+            $cdbXmlNamespaceUri,
+            $cdbXml
+        );
+
+        $event->removeImage($image);
+
+        $this->entryAPI->expects($this->once())
+            ->method('getEvent')
+            ->with($itemId)
+            ->willReturn($udb2Event);
+
+        $this->entryAPI
+            ->expects($this->once())
+            ->method('updateEvent')
+            ->with($this->callback(function ($cdbItem) {
+                $details = $cdbItem->getDetails();
+                $details->rewind();
+                $media = $details->current()->getMedia();
+
+                $removedFiles = [];
+                foreach ($media as $key => $file) {
+                    if ($file->getHLink() === 'http://85.255.197.172/images/20140108/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg') {
+                        $removedFiles[] = $file;
+                    }
+                };
+
+                return empty($removedFiles);
+            }));
 
         $this->repository->syncBackOn();
         $this->repository->save($event);
