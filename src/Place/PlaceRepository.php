@@ -36,7 +36,7 @@ use CultuurNet\UDB3\Place\Events\ContactPointUpdated;
 use CultuurNet\UDB3\Place\Events\DescriptionUpdated;
 use CultuurNet\UDB3\Place\Events\FacilitiesUpdated;
 use CultuurNet\UDB3\Place\Events\ImageAdded;
-use CultuurNet\UDB3\Place\Events\ImageDeleted;
+use CultuurNet\UDB3\Place\Events\ImageRemoved;
 use CultuurNet\UDB3\Place\Events\ImageUpdated;
 use CultuurNet\UDB3\Place\Events\MajorInfoUpdated;
 use CultuurNet\UDB3\Place\Events\OrganizerDeleted;
@@ -49,6 +49,7 @@ use CultuurNet\UDB3\Place\Place;
 use CultuurNet\UDB3\SearchAPI2\SearchServiceInterface;
 use CultuurNet\UDB3\UDB2\ActorRepository;
 use CultuurNet\UDB3\UDB2\EntryAPIImprovedFactoryInterface;
+use CultuurNet\UDB3\UDB2\Media\EditImageTrait;
 use CultuurNet\UDB3\UDB2\Udb3RepositoryTrait;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -61,6 +62,7 @@ use Psr\Log\LoggerAwareTrait;
 class PlaceRepository extends ActorRepository implements RepositoryInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
+    use EditImageTrait;
     use Udb3RepositoryTrait;
     use DelegateEventHandlingToSpecificMethodTrait;
 
@@ -494,52 +496,46 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
         ImageAdded $domainEvent,
         DomainMessage $domainMessage
     ) {
-
         $entryApi = $this->createEntryAPI($domainMessage);
-        $event = $entryApi->getEvent($domainEvent->getPlaceId());
+        $place = $entryApi->getEvent($domainEvent->getItemId());
 
-        $this->addImageToCdbItem($event, $domainEvent->getMediaObject());
-        $entryApi->updateEvent($event);
-
+        $this->addImageToCdbItem($place, $domainEvent->getImage());
+        $entryApi->updateEvent($place);
     }
 
     /**
      * Apply the imageUpdated event to udb2.
-     * @param ImageUpdated|ImageUpdatedd $domainEvent
+     * @param ImageUpdated $domainEvent
      * @param DomainMessage $domainMessage
      */
     private function applyImageUpdated(
         ImageUpdated $domainEvent,
         DomainMessage $domainMessage
     ) {
-
         $entryApi = $this->createEntryAPI($domainMessage);
-        $event = $entryApi->getEvent($domainEvent->getPlaceId());
+        $place = $entryApi->getEvent($domainEvent->getItemId());
 
         $this->updateImageOnCdbItem(
-            $event,
-            $domainEvent->getIndexToUpdate(),
-            $domainEvent->getMediaObject()
+            $place,
+            $domainEvent->getMediaObjectId(),
+            $domainEvent->getDescription(),
+            $domainEvent->getCopyrightHolder()
         );
-        $entryApi->updateEvent($event);
-
+        $entryApi->updateEvent($place);
     }
 
     /**
-     * Apply the imageDeleted event to udb2.
-     * @param ImageDeleted $domainEvent
+     * @param ImageRemoved $domainEvent
      * @param DomainMessage $domainMessage
      */
-    private function applyImageDeleted(
-        ImageDeleted $domainEvent,
+    private function applyImageRemoved(
+        ImageRemoved $domainEvent,
         DomainMessage $domainMessage
     ) {
-
         $entryApi = $this->createEntryAPI($domainMessage);
-        $event = $entryApi->getEvent($domainEvent->getPlaceId());
+        $place = $entryApi->getEvent($domainEvent->getItemId());
 
-        $this->deleteImageOnCdbItem($event, $domainEvent->getIndexToDelete());
-        $entryApi->updateEvent($event);
-
+        $this->removeImageFromCdbItem($place, $domainEvent->getImage());
+        $entryApi->updateEvent($place);
     }
 }

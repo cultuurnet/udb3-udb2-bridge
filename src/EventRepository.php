@@ -54,6 +54,7 @@ use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\Location;
 use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\PlaceService;
+use CultuurNet\UDB3\UDB2\Media\EditImageTrait;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
@@ -66,6 +67,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
     use Udb2UtilityTrait;
+    use EditImageTrait;
     use Udb3RepositoryTrait;
     use DelegateEventHandlingToSpecificMethodTrait;
 
@@ -636,13 +638,11 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         ImageAdded $domainEvent,
         DomainMessage $domainMessage
     ) {
-
         $entryApi = $this->createEntryAPI($domainMessage);
         $event = $entryApi->getEvent($domainEvent->getItemId());
 
         $this->addImageToCdbItem($event, $domainEvent->getImage());
         $entryApi->updateEvent($event);
-
     }
 
     /**
@@ -664,7 +664,6 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
             $domainEvent->getCopyrightHolder()
         );
         $entryApi->updateEvent($event);
-
     }
 
     /**
@@ -675,13 +674,11 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         ImageRemoved $domainEvent,
         DomainMessage $domainMessage
     ) {
-
         $entryApi = $this->createEntryAPI($domainMessage);
         $event = $entryApi->getEvent($domainEvent->getItemId());
 
         $this->removeImageFromCdbItem($event, $domainEvent->getImage());
         $entryApi->updateEvent($event);
-
     }
 
     /**
