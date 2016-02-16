@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "9459d86091c9a673b12c134f7bf2f029",
-    "content-hash": "124a5654f5ab4fac33e624f5222715b3",
+    "hash": "9d90e2046a5122f0676c96483d02469d",
+    "content-hash": "a9cb43181b606b0778e76c1ef29cd1f4",
     "packages": [
         {
             "name": "2dotstwice/collection",
@@ -322,16 +322,16 @@
         },
         {
             "name": "cultuurnet/calendar-summary",
-            "version": "v1.0.4",
+            "version": "v1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/calendar-summary.git",
-                "reference": "208885b8b73730c18337883f9927fef4bf913577"
+                "reference": "0b6f3eda84c52fcb3e7ef5397df6b9389feaaa4c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/calendar-summary/zipball/208885b8b73730c18337883f9927fef4bf913577",
-                "reference": "208885b8b73730c18337883f9927fef4bf913577",
+                "url": "https://api.github.com/repos/cultuurnet/calendar-summary/zipball/0b6f3eda84c52fcb3e7ef5397df6b9389feaaa4c",
+                "reference": "0b6f3eda84c52fcb3e7ef5397df6b9389feaaa4c",
                 "shasum": ""
             },
             "require": {
@@ -364,7 +364,7 @@
                 "Apache-2.0"
             ],
             "description": "Library to convert a cdbXML input to a readable summary",
-            "time": "2015-11-13 08:49:40"
+            "time": "2016-02-16 08:18:15"
         },
         {
             "name": "cultuurnet/cdb",
@@ -372,12 +372,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/Cdb.git",
-                "reference": "15714342dfda0e92c59402008c83641a558a116c"
+                "reference": "267541bb8e35993c7f7be99834cc549f496854c7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/Cdb/zipball/15714342dfda0e92c59402008c83641a558a116c",
-                "reference": "15714342dfda0e92c59402008c83641a558a116c",
+                "url": "https://api.github.com/repos/cultuurnet/Cdb/zipball/267541bb8e35993c7f7be99834cc549f496854c7",
+                "reference": "267541bb8e35993c7f7be99834cc549f496854c7",
                 "shasum": ""
             },
             "require-dev": {
@@ -399,7 +399,7 @@
                 "Apache-2.0"
             ],
             "description": "PHP library for hydrating/manipulating CultuurNet's Cdb XML documents",
-            "time": "2016-01-15 12:57:24"
+            "time": "2016-02-16 08:33:45"
         },
         {
             "name": "cultuurnet/clock",
@@ -701,16 +701,16 @@
         },
         {
             "name": "cultuurnet/udb3",
-            "version": "dev-feature/III-657",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb3-php.git",
-                "reference": "f4bc40469ff684ae6d6660ce6377d9e335c1d83c"
+                "reference": "0d97464ab339a87e6d4504f43ef8572f07edb1a1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/f4bc40469ff684ae6d6660ce6377d9e335c1d83c",
-                "reference": "f4bc40469ff684ae6d6660ce6377d9e335c1d83c",
+                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/0d97464ab339a87e6d4504f43ef8572f07edb1a1",
+                "reference": "0d97464ab339a87e6d4504f43ef8572f07edb1a1",
                 "shasum": ""
             },
             "require": {
@@ -778,7 +778,7 @@
                 }
             ],
             "description": "UDB3 PHP libraries",
-            "time": "2016-02-15 14:54:47"
+            "time": "2016-02-16 10:34:58"
         },
         {
             "name": "danielstjules/stringy",
@@ -4233,18 +4233,9 @@
             "time": "2016-02-02 13:44:19"
         }
     ],
-    "aliases": [
-        {
-            "alias": "0.1",
-            "alias_normalized": "0.1.0.0",
-            "version": "dev-feature/III-657",
-            "package": "cultuurnet/udb3"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "cultuurnet/udb3": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
