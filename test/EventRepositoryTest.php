@@ -346,6 +346,147 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function it_adds_a_label()
+    {
+        $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
+        $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
+
+        $this->repository->save($event);
+
+        $expectedKeyword = [
+            new Label('Keyword B', true),
+        ];
+
+        $event->addLabel(
+            new Label('Keyword B')
+        );
+
+        $this->entryAPI->expects($this->once())
+            ->method('addKeywords')
+            ->with(
+                $id,
+                $expectedKeyword
+            );
+
+        $this->repository->syncBackOn();
+        $this->repository->save($event);
+    }
+
+    /**
+     * @test
+     */
+    public function it_deletes_a_label()
+    {
+        $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
+        $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
+
+        $this->repository->save($event);
+
+        $event->addLabel(
+            new Label('Keyword B')
+        );
+
+        $expectedKeyword = new Label('Keyword B');
+
+        $event->deleteLabel(
+            new Label('Keyword B')
+        );
+
+        $this->entryAPI->expects($this->once())
+            ->method('deleteKeyword')
+            ->with(
+                $id,
+                $expectedKeyword
+            );
+
+        $this->repository->syncBackOn();
+        $this->repository->save($event);
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_delete_a_label_that_does_not_exist()
+    {
+        $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
+        $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
+
+        $this->repository->save($event);
+
+        $event->deleteLabel(
+            new Label('Keyword B')
+        );
+
+        $this->entryAPI->expects($this->never())
+            ->method('deleteKeyword');
+
+        $this->repository->syncBackOn();
+        $this->repository->save($event);
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_translate_the_title()
+    {
+        $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
+        $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
+
+        $this->repository->save($event);
+
+        $expectedLanguage = new Language('en');
+        $expectedTitle = new String('English title');
+
+        $event->translateTitle(
+            new Language('en'),
+            new String('English title')
+        );
+
+        $this->entryAPI->expects($this->once())
+            ->method('translateEventTitle')
+            ->with(
+                $id,
+                $expectedLanguage,
+                $expectedTitle
+            );
+
+        $this->repository->syncBackOn();
+        $this->repository->save($event);
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_translate_the_decription()
+    {
+        $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
+        $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
+
+        $this->repository->save($event);
+
+        $expectedLanguage = new Language('en');
+        $expectedDescription = new String('English description');
+
+        $event->translateDescription(
+            new Language('en'),
+            new String('English description')
+        );
+
+        $this->entryAPI->expects($this->once())
+            ->method('translateEventDescription')
+            ->with(
+                $id,
+                $expectedLanguage,
+                $expectedDescription
+            );
+
+        $this->repository->syncBackOn();
+        $this->repository->save($event);
+    }
+
+    /**
+     * @test
+     */
     public function it_applies_a_translation()
     {
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';

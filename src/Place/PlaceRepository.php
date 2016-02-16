@@ -33,16 +33,20 @@ use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\Place\Events\BookingInfoUpdated;
 use CultuurNet\UDB3\Place\Events\ContactPointUpdated;
+use CultuurNet\UDB3\Place\Events\DescriptionTranslated;
 use CultuurNet\UDB3\Place\Events\DescriptionUpdated;
 use CultuurNet\UDB3\Place\Events\FacilitiesUpdated;
 use CultuurNet\UDB3\Place\Events\ImageAdded;
 use CultuurNet\UDB3\Place\Events\ImageRemoved;
 use CultuurNet\UDB3\Place\Events\ImageUpdated;
+use CultuurNet\UDB3\Place\Events\LabelAdded;
+use CultuurNet\UDB3\Place\Events\LabelDeleted;
 use CultuurNet\UDB3\Place\Events\MajorInfoUpdated;
 use CultuurNet\UDB3\Place\Events\OrganizerDeleted;
 use CultuurNet\UDB3\Place\Events\OrganizerUpdated;
 use CultuurNet\UDB3\Place\Events\PlaceCreated;
 use CultuurNet\UDB3\Place\Events\PlaceDeleted;
+use CultuurNet\UDB3\Place\Events\TitleTranslated;
 use CultuurNet\UDB3\Place\Events\TypicalAgeRangeDeleted;
 use CultuurNet\UDB3\Place\Events\TypicalAgeRangeUpdated;
 use CultuurNet\UDB3\Place\Place;
@@ -537,5 +541,67 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
 
         $this->removeImageFromCdbItem($place, $domainEvent->getImage());
         $entryApi->updateEvent($place);
+    }
+
+    /**
+     * @param LabelAdded $labelAdded
+     * @param DomainMessage $domainMessage
+     */
+    private function applyLabelAdded(
+        LabelAdded $labelAdded,
+        DomainMessage $domainMessage
+    ) {
+        $this->createEntryAPI($domainMessage)
+            ->addKeywords(
+                $labelAdded->getItemId(),
+                array($labelAdded->getLabel())
+            );
+    }
+
+    /**
+     * @param LabelDeleted $labelDeleted
+     * @param DomainMessage $domainMessage
+     */
+    private function applyLabelDeleted(
+        LabelDeleted $labelDeleted,
+        DomainMessage $domainMessage
+    ) {
+        $this->createEntryAPI($domainMessage)
+            ->deleteKeyword(
+                $labelDeleted->getItemId(),
+                $labelDeleted->getLabel()
+            );
+    }
+
+    /**
+     * @param TitleTranslated $domainEvent
+     * @param DomainMessage $domainMessage
+     */
+    private function applyTitleTranslated(
+        TitleTranslated $domainEvent,
+        DomainMessage $domainMessage
+    ) {
+        $this->createEntryAPI($domainMessage)
+            ->translateEventTitle(
+                $domainEvent->getItemId(),
+                $domainEvent->getLanguage(),
+                $domainEvent->getTitle()->toNative()
+            );
+    }
+
+    /**
+     * @param DescriptionTranslated $domainEvent
+     * @param DomainMessage $domainMessage
+     */
+    private function applyDescriptionTranslated(
+        DescriptionTranslated $domainEvent,
+        DomainMessage $domainMessage
+    ) {
+        $this->createEntryAPI($domainMessage)
+            ->translateEventDescription(
+                $domainEvent->getItemId(),
+                $domainEvent->getLanguage(),
+                $domainEvent->getDescription()->toNative()
+            );
     }
 }

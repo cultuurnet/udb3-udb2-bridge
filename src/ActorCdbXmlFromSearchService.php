@@ -65,7 +65,11 @@ class ActorCdbXmlFromSearchService implements ActorCdbXmlServiceInterface
                     ) {
                         if ($reader->namespaceURI !== $this->cdbXmlNamespaceUri) {
                             // @todo Use a more specific exception here.
-                            throw new \RuntimeException('Namespace URI does not match, expected ' . $this->cdbXmlNamespaceUri . ', actual ' . $reader->namespaceURI);
+                            throw new \RuntimeException(sprintf(
+                                'Namespace URI does not match, expected %s, actual %s',
+                                $this->cdbXmlNamespaceUri,
+                                $reader->namespaceURI
+                            ));
                         }
 
                         $node = $reader->expand();

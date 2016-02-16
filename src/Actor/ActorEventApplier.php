@@ -115,7 +115,8 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
 
         if (!$satisfied && $this->logger) {
             $this->logger->debug(
-                'The specification of which actors need to be processed is not satisfied by UDB2 actor with cdbid: ' . $actor->getCdbId()
+                'The specification of which actors need to be processed is ' .
+                'not satisfied by UDB2 actor with cdbid: ' . $actor->getCdbId()
             );
         }
 

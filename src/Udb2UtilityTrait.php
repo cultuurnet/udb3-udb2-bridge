@@ -127,11 +127,10 @@ trait Udb2UtilityTrait
             foreach ($openingHours as $openingHour) {
               // In CDB2 every day needs to be a seperate entry.
                 foreach ($openingHour->dayOfWeek as $day) {
-                    $openingTimesPerDay[$day][] =
-                        new CultureFeed_Cdb_Data_Calendar_OpeningTime(
-                            $openingHour->opens . ':00',
-                            $openingHour->closes . ':00'
-                        );
+                    $openingTimesPerDay[$day][] = new CultureFeed_Cdb_Data_Calendar_OpeningTime(
+                        $openingHour->opens . ':00',
+                        $openingHour->closes . ':00'
+                    );
                 }
 
             }
@@ -140,10 +139,16 @@ trait Udb2UtilityTrait
             foreach ($openingTimesPerDay as $day => $openingTimes) {
                 // Empty == closed.
                 if (empty($openingTimes)) {
-                    $openingInfo = new CultureFeed_Cdb_Data_Calendar_SchemeDay($day, CultureFeed_Cdb_Data_Calendar_SchemeDay::SCHEMEDAY_OPEN_TYPE_CLOSED);
+                    $openingInfo = new CultureFeed_Cdb_Data_Calendar_SchemeDay(
+                        $day,
+                        CultureFeed_Cdb_Data_Calendar_SchemeDay::SCHEMEDAY_OPEN_TYPE_CLOSED
+                    );
                 } else {
                     // Add all opening times.
-                    $openingInfo = new CultureFeed_Cdb_Data_Calendar_SchemeDay($day, CultureFeed_Cdb_Data_Calendar_SchemeDay::SCHEMEDAY_OPEN_TYPE_OPEN);
+                    $openingInfo = new CultureFeed_Cdb_Data_Calendar_SchemeDay(
+                        $day,
+                        CultureFeed_Cdb_Data_Calendar_SchemeDay::SCHEMEDAY_OPEN_TYPE_OPEN
+                    );
                     foreach ($openingTimes as $openingTime) {
                         $openingInfo->addOpeningTime($openingTime);
                     }
