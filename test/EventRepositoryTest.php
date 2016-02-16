@@ -15,6 +15,7 @@ use CultuurNet\UDB3\BookingInfo;
 use CultuurNet\UDB3\Cdb\EventItemFactory;
 use CultuurNet\UDB3\CollaborationData;
 use CultuurNet\UDB3\EntityServiceInterface;
+use CultuurNet\UDB3\Event\Commands\UpdateImage;
 use CultuurNet\UDB3\Event\Event;
 use CultuurNet\UDB3\Event\ReadModel\JSONLD\OrganizerServiceInterface;
 use CultuurNet\UDB3\Event\ReadModel\JSONLD\PlaceServiceInterface;
@@ -709,6 +710,70 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
                 return empty($removedFiles);
             }));
 
+        $this->repository->syncBackOn();
+        $this->repository->save($event);
+    }
+
+    /**
+     * @test
+     */
+    public function it_updates_the_event_media_object_property_when_updating_an_image()
+    {
+        $itemId = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
+
+        $image = new Image(
+            new UUID('9554d6f6-bed1-4303-8d42-3fcec4601e0e'),
+            new MIMEType('image/jpg'),
+            new String('duckfaceplant'),
+            new String('Karbido Ensemble'),
+            Url::fromNative('http://foo.bar/media/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg')
+        );
+
+        $event = $this->createEvent($itemId, 'eventrepositorytest_event.xml');
+        $event->addImage($image);
+
+        $this->repository->save($event);
+
+        $existingEvent = EventItemFactory::createEventFromCdbXml(
+            self::NS,
+            file_get_contents(__DIR__ . '/event.xml')
+        );
+
+        $updateCommand = new UpdateImage(
+            $itemId,
+            new UUID('9554d6f6-bed1-4303-8d42-3fcec4601e0e'),
+            new String('nieuwe beschrijving'),
+            new String('nieuwe auteur')
+        );
+
+
+        $this->entryAPI->expects($this->once())
+            ->method('getEvent')
+            ->with($itemId)
+            ->willReturn($existingEvent);
+
+        $this->entryAPI
+            ->expects($this->once())
+            ->method('updateEvent')
+            ->with($this->callback(function ($cdbItem) {
+                $details = $cdbItem->getDetails();
+                $details->rewind();
+                $media = $details->current()->getMedia();
+
+                $outdatedFiles = [];
+                foreach ($media as $key => $file) {
+                    if ($file->getHLink() === 'http://85.255.197.172/images/20140108/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg') {
+                        if ($file->getTitle() !== 'nieuwe beschrijving' ||
+                        $file->getCopyright() !== 'nieuwe auteur') {
+                            $outdatedFiles[] = $file;
+                        }
+                    }
+                };
+
+                return empty($outdatedFiles);
+            }));
+
+        $event->updateImage($updateCommand);
         $this->repository->syncBackOn();
         $this->repository->save($event);
     }

@@ -2,11 +2,13 @@
 
 namespace CultuurNet\UDB3\UDB2\Media;
 
+use CultureFeed_Cdb_Data_EventDetail;
+use CultureFeed_Cdb_Data_Media;
 use CultureFeed_Cdb_Item_Base;
 use CultureFeed_Cdb_Data_File;
 use CultuurNet\UDB3\Media\Image;
 use ValueObjects\Identity\UUID;
-use ValueObjects\String\String;
+use ValueObjects\String\String as StringLiteral;
 
 trait EditImageTrait
 {
@@ -20,22 +22,13 @@ trait EditImageTrait
         CultureFeed_Cdb_Item_Base $cdbItem,
         Image $image
     ) {
+        $media = $this->getCdbItemMedia($cdbItem);
 
-        $details = $cdbItem->getDetails();
-        $details->rewind();
-
-        // No detail = nothing to delete.
-        if (!$details->valid()) {
-            return;
-        }
-
-        $media = $details->current()->getMedia();
         foreach ($media as $key => $file) {
             if ($this->fileMatchesMediaObject($file, $image->getMediaObjectId())) {
                 $media->remove($key);
             }
         }
-
     }
 
     /**
@@ -43,25 +36,21 @@ trait EditImageTrait
      *
      * @param \CultureFeed_Cdb_Item_Base $cdbItem
      * @param UUID $mediaObjectId
-     * @param \ValueObjects\String\String $description
-     * @param \ValueObjects\String\String $copytightHolder
+     * @param StringLiteral $description
+     * @param StringLiteral $copyrightHolder
      */
     protected function updateImageOnCdbItem(
         CultureFeed_Cdb_Item_Base $cdbItem,
         UUID $mediaObjectId,
-        String $description,
-        String $copyrightHolder
+        StringLiteral $description,
+        StringLiteral $copyrightHolder
     ) {
         $media = $this->getCdbItemMedia($cdbItem);
 
         foreach ($media as $file) {
-            if ($file->getMediatype() === CultureFeed_Cdb_Data_File::MEDIA_TYPE_IMAGEWEB) {
-                $file->setMain();
-
-                if ($this->fileMatchesMediaObject($file, $mediaObjectId)) {
-                    $file->setTitle((string) $description);
-                    $file->setCopyright((string) $copyrightHolder);
-                }
+            if ($this->fileMatchesMediaObject($file, $mediaObjectId)) {
+                $file->setTitle((string) $description);
+                $file->setCopyright((string) $copyrightHolder);
             }
         }
     }
@@ -103,10 +92,13 @@ trait EditImageTrait
      * If the items does not have any detials, one will be created.
      *
      * @param \CultureFeed_Cdb_Item_Base $cdbItem
+     *
+     * @return CultureFeed_Cdb_Data_Media
      */
     private function getCdbItemMedia(CultureFeed_Cdb_Item_Base $cdbItem)
     {
         $details = $cdbItem->getDetails();
+        $details->rewind();
 
         // Get the first detail.
         $detail = null;
