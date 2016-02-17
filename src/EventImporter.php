@@ -106,7 +106,8 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
         } catch (AggregateNotFoundException $e) {
             if ($fallbackToCreate) {
                 $this->logger->notice(
-                    "Could not update event because it does not exist yet on UDB3, will attempt to create the event instead",
+                    "Could not update event because it does not exist yet on " .
+                    "UDB3, will attempt to create the event instead",
                     [
                         'eventId' => $eventId
                     ]

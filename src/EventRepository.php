@@ -25,11 +25,11 @@ use CultuurNet\Entry\EntityType;
 use CultuurNet\Entry\Language;
 use CultuurNet\Entry\Number;
 use CultuurNet\Entry\String;
-use CultuurNet\UDB3\Event\DescriptionTranslated;
 use CultuurNet\UDB3\Event\Event;
 use CultuurNet\UDB3\Event\Events\BookingInfoUpdated;
 use CultuurNet\UDB3\Event\Events\CollaborationDataAdded;
 use CultuurNet\UDB3\Event\Events\ContactPointUpdated;
+use CultuurNet\UDB3\Event\Events\DescriptionTranslated;
 use CultuurNet\UDB3\Event\Events\DescriptionUpdated;
 use CultuurNet\UDB3\Event\Events\EventCreated;
 use CultuurNet\UDB3\Event\Events\EventCreatedFromCdbXml;
@@ -44,12 +44,12 @@ use CultuurNet\UDB3\Event\Events\LabelsMerged;
 use CultuurNet\UDB3\Event\Events\MajorInfoUpdated;
 use CultuurNet\UDB3\Event\Events\OrganizerDeleted;
 use CultuurNet\UDB3\Event\Events\OrganizerUpdated;
+use CultuurNet\UDB3\Event\Events\TitleTranslated;
 use CultuurNet\UDB3\Event\Events\TranslationApplied;
 use CultuurNet\UDB3\Event\Events\TranslationDeleted;
 use CultuurNet\UDB3\Event\Events\TypicalAgeRangeDeleted;
 use CultuurNet\UDB3\Event\Events\TypicalAgeRangeUpdated;
 use CultuurNet\UDB3\Event\Events\LabelDeleted;
-use CultuurNet\UDB3\Event\TitleTranslated;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\Location;
 use CultuurNet\UDB3\OrganizerService;
@@ -154,32 +154,32 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
     }
 
     /**
-     * @param EventWasLabelled $labelled
+     * @param LabelAdded $labelAdded
      * @param DomainMessage $domainMessage
      */
-    private function applyEventWasLabelled(
-        LabelAdded $labelled,
+    private function applyLabelAdded(
+        LabelAdded $labelAdded,
         DomainMessage $domainMessage
     ) {
         $this->createEntryAPI($domainMessage)
             ->addKeywords(
-                $labelled->getEventId(),
-                array($labelled->getLabel())
+                $labelAdded->getItemId(),
+                array($labelAdded->getLabel())
             );
     }
 
     /**
-     * @param Unlabelled $unlabelled
+     * @param LabelDeleted $labelDeleted
      * @param DomainMessage $domainMessage
      */
-    private function applyUnlabelled(
-        LabelDeleted $unlabelled,
+    private function applyLabelDeleted(
+        LabelDeleted $labelDeleted,
         DomainMessage $domainMessage
     ) {
         $this->createEntryAPI($domainMessage)
             ->deleteKeyword(
-                $unlabelled->getEventId(),
-                $unlabelled->getLabel()
+                $labelDeleted->getItemId(),
+                $labelDeleted->getLabel()
             );
     }
 
@@ -193,9 +193,9 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
     ) {
         $this->createEntryAPI($domainMessage)
             ->translateEventTitle(
-                $domainEvent->getEventId(),
+                $domainEvent->getItemId(),
                 $domainEvent->getLanguage(),
-                $domainEvent->getTitle()
+                $domainEvent->getTitle()->toNative()
             );
     }
 
@@ -209,9 +209,9 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
     ) {
         $this->createEntryAPI($domainMessage)
             ->translateEventDescription(
-                $domainEvent->getEventId(),
+                $domainEvent->getItemId(),
                 $domainEvent->getLanguage(),
-                $domainEvent->getDescription()
+                $domainEvent->getDescription()->toNative()
             );
     }
 
