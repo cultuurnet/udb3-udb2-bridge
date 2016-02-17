@@ -122,7 +122,7 @@ class EventImporterTest extends \PHPUnit_Framework_TestCase
         $this->repository->save($event);
 
         $eventXml = file_get_contents(
-            __DIR__ . '/search-results-single-event.xml'
+            __DIR__ . '/samples/search-results-single-event.xml'
         );
 
         $this->eventCdbXmlService

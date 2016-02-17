@@ -2,11 +2,15 @@
 
 namespace CultuurNet\UDB3\UDB2\Media;
 
+use Broadway\Domain\DomainMessage;
 use CultureFeed_Cdb_Data_EventDetail;
 use CultureFeed_Cdb_Data_Media;
 use CultureFeed_Cdb_Item_Base;
 use CultureFeed_Cdb_Data_File;
 use CultuurNet\UDB3\Media\Image;
+use CultuurNet\UDB3\Offer\Events\Image\AbstractImageAdded;
+use CultuurNet\UDB3\Offer\Events\Image\AbstractImageRemoved;
+use CultuurNet\UDB3\Offer\Events\Image\AbstractImageUpdated;
 use ValueObjects\Identity\UUID;
 use ValueObjects\String\String as StringLiteral;
 
@@ -55,8 +59,12 @@ trait EditImageTrait
         }
     }
 
+
     /**
      * Add an image to the cdb item.
+     *
+     * @param CultureFeed_Cdb_Item_Base $cdbItem
+     * @param Image $image
      */
     protected function addImageToCdbItem(
         CultureFeed_Cdb_Item_Base $cdbItem,
@@ -80,8 +88,8 @@ trait EditImageTrait
         $file->setFileType($extension);
         $file->setFileName($filename);
 
-        $file->setCopyright($image->getCopyrightHolder());
-        $file->setTitle($image->getDescription());
+        $file->setCopyright((string) $image->getCopyrightHolder());
+        $file->setTitle((string) $image->getDescription());
 
         $this->getCdbItemMedia($cdbItem)->add($file);
     }
@@ -95,7 +103,7 @@ trait EditImageTrait
      *
      * @return CultureFeed_Cdb_Data_Media
      */
-    private function getCdbItemMedia(CultureFeed_Cdb_Item_Base $cdbItem)
+    protected function getCdbItemMedia(CultureFeed_Cdb_Item_Base $cdbItem)
     {
         $details = $cdbItem->getDetails();
         $details->rewind();
@@ -114,7 +122,9 @@ trait EditImageTrait
             $details->add($detail);
         }
 
-        return $detail->getMedia();
+        $media = $detail->getMedia();
+        $media->rewind();
+        return $media;
     }
 
     /**
@@ -122,12 +132,64 @@ trait EditImageTrait
      * @param UUID $mediaObjectId
      * @return bool
      */
-    private function fileMatchesMediaObject(
+    protected function fileMatchesMediaObject(
         CultureFeed_Cdb_Data_File $file,
         UUID $mediaObjectId
     ) {
         // Matching against the CDBID in the name of the image because
         // that's the only reference in UDB2 we have.
         return !!strpos($file->getHLink(), (string) $mediaObjectId);
+    }
+
+    /**
+     * Apply the imageAdded event to udb2.
+     * @param AbstractImageAdded $domainEvent
+     * @param DomainMessage $domainMessage
+     */
+    protected function applyImageAdded(
+        AbstractImageAdded $domainEvent,
+        DomainMessage $domainMessage
+    ) {
+        $entryApi = $this->createEntryAPI($domainMessage);
+        $udb2Event = $entryApi->getEvent($domainEvent->getItemId());
+
+        $this->addImageToCdbItem($udb2Event, $domainEvent->getImage());
+        $entryApi->updateEvent($udb2Event);
+    }
+
+    /**
+     * Apply the imageUpdated event to udb2.
+     * @param AbstractImageUpdated $domainEvent
+     * @param DomainMessage $domainMessage
+     */
+    protected function applyImageUpdated(
+        AbstractImageUpdated $domainEvent,
+        DomainMessage $domainMessage
+    ) {
+        $entryApi = $this->createEntryAPI($domainMessage);
+        $udb2Event = $entryApi->getEvent($domainEvent->getItemId());
+
+        $this->updateImageOnCdbItem(
+            $udb2Event,
+            $domainEvent->getMediaObjectId(),
+            $domainEvent->getDescription(),
+            $domainEvent->getCopyrightHolder()
+        );
+        $entryApi->updateEvent($udb2Event);
+    }
+
+    /**
+     * @param AbstractImageRemoved $domainEvent
+     * @param DomainMessage $domainMessage
+     */
+    protected function applyImageRemoved(
+        AbstractImageRemoved $domainEvent,
+        DomainMessage $domainMessage
+    ) {
+        $entryApi = $this->createEntryAPI($domainMessage);
+        $udb2Event = $entryApi->getEvent($domainEvent->getItemId());
+
+        $this->removeImageFromCdbItem($udb2Event, $domainEvent->getImage());
+        $entryApi->updateEvent($udb2Event);
     }
 }

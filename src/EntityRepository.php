@@ -66,10 +66,16 @@ abstract class EntityRepository implements RepositoryInterface
             // be reset once we retrieve them, therefore we clone the object.
             $double = clone $aggregate;
             $domainEventStream = $double->getUncommittedEvents();
-            $this->decorateForWrite(
+            $eventStream = $this->decorateForWrite(
                 $aggregate,
                 $domainEventStream
             );
+
+            /** @var DomainMessage $domainMessage */
+            foreach ($eventStream as $domainMessage) {
+                $domainEvent = $domainMessage->getPayload();
+                $this->handle($domainMessage);
+            }
         }
 
         $this->decoratee->save($aggregate);

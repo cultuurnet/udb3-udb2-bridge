@@ -1,7 +1,4 @@
 <?php
-/**
- * @file
- */
 
 namespace CultuurNet\UDB3\UDB2;
 
@@ -36,9 +33,6 @@ use CultuurNet\UDB3\Event\Events\EventCreatedFromCdbXml;
 use CultuurNet\UDB3\Event\Events\EventDeleted;
 use CultuurNet\UDB3\Event\Events\EventUpdatedFromCdbXml;
 use CultuurNet\UDB3\Event\Events\LabelAdded;
-use CultuurNet\UDB3\Event\Events\ImageAdded;
-use CultuurNet\UDB3\Event\Events\ImageRemoved;
-use CultuurNet\UDB3\Event\Events\ImageUpdated;
 use CultuurNet\UDB3\Event\Events\LabelsApplied;
 use CultuurNet\UDB3\Event\Events\LabelsMerged;
 use CultuurNet\UDB3\Event\Events\MajorInfoUpdated;
@@ -627,58 +621,6 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
             );
         }
 
-    }
-
-    /**
-     * Apply the imageAdded event to udb2.
-     * @param ImageAdded $domainEvent
-     * @param DomainMessage $domainMessage
-     */
-    private function applyImageAdded(
-        ImageAdded $domainEvent,
-        DomainMessage $domainMessage
-    ) {
-        $entryApi = $this->createEntryAPI($domainMessage);
-        $event = $entryApi->getEvent($domainEvent->getItemId());
-
-        $this->addImageToCdbItem($event, $domainEvent->getImage());
-        $entryApi->updateEvent($event);
-    }
-
-    /**
-     * Apply the imageUpdated event to udb2.
-     * @param ImageUpdated $domainEvent
-     * @param DomainMessage $domainMessage
-     */
-    private function applyImageUpdated(
-        ImageUpdated $domainEvent,
-        DomainMessage $domainMessage
-    ) {
-        $entryApi = $this->createEntryAPI($domainMessage);
-        $event = $entryApi->getEvent($domainEvent->getItemId());
-
-        $this->updateImageOnCdbItem(
-            $event,
-            $domainEvent->getMediaObjectId(),
-            $domainEvent->getDescription(),
-            $domainEvent->getCopyrightHolder()
-        );
-        $entryApi->updateEvent($event);
-    }
-
-    /**
-     * @param ImageRemoved $domainEvent
-     * @param DomainMessage $domainMessage
-     */
-    private function applyImageRemoved(
-        ImageRemoved $domainEvent,
-        DomainMessage $domainMessage
-    ) {
-        $entryApi = $this->createEntryAPI($domainMessage);
-        $event = $entryApi->getEvent($domainEvent->getItemId());
-
-        $this->removeImageFromCdbItem($event, $domainEvent->getImage());
-        $entryApi->updateEvent($event);
     }
 
     /**

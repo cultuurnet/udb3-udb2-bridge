@@ -1,16 +1,9 @@
 <?php
 
-/**
- * @file
- * Contains \Cultuurnet\UDB3\UDB2\Place\PlaceRepository.
- */
-
 namespace CultuurNet\UDB3\UDB2\Place;
 
 use Broadway\Domain\AggregateRoot;
 use Broadway\Domain\DomainMessage;
-use Broadway\Domain\Metadata;
-use Broadway\EventSourcing\EventStreamDecoratorInterface;
 use Broadway\Repository\AggregateNotFoundException;
 use Broadway\Repository\RepositoryInterface;
 use CultureFeed_Cdb_Data_Address;
@@ -20,25 +13,19 @@ use CultureFeed_Cdb_Data_ContactInfo;
 use CultureFeed_Cdb_Data_EventDetail;
 use CultureFeed_Cdb_Data_EventDetailList;
 use CultureFeed_Cdb_Data_Location;
-use CultureFeed_Cdb_Default;
 use CultureFeed_Cdb_Item_Event;
 use CultuurNet\Entry\BookingPeriod;
 use CultuurNet\Entry\EntityType;
 use CultuurNet\Entry\Language;
 use CultuurNet\Entry\Number;
 use CultuurNet\Entry\String;
-use CultuurNet\UDB3\Actor\ActorImportedFromUDB2;
 use CultuurNet\UDB3\EntityServiceInterface;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
-use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\Place\Events\BookingInfoUpdated;
 use CultuurNet\UDB3\Place\Events\ContactPointUpdated;
 use CultuurNet\UDB3\Place\Events\DescriptionTranslated;
 use CultuurNet\UDB3\Place\Events\DescriptionUpdated;
 use CultuurNet\UDB3\Place\Events\FacilitiesUpdated;
-use CultuurNet\UDB3\Place\Events\ImageAdded;
-use CultuurNet\UDB3\Place\Events\ImageRemoved;
-use CultuurNet\UDB3\Place\Events\ImageUpdated;
 use CultuurNet\UDB3\Place\Events\LabelAdded;
 use CultuurNet\UDB3\Place\Events\LabelDeleted;
 use CultuurNet\UDB3\Place\Events\MajorInfoUpdated;
@@ -50,7 +37,6 @@ use CultuurNet\UDB3\Place\Events\TitleTranslated;
 use CultuurNet\UDB3\Place\Events\TypicalAgeRangeDeleted;
 use CultuurNet\UDB3\Place\Events\TypicalAgeRangeUpdated;
 use CultuurNet\UDB3\Place\Place;
-use CultuurNet\UDB3\SearchAPI2\SearchServiceInterface;
 use CultuurNet\UDB3\UDB2\ActorRepository;
 use CultuurNet\UDB3\UDB2\EntryAPIImprovedFactoryInterface;
 use CultuurNet\UDB3\UDB2\Media\EditImageTrait;
@@ -489,58 +475,6 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
 
         $entryApi->updateFacilities($facilitiesUpdated->getPlaceId(), $dom);
 
-    }
-
-    /**
-     * Apply the imageAdded event to udb2.
-     * @param ImageAdded $domainEvent
-     * @param DomainMessage $domainMessage
-     */
-    private function applyImageAdded(
-        ImageAdded $domainEvent,
-        DomainMessage $domainMessage
-    ) {
-        $entryApi = $this->createEntryAPI($domainMessage);
-        $place = $entryApi->getEvent($domainEvent->getItemId());
-
-        $this->addImageToCdbItem($place, $domainEvent->getImage());
-        $entryApi->updateEvent($place);
-    }
-
-    /**
-     * Apply the imageUpdated event to udb2.
-     * @param ImageUpdated $domainEvent
-     * @param DomainMessage $domainMessage
-     */
-    private function applyImageUpdated(
-        ImageUpdated $domainEvent,
-        DomainMessage $domainMessage
-    ) {
-        $entryApi = $this->createEntryAPI($domainMessage);
-        $place = $entryApi->getEvent($domainEvent->getItemId());
-
-        $this->updateImageOnCdbItem(
-            $place,
-            $domainEvent->getMediaObjectId(),
-            $domainEvent->getDescription(),
-            $domainEvent->getCopyrightHolder()
-        );
-        $entryApi->updateEvent($place);
-    }
-
-    /**
-     * @param ImageRemoved $domainEvent
-     * @param DomainMessage $domainMessage
-     */
-    private function applyImageRemoved(
-        ImageRemoved $domainEvent,
-        DomainMessage $domainMessage
-    ) {
-        $entryApi = $this->createEntryAPI($domainMessage);
-        $place = $entryApi->getEvent($domainEvent->getItemId());
-
-        $this->removeImageFromCdbItem($place, $domainEvent->getImage());
-        $entryApi->updateEvent($place);
     }
 
     /**

@@ -20,7 +20,7 @@ class PlaceFactoryTest extends \PHPUnit_Framework_TestCase
         $factory = new PlaceFactory();
 
         $id = '404EE8DE-E828-9C07-FE7D12DC4EB24480';
-        $cdbXml = file_get_contents(__DIR__ . '/samples/actor.xml');
+        $cdbXml = file_get_contents(__DIR__ . '/../samples/actor.xml');
         $cdbXmlNamespaceUri = 'http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL';
 
         $place = $factory->createFromCdbXml(
