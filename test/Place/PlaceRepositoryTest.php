@@ -1,11 +1,9 @@
 <?php
-/**
- * @file
- */
 
 namespace CultuurNet\UDB3\UDB2\Place;
 
 use Broadway\Domain\Metadata;
+use Broadway\EventSourcing\EventSourcedAggregateRoot;
 use Broadway\EventSourcing\MetadataEnrichment\MetadataEnrichingEventStreamDecorator;
 use Broadway\Repository\AggregateNotFoundException;
 use Broadway\Repository\RepositoryInterface;
@@ -14,21 +12,23 @@ use CultuurNet\Entry\EntryAPI;
 use CultuurNet\UDB3\EntityServiceInterface;
 use CultuurNet\UDB3\EventSourcing\ExecutionContextMetadataEnricher;
 use CultuurNet\UDB3\Label;
-use CultuurNet\UDB3\LabelCollection;
 use CultuurNet\UDB3\Language;
 use CultuurNet\UDB3\OrganizerService;
+use CultuurNet\UDB3\Place\Commands\PlaceCommandFactory;
 use CultuurNet\UDB3\Place\Place;
 use CultuurNet\UDB3\UDB2\EntryAPIImprovedFactoryInterface;
+use CultuurNet\UDB3\UDB2\Media\EditImageTestTrait;
 use ValueObjects\String\String;
 
 class PlaceRepositoryTest extends \PHPUnit_Framework_TestCase
 {
+    use EditImageTestTrait;
     const NS = 'http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL';
 
     /**
      * @var PlaceRepository
      */
-    private $placeRepository;
+    private $repository;
 
     /**
      * @var RepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -58,6 +58,15 @@ class PlaceRepositoryTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->innerRepository = $this->getMock(RepositoryInterface::class);
+        $this->innerRepository->expects($this->any())
+            ->method('save')
+            ->willReturnCallback(
+                function (EventSourcedAggregateRoot $aggregateRoot) {
+                    // Clear the uncommitted events.
+                    $aggregateRoot->getUncommittedEvents();
+                }
+            );
+
         $this->placeImporter = $this->getMock(PlaceImporterInterface::class);
         $this->organizerService = $this->getMock(EntityServiceInterface::class);
         $this->entryAPIImprovedFactory = $this->getMock(
@@ -74,7 +83,7 @@ class PlaceRepositoryTest extends \PHPUnit_Framework_TestCase
             ])
         );
 
-        $this->placeRepository = new PlaceRepository(
+        $this->repository = new PlaceRepository(
             $this->innerRepository,
             $this->entryAPIImprovedFactory,
             $this->placeImporter,
@@ -93,6 +102,8 @@ class PlaceRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->entryAPIImprovedFactory->expects($this->any())
             ->method('withTokenCredentials')
             ->willReturn($this->entryAPI);
+
+        $this->commandFactory = new PlaceCommandFactory();
     }
 
     /**
@@ -114,7 +125,7 @@ class PlaceRepositoryTest extends \PHPUnit_Framework_TestCase
             ->with($id)
             ->willReturn(new Place());
 
-        $this->placeRepository->load($id);
+        $this->repository->load($id);
     }
 
     /**
@@ -137,7 +148,7 @@ class PlaceRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException(AggregateNotFoundException::class);
 
-        $this->placeRepository->load($id);
+        $this->repository->load($id);
     }
 
     /**
@@ -146,7 +157,7 @@ class PlaceRepositoryTest extends \PHPUnit_Framework_TestCase
     public function it_adds_a_label()
     {
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $place = $this->createPlace($id, 'event.xml');
+        $place = $this->createItem($id, 'place.xml');
 
         $this->innerRepository->save($place);
 
@@ -165,8 +176,8 @@ class PlaceRepositoryTest extends \PHPUnit_Framework_TestCase
                 $expectedKeyword
             );
 
-        $this->placeRepository->syncBackOn();
-        $this->placeRepository->save($place);
+        $this->repository->syncBackOn();
+        $this->repository->save($place);
     }
 
     /**
@@ -175,7 +186,7 @@ class PlaceRepositoryTest extends \PHPUnit_Framework_TestCase
     public function it_deletes_a_label()
     {
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $place = $this->createPlace($id, 'event.xml');
+        $place = $this->createItem($id, 'place.xml');
 
         $this->innerRepository->save($place);
 
@@ -196,8 +207,8 @@ class PlaceRepositoryTest extends \PHPUnit_Framework_TestCase
                 $expectedKeyword
             );
 
-        $this->placeRepository->syncBackOn();
-        $this->placeRepository->save($place);
+        $this->repository->syncBackOn();
+        $this->repository->save($place);
     }
 
     /**
@@ -206,7 +217,7 @@ class PlaceRepositoryTest extends \PHPUnit_Framework_TestCase
     public function it_does_not_delete_a_label_that_does_not_exist()
     {
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $place = $this->createPlace($id, 'event.xml');
+        $place = $this->createItem($id, 'place.xml');
 
         $this->innerRepository->save($place);
 
@@ -217,8 +228,8 @@ class PlaceRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->entryAPI->expects($this->never())
             ->method('deleteKeyword');
 
-        $this->placeRepository->syncBackOn();
-        $this->placeRepository->save($place);
+        $this->repository->syncBackOn();
+        $this->repository->save($place);
     }
 
     /**
@@ -227,7 +238,7 @@ class PlaceRepositoryTest extends \PHPUnit_Framework_TestCase
     public function it_can_translate_the_title()
     {
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $place = $this->createPlace($id, 'event.xml');
+        $place = $this->createItem($id, 'place.xml');
 
         $this->innerRepository->save($place);
 
@@ -247,8 +258,8 @@ class PlaceRepositoryTest extends \PHPUnit_Framework_TestCase
                 $expectedTitle
             );
 
-        $this->placeRepository->syncBackOn();
-        $this->placeRepository->save($place);
+        $this->repository->syncBackOn();
+        $this->repository->save($place);
     }
 
     /**
@@ -257,7 +268,7 @@ class PlaceRepositoryTest extends \PHPUnit_Framework_TestCase
     public function it_can_translate_the_decription()
     {
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $place = $this->createPlace($id, 'event.xml');
+        $place = $this->createItem($id, 'place.xml');
 
         $this->innerRepository->save($place);
 
@@ -277,16 +288,16 @@ class PlaceRepositoryTest extends \PHPUnit_Framework_TestCase
                 $expectedDescription
             );
 
-        $this->placeRepository->syncBackOn();
-        $this->placeRepository->save($place);
+        $this->repository->syncBackOn();
+        $this->repository->save($place);
     }
 
-    private function createPlace(
+    private function createItem(
         $id,
         $xmlFile,
         $ns = self::NS
     ) {
-        $cdbXml = file_get_contents(__DIR__ . '/samples/' . $xmlFile);
+        $cdbXml = file_get_contents(__DIR__ . '/../samples/' . $xmlFile);
 
         return Place::importFromUDB2Event(
             $id,

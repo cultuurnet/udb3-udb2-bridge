@@ -46,12 +46,12 @@ class ActorCdbXmlFromSearchServiceTest extends \PHPUnit_Framework_TestCase
      */
     public function it_extracts_actor_from_returned_results()
     {
-        $this->search->setFixedResponseFromFile(__DIR__ . '/search-results-for-actor.xml');
+        $this->search->setFixedResponseFromFile(__DIR__ . '/samples/search-results-for-actor.xml');
 
         $xml = $this->service->getCdbXmlOfActor('061C13AC-A15F-F419-D8993D68C9E94548');
 
         $this->assertXmlStringEqualsXmlFile(
-            __DIR__ . '/search-results-single-actor.xml',
+            __DIR__ . '/samples/search-results-single-actor.xml',
             $xml
         );
     }

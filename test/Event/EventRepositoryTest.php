@@ -1,9 +1,6 @@
 <?php
-/**
- * @file
- */
 
-namespace CultuurNet\UDB3\UDB2;
+namespace CultuurNet\UDB3\UDB2\Event;
 
 use Broadway\Domain\Metadata;
 use Broadway\EventSourcing\EventSourcedAggregateRoot;
@@ -14,29 +11,27 @@ use CultuurNet\Entry\EntryAPI;
 use CultuurNet\UDB3\BookingInfo;
 use CultuurNet\UDB3\Cdb\EventItemFactory;
 use CultuurNet\UDB3\CollaborationData;
-use CultuurNet\UDB3\EntityServiceInterface;
+use CultuurNet\UDB3\Event\Commands\EventCommandFactory;
 use CultuurNet\UDB3\Event\Event;
-use CultuurNet\UDB3\Event\ReadModel\JSONLD\OrganizerServiceInterface;
-use CultuurNet\UDB3\Event\ReadModel\JSONLD\PlaceServiceInterface;
 use CultuurNet\UDB3\EventSourcing\ExecutionContextMetadataEnricher;
 use CultuurNet\UDB3\EventXmlString;
 use CultuurNet\UDB3\Label;
 use CultuurNet\UDB3\Language;
 use CultuurNet\UDB3\LabelCollection;
-use CultuurNet\UDB3\Media\Image;
-use CultuurNet\UDB3\Media\MediaObject;
-use CultuurNet\UDB3\Media\Properties\MIMEType;
 use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\PlaceService;
+use CultuurNet\UDB3\UDB2\EntryAPIImprovedFactoryInterface;
+use CultuurNet\UDB3\UDB2\EventImporterInterface;
+use CultuurNet\UDB3\UDB2\EventRepository;
+use CultuurNet\UDB3\UDB2\Media\EditImageTestTrait;
 use PHPUnit_Framework_TestCase;
 use CultureFeed_Cdb_Data_ContactInfo;
-use ValueObjects\Identity\UUID;
 use ValueObjects\String\String;
 use ValueObjects\Web\Url;
 
 class EventRepositoryTest extends PHPUnit_Framework_TestCase
 {
-
+    use EditImageTestTrait;
     const NS = 'http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL';
 
     /**
@@ -128,6 +123,8 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
         $this->entryAPIImprovedFactory->expects($this->any())
             ->method('withTokenCredentials')
             ->willReturn($this->entryAPI);
+
+        $this->commandFactory = new EventCommandFactory();
     }
 
     /**
@@ -143,7 +140,7 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
 
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
 
-        $cdbXml = file_get_contents(__DIR__ . '/event.xml');
+        $cdbXml = file_get_contents(__DIR__ . '/../samples/event.xml');
 
         $event = Event::importFromUDB2(
             $id,
@@ -171,7 +168,7 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
 
         $expectedContactInfo = CultureFeed_Cdb_Data_ContactInfo::parseFromCdbXml(
             new \SimpleXMLElement(
-                file_get_contents(__DIR__ . '/contactinfo.xml'),
+                file_get_contents(__DIR__ . '/../samples/contactinfo.xml'),
                 0,
                 false,
                 $cdbXmlNamespaceUri
@@ -208,7 +205,7 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
 
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
 
-        $cdbXml = file_get_contents(__DIR__ . '/event.xml');
+        $cdbXml = file_get_contents(__DIR__ . '/../samples/event.xml');
 
         $event = Event::importFromUDB2(
             $id,
@@ -236,7 +233,7 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
 
         $expectedContactInfo = CultureFeed_Cdb_Data_ContactInfo::parseFromCdbXml(
             new \SimpleXMLElement(
-                file_get_contents(__DIR__ . '/contactinfo-emptied.xml'),
+                file_get_contents(__DIR__ . '/../samples/contactinfo-emptied.xml'),
                 0,
                 false,
                 $cdbXmlNamespaceUri
@@ -265,13 +262,13 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
      */
     public function it_creates_an_event_from_cdbxml()
     {
-        $expectedXmlStringArgument = file_get_contents(__DIR__ . '/eventrepositorytest_event_with_cdbid.xml');
+        $expectedXmlStringArgument = file_get_contents(__DIR__ . '/../samples/eventrepositorytest_event_with_cdbid.xml');
 
         $this->entryAPI->expects($this->once())
             ->method('createEventFromRawXml')
             ->with($expectedXmlStringArgument);
 
-        $event = $this->createEvent(
+        $event = $this->createItem(
             'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1',
             'eventrepositorytest_event.xml'
         );
@@ -287,13 +284,13 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
     {
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
 
-        $expectedXmlStringArgument = file_get_contents(__DIR__ . '/eventrepositorytest_event_with_cdbid.xml');
+        $expectedXmlStringArgument = file_get_contents(__DIR__ . '/../samples/eventrepositorytest_event_with_cdbid.xml');
 
         $this->entryAPI->expects($this->once())
             ->method('updateEventFromRawXml')
             ->with($id, $expectedXmlStringArgument);
 
-        $cdbXml = file_get_contents(__DIR__ . '/eventrepositorytest_event.xml');
+        $cdbXml = file_get_contents(__DIR__ . '/../samples/eventrepositorytest_event.xml');
 
         $event = Event::createFromCdbXml(
             new String($id),
@@ -319,7 +316,7 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
     public function it_applies_labels()
     {
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
+        $event = $this->createItem($id, 'eventrepositorytest_event.xml');
 
         $this->repository->save($event);
 
@@ -349,7 +346,7 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
     public function it_adds_a_label()
     {
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
+        $event = $this->createItem($id, 'eventrepositorytest_event.xml');
 
         $this->repository->save($event);
 
@@ -378,7 +375,7 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
     public function it_deletes_a_label()
     {
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
+        $event = $this->createItem($id, 'eventrepositorytest_event.xml');
 
         $this->repository->save($event);
 
@@ -409,7 +406,7 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
     public function it_does_not_delete_a_label_that_does_not_exist()
     {
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
+        $event = $this->createItem($id, 'eventrepositorytest_event.xml');
 
         $this->repository->save($event);
 
@@ -430,7 +427,7 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
     public function it_can_translate_the_title()
     {
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
+        $event = $this->createItem($id, 'eventrepositorytest_event.xml');
 
         $this->repository->save($event);
 
@@ -460,7 +457,7 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
     public function it_can_translate_the_decription()
     {
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
+        $event = $this->createItem($id, 'eventrepositorytest_event.xml');
 
         $this->repository->save($event);
 
@@ -490,7 +487,7 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
     public function it_applies_a_translation()
     {
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
+        $event = $this->createItem($id, 'eventrepositorytest_event.xml');
 
         $this->repository->save($event);
 
@@ -525,7 +522,7 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
     public function it_deletes_a_translation()
     {
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
+        $event = $this->createItem($id, 'eventrepositorytest_event.xml');
 
         $event->applyTranslation(
             new Language('en'),
@@ -555,7 +552,7 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
     public function it_adds_collaboration_data()
     {
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
+        $event = $this->createItem($id, 'eventrepositorytest_event.xml');
 
         $this->repository->save($event);
 
@@ -601,130 +598,17 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @test
-     */
-    public function it_adds_a_media_file_when_adding_an_image()
-    {
-        $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-        $event = $this->createEvent($id, 'eventrepositorytest_event.xml');
-
-        $this->repository->save($event);
-
-        $image = new Image(
-            new UUID('de305d54-75b4-431b-adb2-eb6b9e546014'),
-            new MIMEType('image/png'),
-            new String('sexy ladies without clothes'),
-            new String('Bart Ramakers'),
-            Url::fromNative('http://foo.bar/media/de305d54-75b4-431b-adb2-eb6b9e546014.png')
-        );
-
-        $cdbXmlNamespaceUri = self::NS;
-
-        $cdbXml = file_get_contents(__DIR__ . '/event.xml');
-
-        $udb2Event = EventItemFactory::createEventFromCdbXml(
-            $cdbXmlNamespaceUri,
-            $cdbXml
-        );
-
-        $event->addImage($image);
-
-        $this->entryAPI->expects($this->once())
-            ->method('getEvent')
-            ->with($id)
-            ->willReturn($udb2Event);
-
-        $this->entryAPI->expects($this->once())
-            ->method('updateEvent')
-            ->with($this->callback(function ($cdbItem) {
-                $details = $cdbItem->getDetails();
-                $details->rewind();
-                $media = $details->current()->getMedia();
-
-                $newFiles = [];
-                foreach ($media as $key => $file) {
-                    if ($file->getHLink() === 'http://foo.bar/media/de305d54-75b4-431b-adb2-eb6b9e546014.png') {
-                        $newFiles[] = $file;
-                    }
-                };
-
-                return !empty($newFiles);
-            }));
-
-        $this->repository->syncBackOn();
-        $this->repository->save($event);
-    }
-
-    /**
-     * @test
-     */
-    public function it_deletes_a_media_file_when_removing_an_image()
-    {
-        $itemId = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
-
-        $image = new Image(
-            new UUID('9554d6f6-bed1-4303-8d42-3fcec4601e0e'),
-            new MIMEType('image/jpg'),
-            new String('duckfaceplant'),
-            new String('Karbido Ensemble'),
-            Url::fromNative('http://foo.bar/media/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg')
-        );
-
-        $event = $this->createEvent($itemId, 'eventrepositorytest_event.xml');
-        $event->addImage($image);
-
-        $this->repository->save($event);
-
-        $cdbXmlNamespaceUri = self::NS;
-
-        $cdbXml = file_get_contents(__DIR__ . '/event.xml');
-
-        $udb2Event = EventItemFactory::createEventFromCdbXml(
-            $cdbXmlNamespaceUri,
-            $cdbXml
-        );
-
-        $event->removeImage($image);
-
-        $this->entryAPI->expects($this->once())
-            ->method('getEvent')
-            ->with($itemId)
-            ->willReturn($udb2Event);
-
-        $this->entryAPI
-            ->expects($this->once())
-            ->method('updateEvent')
-            ->with($this->callback(function ($cdbItem) {
-                $details = $cdbItem->getDetails();
-                $details->rewind();
-                $media = $details->current()->getMedia();
-
-                $removedFiles = [];
-                foreach ($media as $key => $file) {
-                    if ($file->getHLink() === 'http://85.255.197.172/images/20140108/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg') {
-                        $removedFiles[] = $file;
-                    }
-                };
-
-                return empty($removedFiles);
-            }));
-
-        $this->repository->syncBackOn();
-        $this->repository->save($event);
-    }
-
-    /**
      * @param string $id
      * @param string $xmlFile
      * @param string $ns
      * @return Event
      */
-    private function createEvent(
+    private function createItem(
         $id,
         $xmlFile,
         $ns = self::NS
     ) {
-        $cdbXml = file_get_contents(__DIR__ . '/' . $xmlFile);
+        $cdbXml = file_get_contents(__DIR__ . '/../samples/' . $xmlFile);
 
         return Event::createFromCdbXml(
             new String((string) $id),

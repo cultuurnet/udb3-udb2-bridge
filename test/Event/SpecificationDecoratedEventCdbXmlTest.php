@@ -45,7 +45,7 @@ class SpecificationDecoratedEventCdbXmlTest extends \PHPUnit_Framework_TestCase
             $this->specification
         );
 
-        $this->xml = file_get_contents(__DIR__ . '/../event.xml');
+        $this->xml = file_get_contents(__DIR__ . '/../samples/event.xml');
     }
 
     /**

@@ -70,12 +70,12 @@ class EventCdbXmlFromEntryAPITest extends \PHPUnit_Framework_TestCase
                     return $request->getUrl() == '/event/7914ed2d-9f28-4946-b9bd-ae8f7a4aea11?uid=user-xyz';
                 }
             ))
-            ->willReturn(new Response(200, null, file_get_contents(__DIR__ . '/entry-api-event-response.xml')));
+            ->willReturn(new Response(200, null, file_get_contents(__DIR__ . '/samples/entry-api-event-response.xml')));
 
         $eventXml = $this->service->getCdbXmlOfEvent('7914ed2d-9f28-4946-b9bd-ae8f7a4aea11');
 
         $this->assertXmlStringEqualsXmlFile(
-            __DIR__ . '/search-results-single-event.xml',
+            __DIR__ . '/samples/search-results-single-event.xml',
             $eventXml
         );
     }

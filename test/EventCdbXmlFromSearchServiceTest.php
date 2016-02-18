@@ -88,7 +88,7 @@ EOS;
         $response = new Response(
             200,
             [],
-            file_get_contents(__DIR__ . '/search-results.xml')
+            file_get_contents(__DIR__ . '/samples/search-results.xml')
         );
 
         $this->searchService
@@ -101,7 +101,7 @@ EOS;
         );
 
         $this->assertXmlStringEqualsXmlFile(
-            __DIR__ . '/search-results-single-event.xml',
+            __DIR__ . '/samples/search-results-single-event.xml',
             $xml
         );
     }
