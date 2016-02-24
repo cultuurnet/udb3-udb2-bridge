@@ -72,11 +72,22 @@ trait EditImageTrait
     ) {
         $sourceUri = (string) $image->getSourceLocation();
         $uriParts = explode('/', $sourceUri);
+        $media = $this->getCdbItemMedia($cdbItem);
 
         $file = new CultureFeed_Cdb_Data_File();
-        $file->setMediaType(CultureFeed_Cdb_Data_File::MEDIA_TYPE_IMAGEWEB);
         $file->setMain();
         $file->setHLink($sourceUri);
+
+        // If there are no existing images the newly added one should be main.
+        $imageTypes = [
+            CultureFeed_Cdb_Data_File::MEDIA_TYPE_PHOTO,
+            CultureFeed_Cdb_Data_File::MEDIA_TYPE_IMAGEWEB
+        ];
+        if ($media->byMediaTypes($imageTypes)->count() === 0) {
+            $file->setMediaType(CultureFeed_Cdb_Data_File::MEDIA_TYPE_PHOTO);
+        } else {
+            $file->setMediaType(CultureFeed_Cdb_Data_File::MEDIA_TYPE_IMAGEWEB);
+        }
 
         $filename = end($uriParts);
         $fileparts = explode('.', $filename);
@@ -91,7 +102,7 @@ trait EditImageTrait
         $file->setCopyright((string) $image->getCopyrightHolder());
         $file->setTitle((string) $image->getDescription());
 
-        $this->getCdbItemMedia($cdbItem)->add($file);
+        $media->add($file);
     }
 
     /**
