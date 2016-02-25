@@ -16,6 +16,11 @@ use ValueObjects\String\String as StringLiteral;
 
 trait EditImageTrait
 {
+    protected $imageTypes = [
+        CultureFeed_Cdb_Data_File::MEDIA_TYPE_PHOTO,
+        CultureFeed_Cdb_Data_File::MEDIA_TYPE_IMAGEWEB
+    ];
+
     /**
      * Delete a given index on the cdb item.
      *
@@ -26,13 +31,24 @@ trait EditImageTrait
         CultureFeed_Cdb_Item_Base $cdbItem,
         Image $image
     ) {
-        $media = $this->getCdbItemMedia($cdbItem);
+        $oldMedia = $this->getCdbItemMedia($cdbItem);
 
-        foreach ($media as $key => $file) {
-            if ($this->fileMatchesMediaObject($file, $image->getMediaObjectId())) {
-                $media->remove($key);
+        $newMedia = new CultureFeed_Cdb_Data_Media();
+        foreach ($oldMedia as $key => $file) {
+            if (!$this->fileMatchesMediaObject($file, $image->getMediaObjectId())) {
+                $newMedia->add($file);
             }
         }
+
+        $images = $newMedia->byMediaTypes($this->imageTypes);
+        if ($images->count() > 0) {
+            $images->rewind();
+            $images->current()->setMediaType(CultureFeed_Cdb_Data_File::MEDIA_TYPE_PHOTO);
+        }
+
+        $details = $cdbItem->getDetails();
+        $details->rewind();
+        $details->current()->setMedia($newMedia);
     }
 
     /**
@@ -79,11 +95,7 @@ trait EditImageTrait
         $file->setHLink($sourceUri);
 
         // If there are no existing images the newly added one should be main.
-        $imageTypes = [
-            CultureFeed_Cdb_Data_File::MEDIA_TYPE_PHOTO,
-            CultureFeed_Cdb_Data_File::MEDIA_TYPE_IMAGEWEB
-        ];
-        if ($media->byMediaTypes($imageTypes)->count() === 0) {
+        if ($media->byMediaTypes($this->imageTypes)->count() === 0) {
             $file->setMediaType(CultureFeed_Cdb_Data_File::MEDIA_TYPE_PHOTO);
         } else {
             $file->setMediaType(CultureFeed_Cdb_Data_File::MEDIA_TYPE_IMAGEWEB);

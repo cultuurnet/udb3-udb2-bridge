@@ -168,6 +168,63 @@ trait EditImageTestTrait
     /**
      * @test
      */
+    public function it_should_make_the_oldest_image_main_when_deleting_the_current_main_image()
+    {
+        $itemId = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
+        $newImage = new Image(
+            new UUID('9554d6f6-bed1-4303-8d42-3fcec4eee000'),
+            new MIMEType('image/jpg'),
+            new StringLiteral('duckfaceplant'),
+            new StringLiteral('Karbido Ensemble'),
+            Url::fromNative('http://foo.bar/media/9554d6f6-bed1-4303-8d42-3fcec4eee000.jpg')
+        );
+        $olderImage = new Image(
+            new UUID('9554d6f6-bed1-4303-8d42-3fcec4601e0e'),
+            new MIMEType('image/jpg'),
+            new StringLiteral('Beep Boop'),
+            new StringLiteral('Noo Idee'),
+            Url::fromNative('http://foo.bar/media/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg')
+        );
+
+        $udb2Event = EventItemFactory::createEventFromCdbXml(
+            self::NS,
+            file_get_contents(__DIR__ . '/../samples/event-with-existing-images.xml')
+        );
+
+        $item = $this->createItem($itemId, 'eventrepositorytest_event.xml');
+        $item->addImage($olderImage);
+        $item->addImage($newImage);
+        $this->repository->save($item);
+
+        $this->entryAPI->expects($this->once())
+            ->method('getEvent')
+            ->with($itemId)
+            ->willReturn($udb2Event);
+
+        $this->entryAPI
+            ->expects($this->any())
+            ->method('updateEvent')
+            ->with($this->callback(function ($cdbItem) {
+                $media = $this->getCdbItemMedia($cdbItem);
+
+                $newMainImage = false;
+                foreach ($media as $key => $file) {
+                    if ($file->getHLink() === 'http://foo.bar/media/9554d6f6-bed1-4303-8d42-3fcec4eee000.jpg') {
+                        $newMainImage = ($file->getMediaType() === \CultureFeed_Cdb_Data_File::MEDIA_TYPE_PHOTO);
+                    }
+                };
+
+                return $newMainImage;
+            }));
+
+        $item->removeImage($olderImage);
+        $this->repository->syncBackOn();
+        $this->repository->save($item);
+    }
+
+    /**
+     * @test
+     */
     public function it_updates_the_event_media_object_property_when_updating_an_image()
     {
         $itemId = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
