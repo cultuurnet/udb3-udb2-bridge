@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "8c756dc02258c3eb63fe93b197611721",
-    "content-hash": "707b283a38a8d52efba4d04955f0e90e",
+    "hash": "e08242d88aa89aaefd7307e1243d7a01",
+    "content-hash": "efa5d0041109369cd5e7bf505a0acf84",
     "packages": [
         {
             "name": "2dotstwice/collection",
@@ -728,16 +728,16 @@
         },
         {
             "name": "cultuurnet/udb3",
-            "version": "dev-master",
+            "version": "dev-feature/III-717",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb3-php.git",
-                "reference": "f9c14933654b83fc6e61a9cd46efb1ea0c7595c9"
+                "reference": "c1bb72e31dfb82156f8ff9a197e9aa2c5d81069f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/f9c14933654b83fc6e61a9cd46efb1ea0c7595c9",
-                "reference": "f9c14933654b83fc6e61a9cd46efb1ea0c7595c9",
+                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/c1bb72e31dfb82156f8ff9a197e9aa2c5d81069f",
+                "reference": "c1bb72e31dfb82156f8ff9a197e9aa2c5d81069f",
                 "shasum": ""
             },
             "require": {
@@ -805,7 +805,7 @@
                 }
             ],
             "description": "UDB3 PHP libraries",
-            "time": "2016-02-19 13:08:44"
+            "time": "2016-02-26 13:25:24"
         },
         {
             "name": "danielstjules/stringy",
@@ -3663,16 +3663,16 @@
         },
         {
             "name": "sebastian/environment",
-            "version": "1.3.3",
+            "version": "1.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/environment.git",
-                "reference": "6e7133793a8e5a5714a551a8324337374be209df"
+                "reference": "22aa49baa48886f40b060e061a7967436f44a249"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/6e7133793a8e5a5714a551a8324337374be209df",
-                "reference": "6e7133793a8e5a5714a551a8324337374be209df",
+                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/22aa49baa48886f40b060e061a7967436f44a249",
+                "reference": "22aa49baa48886f40b060e061a7967436f44a249",
                 "shasum": ""
             },
             "require": {
@@ -3709,7 +3709,7 @@
                 "environment",
                 "hhvm"
             ],
-            "time": "2015-12-02 08:37:27"
+            "time": "2016-02-26 11:40:57"
         },
         {
             "name": "sebastian/exporter",
@@ -4193,6 +4193,12 @@
     ],
     "aliases": [
         {
+            "alias": "0.1",
+            "alias_normalized": "0.1.0.0",
+            "version": "dev-feature/III-717",
+            "package": "cultuurnet/udb3"
+        },
+        {
             "alias": "2.1.2",
             "alias_normalized": "2.1.2.0",
             "version": "dev-feature/III-717",
@@ -4201,6 +4207,7 @@
     ],
     "minimum-stability": "dev",
     "stability-flags": {
+        "cultuurnet/udb3": 20,
         "cultuurnet/cdb": 20
     },
     "prefer-stable": true,

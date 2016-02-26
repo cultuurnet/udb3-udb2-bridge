@@ -283,6 +283,69 @@ trait EditImageTestTrait
     }
 
     /**
+     * @test
+     */
+    public function it_should_update_the_image_property_when_selecting_a_main_image()
+    {
+        $itemId = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
+
+        $newImage = new Image(
+            new UUID('9554d6f6-bed1-4303-8d42-3fcec4eee000'),
+            new MIMEType('image/jpg'),
+            new StringLiteral('duckfaceplant'),
+            new StringLiteral('Karbido Ensemble'),
+            Url::fromNative('http://foo.bar/media/9554d6f6-bed1-4303-8d42-3fcec4eee000.jpg')
+        );
+        $image = new Image(
+            new UUID('9554d6f6-bed1-4303-8d42-3fcec4601e0e'),
+            new MIMEType('image/jpg'),
+            new StringLiteral('Beep Boop'),
+            new StringLiteral('Noo Idee'),
+            Url::fromNative('http://foo.bar/media/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg')
+        );
+
+        $item = $this->createItem($itemId, 'eventrepositorytest_event.xml');
+        $item->addImage($image);
+        $item->addImage($newImage);
+        $this->repository->save($item);
+
+        $existingEvent = EventItemFactory::createEventFromCdbXml(
+            self::NS,
+            file_get_contents(__DIR__ . '/../samples/event-with-existing-images.xml')
+        );
+
+        $this->entryAPI->expects($this->once())
+            ->method('getEvent')
+            ->with($itemId)
+            ->willReturn($existingEvent);
+
+        $this->entryAPI
+            ->expects($this->once())
+            ->method('updateEvent')
+            ->with($this->callback(function ($cdbItem) {
+                $media = $this->getCdbItemMedia($cdbItem);
+
+                $newMainImageSet = false;
+                $oldMainImageDowngraded = false;
+                foreach ($media as $key => $file) {
+                    if ($file->getHLink() === 'http://foo.bar/media/9554d6f6-bed1-4303-8d42-3fcec4eee000.jpg') {
+                        $newMainImageSet = ($file->getMediaType() === \CultureFeed_Cdb_Data_File::MEDIA_TYPE_PHOTO);
+                    }
+
+                    if ($file->getHLink() === 'http://foo.bar/media/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg') {
+                        $oldMainImageDowngraded = ($file->getMediaType() === \CultureFeed_Cdb_Data_File::MEDIA_TYPE_IMAGEWEB);
+                    }
+                };
+
+                return $newMainImageSet && $oldMainImageDowngraded;
+            }));
+
+        $this->repository->syncBackOn();
+        $item->selectMainImage($newImage);
+        $this->repository->save($item);
+    }
+
+    /**
      * @param CultureFeed_Cdb_Item_Base $cdbItem
      * @return CultureFeed_Cdb_Data_Media
      */

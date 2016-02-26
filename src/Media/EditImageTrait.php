@@ -11,6 +11,7 @@ use CultuurNet\UDB3\Media\Image;
 use CultuurNet\UDB3\Offer\Events\Image\AbstractImageAdded;
 use CultuurNet\UDB3\Offer\Events\Image\AbstractImageRemoved;
 use CultuurNet\UDB3\Offer\Events\Image\AbstractImageUpdated;
+use CultuurNet\UDB3\Offer\Events\Image\AbstractMainImageSelected;
 use ValueObjects\Identity\UUID;
 use ValueObjects\String\String as StringLiteral;
 
@@ -49,6 +50,32 @@ trait EditImageTrait
         $details = $cdbItem->getDetails();
         $details->rewind();
         $details->current()->setMedia($newMedia);
+    }
+
+    /**
+     * Select the main image for a cdb item.
+     *
+     * @param CultureFeed_Cdb_Item_Base $cdbItem
+     * @param Image $image
+     */
+    protected function selectCdbItemMainImage(
+        CultureFeed_Cdb_Item_Base $cdbItem,
+        Image $image
+    ) {
+        $media = $this->getCdbItemMedia($cdbItem);
+        $mainImageId = $image->getMediaObjectId();
+
+        $mainImages = $media->byMediaType(CultureFeed_Cdb_Data_File::MEDIA_TYPE_PHOTO);
+        if ($mainImages->count() > 0) {
+            $mainImages->rewind();
+            $mainImages->current()->setMediaType(CultureFeed_Cdb_Data_File::MEDIA_TYPE_IMAGEWEB);
+        }
+
+        foreach ($media as $file) {
+            if ($this->fileMatchesMediaObject($file, $mainImageId)) {
+                $file->setMediaType(CultureFeed_Cdb_Data_File::MEDIA_TYPE_PHOTO);
+            }
+        }
     }
 
     /**
@@ -213,6 +240,21 @@ trait EditImageTrait
         $udb2Event = $entryApi->getEvent($domainEvent->getItemId());
 
         $this->removeImageFromCdbItem($udb2Event, $domainEvent->getImage());
+        $entryApi->updateEvent($udb2Event);
+    }
+
+    /**
+     * @param AbstractMainImageSelected $mainImageSelected
+     * @param DomainMessage $domainMessage
+     */
+    protected function applyMainImageSelected(
+        AbstractMainImageSelected $mainImageSelected,
+        DomainMessage $domainMessage
+    ) {
+        $entryApi = $this->createEntryAPI($domainMessage);
+        $udb2Event = $entryApi->getEvent($mainImageSelected->getItemId());
+
+        $this->selectCdbItemMainImage($udb2Event, $mainImageSelected->getImage());
         $entryApi->updateEvent($udb2Event);
     }
 }
