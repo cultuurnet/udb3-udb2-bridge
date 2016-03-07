@@ -11,11 +11,17 @@ use CultuurNet\UDB3\Media\Image;
 use CultuurNet\UDB3\Offer\Events\Image\AbstractImageAdded;
 use CultuurNet\UDB3\Offer\Events\Image\AbstractImageRemoved;
 use CultuurNet\UDB3\Offer\Events\Image\AbstractImageUpdated;
+use CultuurNet\UDB3\Offer\Events\Image\AbstractMainImageSelected;
 use ValueObjects\Identity\UUID;
 use ValueObjects\String\String as StringLiteral;
 
 trait EditImageTrait
 {
+    protected $imageTypes = [
+        CultureFeed_Cdb_Data_File::MEDIA_TYPE_PHOTO,
+        CultureFeed_Cdb_Data_File::MEDIA_TYPE_IMAGEWEB
+    ];
+
     /**
      * Delete a given index on the cdb item.
      *
@@ -26,11 +32,48 @@ trait EditImageTrait
         CultureFeed_Cdb_Item_Base $cdbItem,
         Image $image
     ) {
-        $media = $this->getCdbItemMedia($cdbItem);
+        $oldMedia = $this->getCdbItemMedia($cdbItem);
 
-        foreach ($media as $key => $file) {
-            if ($this->fileMatchesMediaObject($file, $image->getMediaObjectId())) {
-                $media->remove($key);
+        $newMedia = new CultureFeed_Cdb_Data_Media();
+        foreach ($oldMedia as $key => $file) {
+            if (!$this->fileMatchesMediaObject($file, $image->getMediaObjectId())) {
+                $newMedia->add($file);
+            }
+        }
+
+        $images = $newMedia->byMediaTypes($this->imageTypes);
+        if ($images->count() > 0) {
+            $images->rewind();
+            $images->current()->setMediaType(CultureFeed_Cdb_Data_File::MEDIA_TYPE_PHOTO);
+        }
+
+        $details = $cdbItem->getDetails();
+        $details->rewind();
+        $details->current()->setMedia($newMedia);
+    }
+
+    /**
+     * Select the main image for a cdb item.
+     *
+     * @param CultureFeed_Cdb_Item_Base $cdbItem
+     * @param Image $image
+     */
+    protected function selectCdbItemMainImage(
+        CultureFeed_Cdb_Item_Base $cdbItem,
+        Image $image
+    ) {
+        $media = $this->getCdbItemMedia($cdbItem);
+        $mainImageId = $image->getMediaObjectId();
+
+        $mainImages = $media->byMediaType(CultureFeed_Cdb_Data_File::MEDIA_TYPE_PHOTO);
+        if ($mainImages->count() > 0) {
+            $mainImages->rewind();
+            $mainImages->current()->setMediaType(CultureFeed_Cdb_Data_File::MEDIA_TYPE_IMAGEWEB);
+        }
+
+        foreach ($media as $file) {
+            if ($this->fileMatchesMediaObject($file, $mainImageId)) {
+                $file->setMediaType(CultureFeed_Cdb_Data_File::MEDIA_TYPE_PHOTO);
             }
         }
     }
@@ -72,11 +115,18 @@ trait EditImageTrait
     ) {
         $sourceUri = (string) $image->getSourceLocation();
         $uriParts = explode('/', $sourceUri);
+        $media = $this->getCdbItemMedia($cdbItem);
 
         $file = new CultureFeed_Cdb_Data_File();
-        $file->setMediaType(CultureFeed_Cdb_Data_File::MEDIA_TYPE_IMAGEWEB);
         $file->setMain();
         $file->setHLink($sourceUri);
+
+        // If there are no existing images the newly added one should be main.
+        if ($media->byMediaTypes($this->imageTypes)->count() === 0) {
+            $file->setMediaType(CultureFeed_Cdb_Data_File::MEDIA_TYPE_PHOTO);
+        } else {
+            $file->setMediaType(CultureFeed_Cdb_Data_File::MEDIA_TYPE_IMAGEWEB);
+        }
 
         $filename = end($uriParts);
         $fileparts = explode('.', $filename);
@@ -91,7 +141,7 @@ trait EditImageTrait
         $file->setCopyright((string) $image->getCopyrightHolder());
         $file->setTitle((string) $image->getDescription());
 
-        $this->getCdbItemMedia($cdbItem)->add($file);
+        $media->add($file);
     }
 
     /**
@@ -190,6 +240,21 @@ trait EditImageTrait
         $udb2Event = $entryApi->getEvent($domainEvent->getItemId());
 
         $this->removeImageFromCdbItem($udb2Event, $domainEvent->getImage());
+        $entryApi->updateEvent($udb2Event);
+    }
+
+    /**
+     * @param AbstractMainImageSelected $mainImageSelected
+     * @param DomainMessage $domainMessage
+     */
+    protected function applyMainImageSelected(
+        AbstractMainImageSelected $mainImageSelected,
+        DomainMessage $domainMessage
+    ) {
+        $entryApi = $this->createEntryAPI($domainMessage);
+        $udb2Event = $entryApi->getEvent($mainImageSelected->getItemId());
+
+        $this->selectCdbItemMainImage($udb2Event, $mainImageSelected->getImage());
         $entryApi->updateEvent($udb2Event);
     }
 }
