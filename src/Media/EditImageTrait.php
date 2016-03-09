@@ -128,11 +128,17 @@ trait EditImageTrait
             $file->setMediaType(CultureFeed_Cdb_Data_File::MEDIA_TYPE_IMAGEWEB);
         }
 
+        // If the file name does not contain an extension, default to jpeg.
+        $extension = 'jpeg';
+
+        // If the file name does contain an extension, then normalize it.
         $filename = end($uriParts);
-        $fileparts = explode('.', $filename);
-        $extension = strtolower(end($fileparts));
-        if ($extension === 'jpg') {
-            $extension = 'jpeg';
+        if (false !== strpos($filename, '.')) {
+            $fileparts = explode('.', $filename);
+            $extension = strtolower(end($fileparts));
+            if ($extension === 'jpg') {
+                $extension = 'jpeg';
+            }
         }
 
         $file->setFileType($extension);
