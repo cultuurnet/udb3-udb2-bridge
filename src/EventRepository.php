@@ -32,9 +32,13 @@ use CultuurNet\UDB3\Event\Events\EventCreated;
 use CultuurNet\UDB3\Event\Events\EventCreatedFromCdbXml;
 use CultuurNet\UDB3\Event\Events\EventDeleted;
 use CultuurNet\UDB3\Event\Events\EventUpdatedFromCdbXml;
+use CultuurNet\UDB3\Event\Events\ImageAdded;
+use CultuurNet\UDB3\Event\Events\ImageRemoved;
+use CultuurNet\UDB3\Event\Events\ImageUpdated;
 use CultuurNet\UDB3\Event\Events\LabelAdded;
 use CultuurNet\UDB3\Event\Events\LabelsApplied;
 use CultuurNet\UDB3\Event\Events\LabelsMerged;
+use CultuurNet\UDB3\Event\Events\MainImageSelected;
 use CultuurNet\UDB3\Event\Events\MajorInfoUpdated;
 use CultuurNet\UDB3\Event\Events\OrganizerDeleted;
 use CultuurNet\UDB3\Event\Events\OrganizerUpdated;
@@ -61,7 +65,12 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
     use Udb2UtilityTrait;
-    use EditImageTrait;
+    use EditImageTrait {
+        applyImageAdded as applyOfferImageAdded;
+        applyImageUpdated as applyOfferImageUpdated;
+        applyImageRemoved as applyOfferImageRemoved;
+        applyMainImageSelected as applyOfferMainImageSelected;
+    }
     use Udb3RepositoryTrait;
     use DelegateEventHandlingToSpecificMethodTrait;
 
@@ -711,5 +720,33 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
                 $labelsMerged->getEventId()->toNative(),
                 $labelsMerged->getLabels()->asArray()
             );
+    }
+
+    public function applyImageAdded(
+        ImageAdded $imageAdded,
+        DomainMessage $domainMessage
+    ) {
+        $this->applyOfferImageAdded($imageAdded, $domainMessage);
+    }
+
+    public function applyImageRemoved(
+        ImageRemoved $imageRemoved,
+        DomainMessage $domainMessage
+    ) {
+        $this->applyOfferImageRemoved($imageRemoved, $domainMessage);
+    }
+
+    public function applyImageUpdated(
+        ImageUpdated $imageUpdated,
+        DomainMessage $domainMessage
+    ) {
+        $this->applyOfferImageUpdated($imageUpdated, $domainMessage);
+    }
+
+    public function applyMainImageSelected(
+        MainImageSelected $mainImageSelected,
+        DomainMessage $domainMessage
+    ) {
+        $this->applyOfferMainImageSelected($mainImageSelected, $domainMessage);
     }
 }

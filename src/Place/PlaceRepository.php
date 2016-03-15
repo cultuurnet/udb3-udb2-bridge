@@ -26,8 +26,12 @@ use CultuurNet\UDB3\Place\Events\ContactPointUpdated;
 use CultuurNet\UDB3\Place\Events\DescriptionTranslated;
 use CultuurNet\UDB3\Place\Events\DescriptionUpdated;
 use CultuurNet\UDB3\Place\Events\FacilitiesUpdated;
+use CultuurNet\UDB3\Place\Events\ImageAdded;
+use CultuurNet\UDB3\Place\Events\ImageRemoved;
+use CultuurNet\UDB3\Place\Events\ImageUpdated;
 use CultuurNet\UDB3\Place\Events\LabelAdded;
 use CultuurNet\UDB3\Place\Events\LabelDeleted;
+use CultuurNet\UDB3\Place\Events\MainImageSelected;
 use CultuurNet\UDB3\Place\Events\MajorInfoUpdated;
 use CultuurNet\UDB3\Place\Events\OrganizerDeleted;
 use CultuurNet\UDB3\Place\Events\OrganizerUpdated;
@@ -52,8 +56,12 @@ use Psr\Log\LoggerAwareTrait;
 class PlaceRepository extends ActorRepository implements RepositoryInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
-    use EditImageTrait;
-    use Udb3RepositoryTrait;
+    use EditImageTrait {
+        applyImageAdded as applyOfferImageAdded;
+        applyImageUpdated as applyOfferImageUpdated;
+        applyImageRemoved as applyOfferImageRemoved;
+        applyMainImageSelected as applyOfferMainImageSelected;
+    }    use Udb3RepositoryTrait;
     use DelegateEventHandlingToSpecificMethodTrait;
 
     /**
@@ -537,5 +545,33 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
                 $domainEvent->getLanguage(),
                 $domainEvent->getDescription()->toNative()
             );
+    }
+
+    public function applyImageAdded(
+        ImageAdded $imageAdded,
+        DomainMessage $domainMessage
+    ) {
+        $this->applyOfferImageAdded($imageAdded, $domainMessage);
+    }
+
+    public function applyImageRemoved(
+        ImageRemoved $imageRemoved,
+        DomainMessage $domainMessage
+    ) {
+        $this->applyOfferImageRemoved($imageRemoved, $domainMessage);
+    }
+
+    public function applyImageUpdated(
+        ImageUpdated $imageUpdated,
+        DomainMessage $domainMessage
+    ) {
+        $this->applyOfferImageUpdated($imageUpdated, $domainMessage);
+    }
+
+    public function applyMainImageSelected(
+        MainImageSelected $mainImageSelected,
+        DomainMessage $domainMessage
+    ) {
+        $this->applyOfferMainImageSelected($mainImageSelected, $domainMessage);
     }
 }
