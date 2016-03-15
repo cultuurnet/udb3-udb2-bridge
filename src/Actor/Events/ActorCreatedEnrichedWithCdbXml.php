@@ -1,30 +1,29 @@
 <?php
-/**
- * @file
- */
-
 namespace CultuurNet\UDB3\UDB2\Actor\Events;
 
 use CultuurNet\UDB2DomainEvents\ActorCreated;
 use CultuurNet\UDB3\Cdb\CdbXmlContainerInterface;
 use CultuurNet\UDB3\HasCdbXmlTrait;
-use ValueObjects\String\String;
+use ValueObjects\String\String as StringLiteral;
+use ValueObjects\Web\Url;
 
 class ActorCreatedEnrichedWithCdbXml extends ActorCreated implements CdbXmlContainerInterface
 {
     use HasCdbXmlTrait;
 
     public function __construct(
-        String $actorId,
+        StringLiteral $actorId,
         \DateTimeImmutable $time,
-        String $author,
-        String $cdbXml,
-        String $cdbXmlNamespaceUri
+        StringLiteral $author,
+        Url $url,
+        StringLiteral $cdbXml,
+        StringLiteral $cdbXmlNamespaceUri
     ) {
         parent::__construct(
             $actorId,
             $time,
-            $author
+            $author,
+            $url
         );
 
         $this->setCdbXml((string)$cdbXml);
@@ -33,13 +32,14 @@ class ActorCreatedEnrichedWithCdbXml extends ActorCreated implements CdbXmlConta
 
     public static function fromActorCreated(
         ActorCreated $actorCreated,
-        String $cdbXml,
-        String $cdbXmlNamespaceUri
+        StringLiteral $cdbXml,
+        StringLiteral $cdbXmlNamespaceUri
     ) {
         return new self(
             $actorCreated->getActorId(),
             $actorCreated->getTime(),
             $actorCreated->getAuthor(),
+            $actorCreated->getUrl(),
             $cdbXml,
             $cdbXmlNamespaceUri
         );

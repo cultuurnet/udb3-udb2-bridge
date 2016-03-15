@@ -17,6 +17,7 @@ use CultuurNet\UDB3\UDB2\ActorCdbXmlServiceInterface;
 use CultuurNet\UDB3\UDB2\OutdatedXmlRepresentationException;
 use ValueObjects\Identity\UUID;
 use ValueObjects\String\String;
+use ValueObjects\Web\Url;
 
 class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
 {
@@ -94,6 +95,7 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
                     $actorCreated->getActorId(),
                     $actorCreated->getTime(),
                     $actorCreated->getAuthor(),
+                    $actorCreated->getUrl(),
                     new String($this->cdbXml()),
                     new String($this->cdbXmlNamespaceUri())
                 )
@@ -104,6 +106,7 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
                     $actorUpdated->getActorId(),
                     $actorUpdated->getTime(),
                     $actorUpdated->getAuthor(),
+                    $actorCreated->getUrl(),
                     new String($this->cdbXml()),
                     new String($this->cdbXmlNamespaceUri())
                 )
@@ -127,11 +130,13 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
     {
         $actorId = new String('foo');
         $author = new String('me@example.com');
+        $url = Url::fromNative('http://www.some.url');
 
         return new ActorCreated(
             $actorId,
             $time,
-            $author
+            $author,
+            $url
         );
     }
 
@@ -139,11 +144,13 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
     {
         $actorId = new String('foo');
         $author = new String('me@example.com');
+        $url = Url::fromNative('http://www.some.url');
 
         return new ActorUpdated(
             $actorId,
             $time,
-            $author
+            $author,
+            $url
         );
     }
 
