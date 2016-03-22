@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b7703cdc79e642714d8c28d30c5e3ca0",
-    "content-hash": "8c1659f577cc1a4e309a1f25e037c03e",
+    "hash": "6cd86caca834017deabfeea313ef09dc",
+    "content-hash": "0a7412b9d4671d0b7d8a9f8cba78849c",
     "packages": [
         {
             "name": "2dotstwice/collection",
@@ -681,16 +681,16 @@
         },
         {
             "name": "cultuurnet/udb2-domain-events",
-            "version": "dev-feature/III-685",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb2-domain-events.git",
-                "reference": "5079619c6a0f1aca395f0eafdaafafaca4ca509c"
+                "reference": "1f2857b4cd957c17e051536a8402d8e595d08453"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb2-domain-events/zipball/5079619c6a0f1aca395f0eafdaafafaca4ca509c",
-                "reference": "5079619c6a0f1aca395f0eafdaafafaca4ca509c",
+                "url": "https://api.github.com/repos/cultuurnet/udb2-domain-events/zipball/1f2857b4cd957c17e051536a8402d8e595d08453",
+                "reference": "1f2857b4cd957c17e051536a8402d8e595d08453",
                 "shasum": ""
             },
             "require": {
@@ -725,7 +725,7 @@
                 }
             ],
             "description": "PHP models for domain events in UiTdatabank version 2",
-            "time": "2016-03-15 08:04:25"
+            "time": "2016-03-22 08:50:32"
         },
         {
             "name": "cultuurnet/udb3",
@@ -4248,18 +4248,9 @@
             "time": "2016-02-23 15:16:06"
         }
     ],
-    "aliases": [
-        {
-            "alias": "0.1",
-            "alias_normalized": "0.1.0.0",
-            "version": "dev-feature/III-685",
-            "package": "cultuurnet/udb2-domain-events"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "cultuurnet/udb2-domain-events": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],

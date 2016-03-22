@@ -14,7 +14,7 @@
   ],
   "require": {
     "cultuurnet/udb3": "~0.1",
-    "cultuurnet/udb2-domain-events": "dev-feature/III-685 as 0.1",
+    "cultuurnet/udb2-domain-events": "~0.1",
     "cultuurnet/auth": "~1.2",
     "cultuurnet/entry": "~0.1",
     "cultuurnet/cdb": "~2.2.0"
