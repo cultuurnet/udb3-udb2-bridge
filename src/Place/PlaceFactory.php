@@ -10,7 +10,7 @@ use CultuurNet\UDB3\UDB2\Offer\OfferFactoryInterface;
 use ValueObjects\String\String as StringLiteral;
 
 /**
- * Creates UDB3 place entities based on UDB2 actor cdb xml.
+ * Creates UDB3 place entities based on UDB2 event cdb xml.
  */
 class PlaceFactory implements OfferFactoryInterface
 {
@@ -22,7 +22,7 @@ class PlaceFactory implements OfferFactoryInterface
         StringLiteral $cdbXml,
         StringLiteral $cdbXmlNamespaceUri
     ) {
-        return Place::importFromUDB2Actor(
+        return Place::importFromUDB2Event(
             (string)$id,
             (string)$cdbXml,
             (string)$cdbXmlNamespaceUri

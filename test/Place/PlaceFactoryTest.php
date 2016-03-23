@@ -8,7 +8,9 @@ namespace CultuurNet\UDB3\UDB2\Place;
 use Broadway\Domain\AggregateRoot;
 use Broadway\Domain\DomainMessage;
 use CultuurNet\UDB3\Place\Events\PlaceImportedFromUDB2;
+use CultuurNet\UDB3\Place\Events\PlaceImportedFromUDB2Event;
 use CultuurNet\UDB3\Place\Place;
+use ValueObjects\String\String;
 
 class PlaceFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,19 +22,19 @@ class PlaceFactoryTest extends \PHPUnit_Framework_TestCase
         $factory = new PlaceFactory();
 
         $id = '404EE8DE-E828-9C07-FE7D12DC4EB24480';
-        $cdbXml = file_get_contents(__DIR__ . '/../samples/actor.xml');
+        $cdbXml = file_get_contents(__DIR__ . '/../samples/event.xml');
         $cdbXmlNamespaceUri = 'http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL';
 
         $place = $factory->createFromCdbXml(
-            $id,
-            $cdbXml,
-            $cdbXmlNamespaceUri
+            new String($id),
+            new String($cdbXml),
+            new String($cdbXmlNamespaceUri)
         );
 
         $this->assertInstanceOf(Place::class, $place);
         $this->assertEvents(
             [
-                new PlaceImportedFromUDB2(
+                new PlaceImportedFromUDB2Event(
                     $id,
                     $cdbXml,
                     $cdbXmlNamespaceUri
