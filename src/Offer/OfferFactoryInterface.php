@@ -29,4 +29,3 @@ interface OfferFactoryInterface
         StringLiteral $cdbXmlNamespaceUri
     );
 }
-

@@ -24,5 +24,4 @@ class EventFactory implements OfferFactoryInterface
             (string)$cdbXmlNamespaceUri
         );
     }
-
 }
