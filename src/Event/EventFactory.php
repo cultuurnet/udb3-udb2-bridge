@@ -3,29 +3,26 @@
  * @file
  */
 
-namespace CultuurNet\UDB3\UDB2\Place;
+namespace CultuurNet\UDB3\UDB2\Event;
 
-use CultuurNet\UDB3\Place\Place;
+use Broadway\Domain\AggregateRoot;
+use CultuurNet\UDB3\Cdb\UpdateableWithCdbXmlInterface;
+use CultuurNet\UDB3\Event\Event;
 use CultuurNet\UDB3\UDB2\Offer\OfferFactoryInterface;
 use ValueObjects\String\String as StringLiteral;
 
-/**
- * Creates UDB3 place entities based on UDB2 actor cdb xml.
- */
-class PlaceFactory implements OfferFactoryInterface
+class EventFactory implements OfferFactoryInterface
 {
-    /**
-     * @inheritdoc
-     */
     public function createFromCdbXml(
         StringLiteral $id,
         StringLiteral $cdbXml,
         StringLiteral $cdbXmlNamespaceUri
     ) {
-        return Place::importFromUDB2Actor(
+        return Event::importFromUDB2(
             (string)$id,
             (string)$cdbXml,
             (string)$cdbXmlNamespaceUri
         );
     }
+
 }
