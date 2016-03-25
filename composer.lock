@@ -59,16 +59,16 @@
         },
         {
             "name": "beberlei/assert",
-            "version": "v2.4",
+            "version": "v2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/beberlei/assert.git",
-                "reference": "7281b1fd8118b31cb9162c2fb5a4cc6f01d62ed6"
+                "reference": "91e2690c4ecc8a4e3e2d333430069f6a0c694a7a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/beberlei/assert/zipball/7281b1fd8118b31cb9162c2fb5a4cc6f01d62ed6",
-                "reference": "7281b1fd8118b31cb9162c2fb5a4cc6f01d62ed6",
+                "url": "https://api.github.com/repos/beberlei/assert/zipball/91e2690c4ecc8a4e3e2d333430069f6a0c694a7a",
+                "reference": "91e2690c4ecc8a4e3e2d333430069f6a0c694a7a",
                 "shasum": ""
             },
             "require": {
@@ -108,7 +108,7 @@
                 "assertion",
                 "validation"
             ],
-            "time": "2015-08-21 16:50:17"
+            "time": "2016-03-22 14:34:51"
         },
         {
             "name": "broadway/broadway",
@@ -733,12 +733,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb3-php.git",
-                "reference": "5e738edc5bc75cf4ed50e08e06c14addc12b60a3"
+                "reference": "dafc3af07a6f6076f1c508208ffa81ffbdb16fc3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/5e738edc5bc75cf4ed50e08e06c14addc12b60a3",
-                "reference": "5e738edc5bc75cf4ed50e08e06c14addc12b60a3",
+                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/dafc3af07a6f6076f1c508208ffa81ffbdb16fc3",
+                "reference": "dafc3af07a6f6076f1c508208ffa81ffbdb16fc3",
                 "shasum": ""
             },
             "require": {
@@ -807,7 +807,7 @@
                 }
             ],
             "description": "UDB3 PHP libraries",
-            "time": "2016-03-11 18:43:16"
+            "time": "2016-03-25 10:19:35"
         },
         {
             "name": "danielstjules/stringy",
