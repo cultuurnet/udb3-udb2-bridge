@@ -7,6 +7,7 @@ use Broadway\EventSourcing\EventSourcedAggregateRoot;
 use Broadway\EventSourcing\MetadataEnrichment\MetadataEnrichingEventStreamDecorator;
 use Broadway\Repository\RepositoryInterface;
 use CultuurNet\Auth\TokenCredentials;
+use CultuurNet\Entry\EntityType;
 use CultuurNet\Entry\EntryAPI;
 use CultuurNet\UDB3\BookingInfo;
 use CultuurNet\UDB3\Cdb\EventItemFactory;
@@ -591,6 +592,51 @@ class EventRepositoryTest extends PHPUnit_Framework_TestCase
                 'Title',
                 'Copyright',
                 'http://google.com'
+            );
+
+        $this->repository->syncBackOn();
+        $this->repository->save($event);
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_remove_the_description_when_updating_with_an_empty_string()
+    {
+        $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
+        $event = $this->createItem($id, 'eventrepositorytest_event.xml');
+
+        $event->updateDescription('');
+
+        $this->entryAPI->expects($this->once())
+            ->method('deleteDescription')
+            ->with(
+                $id,
+                new EntityType('event'),
+                new \CultuurNet\Entry\Language('nl')
+            );
+
+        $this->repository->syncBackOn();
+        $this->repository->save($event);
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_update_the_description()
+    {
+        $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
+        $event = $this->createItem($id, 'eventrepositorytest_event.xml');
+
+        $event->updateDescription('beep boop');
+
+        $this->entryAPI->expects($this->once())
+            ->method('updateDescription')
+            ->with(
+                $id,
+                new EntityType('event'),
+                'beep boop',
+                new \CultuurNet\Entry\Language('nl')
             );
 
         $this->repository->syncBackOn();
