@@ -475,10 +475,10 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
         $newDescription = $descriptionUpdated->getDescription();
         $entityId = $descriptionUpdated->getEventId();
         $entityType = new EntityType('event');
-        $description = new String($newDescription);
         $language = new Language('nl');
 
         if (!empty($newDescription)) {
+            $description = new String($newDescription);
             $entryApi->updateDescription($entityId, $entityType, $description, $language);
         } else {
             $entryApi->deleteDescription($entityId, $entityType, $language);
