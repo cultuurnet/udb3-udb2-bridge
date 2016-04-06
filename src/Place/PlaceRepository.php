@@ -212,7 +212,7 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
     public function applyPlaceDeleted(PlaceDeleted $placeDeleted, DomainMessage $domainMessage)
     {
         $entryApi = $this->createEntryAPI($domainMessage);
-        return $entryApi->deleteEvent($placeDeleted->getPlaceId());
+        return $entryApi->deleteEvent($placeDeleted->getItemId());
     }
 
     /**
