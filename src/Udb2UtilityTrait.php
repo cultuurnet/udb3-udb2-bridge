@@ -132,7 +132,6 @@ trait Udb2UtilityTrait
                         $openingHour->closes . ':00'
                     );
                 }
-
             }
 
             // Create the opening times correctly
@@ -156,7 +155,6 @@ trait Udb2UtilityTrait
 
                 $weekscheme->setDay($day, $openingInfo);
             }
-
         }
 
         // Multiple days.
@@ -223,7 +221,6 @@ trait Udb2UtilityTrait
         }
 
         $cdbEvent->setCalendar($calendar);
-
     }
 
     /**
