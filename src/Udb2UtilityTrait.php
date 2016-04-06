@@ -217,7 +217,6 @@ trait Udb2UtilityTrait
             if (!empty($weekScheme)) {
                 $calendar->setWeekScheme($weekscheme);
             }
-
         }
 
         $cdbEvent->setCalendar($calendar);
