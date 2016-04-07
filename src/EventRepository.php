@@ -402,7 +402,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
     public function applyEventDeleted(EventDeleted $eventDeleted, DomainMessage $domainMessage)
     {
         $entryApi = $this->createEntryAPI($domainMessage);
-        $entryApi->deleteEvent($eventDeleted->getEventId());
+        $entryApi->deleteEvent($eventDeleted->getItemId());
     }
 
     /**
