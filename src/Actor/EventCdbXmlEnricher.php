@@ -1,7 +1,4 @@
 <?php
-/**
- * @file
- */
 
 namespace CultuurNet\UDB3\UDB2\Actor;
 
@@ -13,19 +10,19 @@ use Broadway\EventHandling\EventBusInterface;
 use Broadway\EventHandling\EventListenerInterface;
 use CultuurNet\UDB2DomainEvents\ActorCreated;
 use CultuurNet\UDB2DomainEvents\ActorUpdated;
-use CultuurNet\UDB3\Cdb\ActorItemFactory;
-use CultuurNet\UDB3\Cdb\DateTimeFactory;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorUpdatedEnrichedWithCdbXml;
-use CultuurNet\UDB3\UDB2\ActorCdbXmlServiceInterface;
 use CultuurNet\UDB3\UDB2\ActorNotFoundException;
-use CultuurNet\UDB3\UDB2\OutdatedXmlRepresentationException;
-use DateTimeInterface;
+use DOMDocument;
+use GuzzleHttp\Psr7\Request;
+use Http\Client\HttpClient;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use ValueObjects\Identity\UUID;
-use ValueObjects\String\String;
+use ValueObjects\String\String as StringLiteral;
+use ValueObjects\Web\Url;
+use XMLReader;
 
 /**
  * Creates new event messages based on incoming UDB2 events, enriching them with
@@ -37,9 +34,9 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
     use LoggerAwareTrait;
 
     /**
-     * @var ActorCdbXmlServiceInterface
+     * @var HttpClient
      */
-    protected $cdbXmlService;
+    protected $httpClient;
 
     /**
      * @var EventBusInterface
@@ -52,14 +49,14 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
     protected $logContext;
 
     /**
-     * @param ActorCdbXmlServiceInterface $cdbXmlService
+     * @param HttpClient $httpClient
      * @param EventBusInterface $eventBus
      */
     public function __construct(
-        ActorCdbXmlServiceInterface $cdbXmlService,
+        HttpClient $httpClient,
         EventBusInterface $eventBus
     ) {
-        $this->cdbXmlService = $cdbXmlService;
+        $this->httpClient = $httpClient;
         $this->eventBus = $eventBus;
     }
 
@@ -87,15 +84,14 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
     ) {
         $this->setLogContextFromDomainMessage($message);
 
-        $xml = $this->getActorXml(
-            $actorCreated->getActorId(),
-            $actorCreated->getTime()
-        );
+        $xml = $this->getActorXml($actorCreated->getUrl());
 
         $enrichedActorCreated = ActorCreatedEnrichedWithCdbXml::fromActorCreated(
             $actorCreated,
             $xml,
-            new String($this->cdbXmlService->getCdbXmlNamespaceUri())
+            new StringLiteral(
+                \CultureFeed_Cdb_Xml::namespaceUriForVersion('3.3')
+            )
         );
 
         $this->publish(
@@ -114,15 +110,14 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
     ) {
         $this->setLogContextFromDomainMessage($message);
 
-        $xml = $this->getActorXml(
-            $actorUpdated->getActorId(),
-            $actorUpdated->getTime()
-        );
+        $xml = $this->getActorXml($actorUpdated->getUrl());
 
         $enrichedActorUpdated = ActorUpdatedEnrichedWithCdbXml::fromActorUpdated(
             $actorUpdated,
             $xml,
-            new String($this->cdbXmlService->getCdbXmlNamespaceUri())
+            new StringLiteral(
+                \CultureFeed_Cdb_Xml::namespaceUriForVersion('3.3')
+            )
         );
 
         $this->publish(
@@ -150,81 +145,71 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
     }
 
     /**
-     * @param String $actorId
-     * @param DateTimeInterface $updatedSince
+     * @param Url $url
+     * @return StringLiteral
      *
      * @throws ActorNotFoundException
-     * @throws OutdatedXmlRepresentationException
-     *
-     * @return String
      */
-    private function getActorXml(String $actorId, DateTimeInterface $updatedSince)
+    private function getActorXml(Url $url)
     {
-        $xml = $this->cdbXmlService->getCdbXmlOfActor((string)$actorId);
-        $this->guardXmlFreshness($actorId, $xml, $updatedSince);
+        $this->logger->debug('retrieving cdbxml from ' . (string)$url);
 
-        return new String($xml);
-    }
+        $request = new Request(
+            'GET',
+            (string)$url,
+            [
+                'Accept' => 'application/xml',
+            ]
+        );
 
-    /**
-     * @param String $actorId
-     * @param string $xml
-     * @param DateTimeInterface $updatedSince
-     *
-     * @throws OutdatedXmlRepresentationException
-     *
-     * @return void
-     */
-    private function guardXmlFreshness($actorId, $xml, DateTimeInterface $updatedSince)
-    {
-        $actualUpdateDate = $this->getUpdatedDate($xml);
+        $response = $this->httpClient->sendRequest($request);
 
-        if ($actualUpdateDate < $updatedSince) {
-            $msg = 'The xml retrieved from UDB2 seems older than the time indicated in the event message.';
-
-            $exception = new OutdatedXmlRepresentationException(
-                $msg,
-                (string)$actorId,
-                $updatedSince,
-                $actualUpdateDate
-            );
-
-            $this->logError(
-                $msg,
+        if (200 !== $response->getStatusCode()) {
+            $this->logger->error(
+                'Unable to retrieve cdbxml, server responded with ' .
+                $response->getStatusCode() . ' ' . $response->getReasonPhrase(),
                 [
-                    'actorId' => (string)$actorId,
-                    'exception' => $exception,
-                    'actualUpdateDate' => $actualUpdateDate->format(
-                        \DateTime::ISO8601
-                    ),
-                    'sinceDate' => $updatedSince->format(\DateTime::ISO8601)
+                    'url' => (string)$url
                 ]
             );
 
-            throw $exception;
+            throw new ActorNotFoundException(
+                'Unable to retrieve event from ' . (string)$url
+            );
         }
-    }
 
-    private function logError($msg, $context = [])
-    {
-        if ($this->logger) {
-            $this->logger->error($msg, $this->logContext + $context);
-        }
+        $xml = $response->getBody()->getContents();
+
+        $eventXml = $this->extractActorElement($xml);
+
+        return new StringLiteral($eventXml);
     }
 
     /**
-     * @param string $actorXml
-     * @return \DateTimeImmutable
+     * @param string $cdbXml
+     * @return string
+     * @throws \RuntimeException
      */
-    private function getUpdatedDate($actorXml)
+    private function extractActorElement($cdbXml)
     {
-        $actor = ActorItemFactory::createActorFromCdbXml(
-            $this->cdbXmlService->getCdbXmlNamespaceUri(),
-            $actorXml
-        );
+        $reader = new XMLReader();
+        $reader->xml($cdbXml);
 
-        return DateTimeFactory::dateTimeFromDateString(
-            $actor->getLastUpdated()
+        while ($reader->read()) {
+            switch ($reader->nodeType) {
+                case ($reader::ELEMENT):
+                    if ($reader->localName === 'actor') {
+                        $node = $reader->expand();
+                        $dom = new DomDocument('1.0');
+                        $n = $dom->importNode($node, true);
+                        $dom->appendChild($n);
+                        return $dom->saveXML();
+                    }
+            }
+        }
+
+        throw new \RuntimeException(
+            "Actor could not be found in the Entry API response body."
         );
     }
 }

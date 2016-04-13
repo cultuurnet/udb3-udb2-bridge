@@ -13,6 +13,12 @@ use Psr\Log\LoggerAwareTrait;
 
 /**
  * Imports organizers from UDB2 into UDB3 based on cdbxml.
+ *
+ * @deprecated
+ *   Used in CultuurNet\UDB3\UDB2\Organizer\OrganizerRepository to import an
+ *   organizer from UDB2 if it's not found in the local repository. In the
+ *   future Organizers will be only imported from the UDB2 domain messages
+ *   on an AMQP exchange when the repository decorator is dropped.
  */
 class OrganizerCdbXmlImporter implements OrganizerImporterInterface, LoggerAwareInterface
 {
