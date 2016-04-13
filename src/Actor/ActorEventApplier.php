@@ -17,7 +17,7 @@ use CultuurNet\UDB3\UDB2\Actor\Events\ActorCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorUpdatedEnrichedWithCdbXml;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use Psr\Log\LoggerInterface;
+use ValueObjects\String\String as StringLiteral;
 
 /**
  * Applies incoming UDB2 actor events enriched with cdb xml on UDB3 organizers.
@@ -124,11 +124,11 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
     }
 
     /**
-     * @param $entityId
+     * @param StringLiteral $entityId
      * @param CdbXmlContainerInterface $cdbXml
      */
     private function updateWithCreateFallback(
-        $entityId,
+        StringLiteral $entityId,
         CdbXmlContainerInterface $cdbXml
     ) {
         try {
@@ -158,11 +158,11 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
     }
 
     /**
-     * @param $entityId
+     * @param StringLiteral $entityId
      * @param CdbXmlContainerInterface $cdbXml
      */
     private function createWithUpdateFallback(
-        $entityId,
+        StringLiteral $entityId,
         CdbXmlContainerInterface $cdbXml
     ) {
         try {
@@ -185,13 +185,15 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
     }
 
     /**
-     * @param $entityId
+     * @param StringLiteral $entityId
      * @param CdbXmlContainerInterface $cdbXml
      */
     private function update(
-        $entityId,
+        StringLiteral $entityId,
         CdbXmlContainerInterface $cdbXml
     ) {
+        $entityId = (string) $entityId;
+
         /** @var UpdateableWithCdbXmlInterface|AggregateRoot $entity */
         $entity = $this->repository->load($entityId);
 
@@ -200,23 +202,23 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
             $cdbXml->getCdbXmlNamespaceUri()
         );
 
-        $this->repository->add($entity);
+        $this->repository->save($entity);
     }
 
     /**
-     * @param string $id
+     * @param StringLiteral $id
      * @param CdbXmlContainerInterface $cdbXml
      */
     private function create(
-        $id,
+        StringLiteral $id,
         CdbXmlContainerInterface $cdbXml
     ) {
         $entity = $this->actorFactory->createFromCdbXml(
-            $id,
+            (string) $id,
             $cdbXml->getCdbXml(),
             $cdbXml->getCdbXmlNamespaceUri()
         );
 
-        $this->repository->add($entity);
+        $this->repository->save($entity);
     }
 }
