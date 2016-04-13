@@ -49,15 +49,15 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
     protected $logContext;
 
     /**
-     * @param HttpClient $httpClient
      * @param EventBusInterface $eventBus
+     * @param HttpClient $httpClient
      */
     public function __construct(
-        HttpClient $httpClient,
-        EventBusInterface $eventBus
+        EventBusInterface $eventBus,
+        HttpClient $httpClient
     ) {
-        $this->httpClient = $httpClient;
         $this->eventBus = $eventBus;
+        $this->httpClient = $httpClient;
     }
 
     /**
