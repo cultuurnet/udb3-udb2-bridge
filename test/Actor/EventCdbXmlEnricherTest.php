@@ -15,6 +15,9 @@ use CultuurNet\UDB3\UDB2\Actor\Events\ActorCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorUpdatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\ActorCdbXmlServiceInterface;
 use CultuurNet\UDB3\UDB2\OutdatedXmlRepresentationException;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
+use Http\Client\HttpClient;
 use ValueObjects\Identity\UUID;
 use ValueObjects\String\String;
 use ValueObjects\Web\Url;
@@ -27,9 +30,9 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
     private $eventBus;
 
     /**
-     * @var ActorCdbXmlServiceInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var HttpClient|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $cdbXmlService;
+    private $httpClient;
 
     /**
      * @var EventCdbXmlEnricher
@@ -44,18 +47,36 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
 
         $this->eventBus->trace();
 
-        $this->cdbXmlService = $this->getMock(
-            ActorCdbXmlServiceInterface::class
+        $this->httpClient = $this->getMock(
+            HttpClient::class
         );
-
-        $this->cdbXmlService->expects($this->any())
-            ->method('getCdbXmlNamespaceUri')
-            ->willReturn($this->cdbXmlNamespaceUri());
 
         $this->enricher = new EventCdbXmlEnricher(
-            $this->cdbXmlService,
-            $this->eventBus
+            $this->eventBus,
+            $this->httpClient
         );
+    }
+
+    private function expectHttpClientToReturnCdbXmlFromUrl($url)
+    {
+        $request = new Request(
+            'GET',
+            (string)$url,
+            [
+                'Accept' => 'application/xml',
+            ]
+        );
+
+        $response = new Response(
+            200,
+            [],
+            $this->cdbXml()
+        );
+
+        $this->httpClient->expects($this->once())
+            ->method('sendRequest')
+            ->with($request)
+            ->willReturn($response);
     }
 
     private function cdbXml()
@@ -65,7 +86,7 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
 
     private function cdbXmlNamespaceUri()
     {
-        return 'http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.2/FINAL';
+        return 'http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL';
     }
 
     /**
@@ -164,12 +185,9 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
         $incomingEvent,
         $newEvent
     ) {
-        $this->cdbXmlService->expects($this->once())
-            ->method('getCdbXmlOfActor')
-            ->with($incomingEvent->getActorId())
-            ->willReturn(
-                $this->cdbXml()
-            );
+        $this->expectHttpClientToReturnCdbXmlFromUrl(
+            $incomingEvent->getUrl()
+        );
 
         $this->publish($incomingEvent);
 
@@ -178,42 +196,6 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
                 $newEvent
             ]
         );
-    }
-
-    /**
-     *
-     */
-    public function messagesCausingOutdatedXmlExceptionProvider()
-    {
-        // Time is anything later than the lastupdated property in the xml file
-        // with actor xml that is loaded.
-        return [
-            [
-                $this->newActorUpdated(new \DateTimeImmutable())
-            ],
-            [
-                $this->newActorCreated(new \DateTimeImmutable())
-            ],
-        ];
-    }
-
-    /**
-     * @test
-     * @dataProvider messagesCausingOutdatedXmlExceptionProvider
-     * @param ActorUpdated|ActorCreated $event
-     */
-    public function it_fails_if_the_retrieved_xml_is_older_than_time_indicated_in_the_message($event)
-    {
-        $this->cdbXmlService->expects($this->once())
-            ->method('getCdbXmlOfActor')
-            ->with($event->getActorId())
-            ->willReturn(
-                $this->cdbXml()
-            );
-
-        $this->setExpectedException(OutdatedXmlRepresentationException::class);
-
-        $this->publish($event);
     }
 
     /**

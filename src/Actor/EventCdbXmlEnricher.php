@@ -10,6 +10,7 @@ use Broadway\EventHandling\EventBusInterface;
 use Broadway\EventHandling\EventListenerInterface;
 use CultuurNet\UDB2DomainEvents\ActorCreated;
 use CultuurNet\UDB2DomainEvents\ActorUpdated;
+use CultuurNet\UDB3\Cdb\ActorItemFactory;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorUpdatedEnrichedWithCdbXml;
@@ -19,6 +20,7 @@ use GuzzleHttp\Psr7\Request;
 use Http\Client\HttpClient;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use ValueObjects\Identity\UUID;
 use ValueObjects\String\String as StringLiteral;
 use ValueObjects\Web\Url;
@@ -58,6 +60,7 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
     ) {
         $this->eventBus = $eventBus;
         $this->httpClient = $httpClient;
+        $this->logger = new NullLogger();
     }
 
     /**

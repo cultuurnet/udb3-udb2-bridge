@@ -1,15 +1,9 @@
-<cdb:actor xmlns:cdb="http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.2/FINAL"
-           asset="true" availablefrom="2013-07-18T09:04:07"
-           availableto="2100-01-01T00:00:00" createdby="cultuurnet001"
-           creationdate="2010-01-06T13:33:06"
-           cdbid="318F2ACB-F612-6F75-0037C9C29F44087A"
-           externalid="Cultuurnet:organisation_1565"
-           lastupdated="2013-07-18T09:04:37" lastupdatedby="lotte@cultuurnet.be"
-           owner="Invoerders Algemeen ">
-    <cdb:actordetails>
+<?xml version="1.0"?>
+<cdb:actor xmlns:cdb="http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL" asset="true" availablefrom="2013-07-18T09:04:07" availableto="2100-01-01T00:00:00" createdby="cultuurnet001" creationdate="2010-01-06T13:33:06" cdbid="318F2ACB-F612-6F75-0037C9C29F44087A" externalid="Cultuurnet:organisation_1565" lastupdated="2013-07-18T09:04:37" lastupdatedby="lotte@cultuurnet.be" owner="Invoerders Algemeen">
+<cdb:actordetails>
         <cdb:actordetail lang="nl">
             <cdb:calendarsummary>
-                Bij voorstellingen is de balie van CC Palethe één uur voor
+                Bij voorstellingen is de balie van CC Palethe een uur voor
                 aanvang geopend.
             </cdb:calendarsummary>
             <cdb:media>
@@ -58,6 +52,6 @@
         <cdb:url main="true">http://www.palethe.be/</cdb:url>
     </cdb:contactinfo>
     <cdb:keywords>
-        Aanvaarden van SABAM-cultuurchèques;Toevlalocatie;toevlalocatie
+        Aanvaarden van SABAM-cultuurcheques;Toevlalocatie;toevlalocatie
     </cdb:keywords>
 </cdb:actor>
