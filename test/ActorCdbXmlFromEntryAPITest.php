@@ -1,0 +1,77 @@
+<?php
+
+namespace CultuurNet\UDB3\UDB2;
+
+use CultuurNet\Auth\ConsumerCredentials;
+use CultuurNet\Auth\Guzzle\HttpClientFactory;
+use Guzzle\Http\Client;
+use Guzzle\Http\Message\RequestInterface;
+use Guzzle\Http\Message\Response;
+use ValueObjects\String\String as StringLiteral;
+
+class ActorCdbXmlFromEntryAPITest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * @var ActorCdbXmlFromEntryAPI
+     */
+    private $service;
+
+    /**
+     * @var HttpClientFactory|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $clientFactory;
+
+    protected function setUp()
+    {
+        $this->service = new ActorCdbXmlFromEntryAPI(
+            'http://example.com/uitid/rest',
+            new ConsumerCredentials(
+                'foo',
+                'bar'
+            ),
+            new StringLiteral('user-xyz')
+        );
+
+        $this->clientFactory = $this->getMock(HttpClientFactory::class);
+
+        $this->service->setHttpClientFactory($this->clientFactory);
+    }
+
+    /**
+     * @test
+     */
+    public function it_retrieves_cdbxml_of_an_actor()
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject $client */
+        $client = $this->getMock(Client::class, ['send']);
+
+        $this->clientFactory->expects($this->once())
+            ->method('createClient')
+            ->with(
+                'http://example.com/uitid/rest',
+                new ConsumerCredentials(
+                    'foo',
+                    'bar'
+                )
+            )
+            ->willReturn(
+                $client
+            );
+
+        $client->expects($this->once())
+            ->method('send')
+            ->with($this->callback(
+                function (RequestInterface $request) {
+                    return $request->getUrl() == '/actor/061C13AC-A15F-F419-D8993D68C9E94548?uid=user-xyz';
+                }
+            ))
+            ->willReturn(new Response(200, null, file_get_contents(__DIR__ . '/samples/entry-api-actor-response.xml')));
+
+        $actorXml = $this->service->getCdbXmlOfActor('061C13AC-A15F-F419-D8993D68C9E94548');
+
+        $this->assertXmlStringEqualsXmlFile(
+            __DIR__ . '/samples/search-results-single-actor.xml',
+            $actorXml
+        );
+    }
+}
