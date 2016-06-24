@@ -117,7 +117,7 @@ class PlaceCdbXmlImporterTest extends \PHPUnit_Framework_TestCase
 
         $placeId = '764066ab-826f-48c2-897d-a329ebce953f';
 
-        $cdbXml = file_get_contents(__DIR__ . '/../samples/place.xml');
+        $cdbXml = file_get_contents(__DIR__ . '/../samples/place-event-without-externalurl.xml');
         $cdbXmlNamespaceUri = 'http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL';
 
         $this->actorCdbXmlService->expects($this->once())
@@ -170,22 +170,36 @@ class PlaceCdbXmlImporterTest extends \PHPUnit_Framework_TestCase
      */
     public function it_logs_creation_failures()
     {
-        $exception = new ActorNotFoundException();
+        $actorException = new ActorNotFoundException();
+        $eventException = new EventNotFoundException();
 
         $this->actorCdbXmlService->expects($this->once())
             ->method('getCdbXmlOfActor')
-            ->willThrowException($exception);
+            ->willThrowException($actorException);
+
+        $this->eventCdbXmlService->expects($this->once())
+            ->method('getCdbXmlOfEvent')
+            ->willThrowException($eventException);
 
         $logger = $this->getMock(LoggerInterface::class);
         $this->importer->setLogger($logger);
 
-        $logger->expects($this->once())
+        $logger->expects($this->exactly(2))
             ->method('notice')
-            ->with(
-                'Place creation in UDB3 failed with an exception',
+            ->withConsecutive(
                 [
-                    'exception' => $exception,
-                    'placeId' => 'foo',
+                    'Place creation in UDB3 failed with an exception',
+                    [
+                        'exception' => $actorException,
+                        'placeId' => 'foo',
+                    ]
+                ],
+                [
+                    'Place creation in UDB3 failed with an exception',
+                    [
+                        'exception' => $eventException,
+                        'placeId' => 'foo',
+                    ]
                 ]
             );
 
