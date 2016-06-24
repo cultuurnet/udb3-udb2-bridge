@@ -6,6 +6,7 @@
 namespace CultuurNet\UDB3\UDB2\Organizer;
 
 use Broadway\Repository\RepositoryInterface;
+use CultuurNet\UDB3\Cdb\ActorItemFactory;
 use CultuurNet\UDB3\Organizer\Organizer;
 use CultuurNet\UDB3\UDB2\ActorCdbXmlServiceInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -61,6 +62,17 @@ class OrganizerCdbXmlImporter implements OrganizerImporterInterface, LoggerAware
     {
         try {
             $organizerXml = $this->cdbXmlService->getCdbXmlOfActor($organizerId);
+
+            $cfActor = ActorItemFactory::createActorFromCdbXml(
+                $this->cdbXmlService->getCdbXmlNamespaceUri(),
+                $organizerXml
+            );
+
+            if (!empty($cfActor->getExternalUrl())) {
+                // Do not import an actor that has an external url, which would
+                // mean that it already exists on another udb3 system.
+                return null;
+            }
 
             $organizer = Organizer::importFromUDB2(
                 $organizerId,

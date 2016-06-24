@@ -6,6 +6,8 @@
 namespace CultuurNet\UDB3\UDB2\Place;
 
 use Broadway\Repository\RepositoryInterface;
+use CultuurNet\UDB3\Cdb\ActorItemFactory;
+use CultuurNet\UDB3\Cdb\EventItemFactory;
 use CultuurNet\UDB3\Place\Place;
 use CultuurNet\UDB3\UDB2\ActorCdbXmlServiceInterface;
 use CultuurNet\UDB3\UDB2\EventCdbXmlServiceInterface;
@@ -62,6 +64,17 @@ class PlaceCdbXmlImporter implements PlaceImporterInterface, LoggerAwareInterfac
     {
         $placeXml = $this->actorCdbXmlService->getCdbXmlOfActor($placeId);
 
+        $cfActor = ActorItemFactory::createActorFromCdbXml(
+            $this->actorCdbXmlService->getCdbXmlNamespaceUri(),
+            $placeXml
+        );
+
+        if (!empty($cfActor->getExternalUrl())) {
+            // Do not import an actor that has an external url, which would
+            // mean that it already exists on another udb3 system.
+            return null;
+        }
+
         $place = Place::importFromUDB2Actor(
             $placeId,
             $placeXml,
@@ -74,6 +87,17 @@ class PlaceCdbXmlImporter implements PlaceImporterInterface, LoggerAwareInterfac
     private function createPlaceFromEvent($placeId)
     {
         $placeXml = $this->eventCdbXmlService->getCdbXmlOfEvent($placeId);
+
+        $cfEvent = EventItemFactory::createEventFromCdbXml(
+            $this->actorCdbXmlService->getCdbXmlNamespaceUri(),
+            $placeXml
+        );
+
+        if (!empty($cfEvent->getExternalUrl())) {
+            // Do not import an event that has an external url, which would
+            // mean that it already exists on another udb3 system.
+            return null;
+        }
 
         $place = Place::importFromUDB2Event(
             $placeId,
