@@ -89,7 +89,7 @@ class PlaceCdbXmlImporter implements PlaceImporterInterface, LoggerAwareInterfac
         $placeXml = $this->eventCdbXmlService->getCdbXmlOfEvent($placeId);
 
         $cfEvent = EventItemFactory::createEventFromCdbXml(
-            $this->actorCdbXmlService->getCdbXmlNamespaceUri(),
+            $this->eventCdbXmlService->getCdbXmlNamespaceUri(),
             $placeXml
         );
 
