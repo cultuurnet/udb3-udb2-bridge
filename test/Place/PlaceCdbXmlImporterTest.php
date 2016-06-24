@@ -115,17 +115,19 @@ class PlaceCdbXmlImporterTest extends \PHPUnit_Framework_TestCase
     {
         $this->store->trace();
 
-        $placeId = '764066ab-826f-48c2-897d-a329ebce953f';
+        $placeId = 'bf5fee06-4f1a-410b-97d8-b8d48351419c';
 
         $cdbXml = file_get_contents(__DIR__ . '/../samples/place-event-without-externalurl.xml');
         $cdbXmlNamespaceUri = 'http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL';
 
         $this->actorCdbXmlService->expects($this->once())
             ->method('getCdbXmlOfActor')
+            ->with($placeId)
             ->willThrowException(new ActorNotFoundException());
 
         $this->eventCdbXmlService->expects($this->once())
             ->method('getCdbXmlOfEvent')
+            ->with($placeId)
             ->willReturn($cdbXml);
 
         $this->eventCdbXmlService->expects($this->atLeastOnce())
