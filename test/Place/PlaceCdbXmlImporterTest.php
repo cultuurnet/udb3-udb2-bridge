@@ -193,6 +193,35 @@ class PlaceCdbXmlImporterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @test
+     */
+    public function it_fails_on_trying_to_import_an_organizer()
+    {
+        $this->store->trace();
+
+        $placeId = '404EE8DE-E828-9C07-FE7D12DC4EB24480';
+
+        $cdbXml = file_get_contents(__DIR__ . '/../samples/actor-organizer.xml');
+        $cdbXmlNamespaceUri = 'http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL';
+
+        $this->actorCdbXmlService->expects($this->once())
+            ->method('getCdbXmlOfActor')
+            ->willReturn($cdbXml);
+
+        $this->actorCdbXmlService->expects($this->atLeastOnce())
+            ->method('getCdbXmlNamespaceUri')
+            ->willReturn($cdbXmlNamespaceUri);
+
+        $this->eventCdbXmlService->expects($this->once())
+            ->method('getCdbXmlOfEvent')
+            ->willThrowException(new ActorNotFoundException());
+
+        $place = $this->importer->createPlaceFromUDB2($placeId);
+
+        $this->assertNull($place);
+    }
+
+    /**
      * @param object[] $expectedEvents
      */
     protected function assertTracedEvents($expectedEvents)

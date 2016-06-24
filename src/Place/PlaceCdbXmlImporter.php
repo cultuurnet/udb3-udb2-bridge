@@ -8,6 +8,7 @@ namespace CultuurNet\UDB3\UDB2\Place;
 use Broadway\Repository\RepositoryInterface;
 use CultuurNet\UDB3\Place\Place;
 use CultuurNet\UDB3\UDB2\ActorCdbXmlServiceInterface;
+use CultuurNet\UDB3\UDB2\ActorNotFoundException;
 use CultuurNet\UDB3\UDB2\EventCdbXmlServiceInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -61,6 +62,23 @@ class PlaceCdbXmlImporter implements PlaceImporterInterface, LoggerAwareInterfac
     private function createPlaceFromActor($placeId)
     {
         $placeXml = $this->actorCdbXmlService->getCdbXmlOfActor($placeId);
+
+        // check if the actor is an organizer
+        $placeXmlObj = new \SimpleXMLElement(
+            $placeXml,
+            0,
+            false,
+            $this->actorCdbXmlService->getCdbXmlNamespaceUri()
+        );
+        $qualifiesAsPlaceSpecification = new QualifiesAsPlaceSpecification();
+        $actor = \CultureFeed_Cdb_Item_Actor::parseFromCdbXml($placeXmlObj);
+
+        if(!$qualifiesAsPlaceSpecification->isSatisfiedBy($actor)) {
+            throw new ActorNotFoundException(sprintf(
+                "Actor %s could not be found as a Place",
+                $placeId
+            ));
+        }
 
         $place = Place::importFromUDB2Actor(
             $placeId,
