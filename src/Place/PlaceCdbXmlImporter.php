@@ -73,7 +73,7 @@ class PlaceCdbXmlImporter implements PlaceImporterInterface, LoggerAwareInterfac
         $qualifiesAsPlaceSpecification = new QualifiesAsPlaceSpecification();
         $actor = \CultureFeed_Cdb_Item_Actor::parseFromCdbXml($placeXmlObj);
 
-        if(!$qualifiesAsPlaceSpecification->isSatisfiedBy($actor)) {
+        if (!$qualifiesAsPlaceSpecification->isSatisfiedBy($actor)) {
             throw new ActorNotFoundException(sprintf(
                 "Actor %s could not be found as a Place",
                 $placeId

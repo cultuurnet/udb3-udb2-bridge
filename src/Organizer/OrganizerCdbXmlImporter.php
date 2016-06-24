@@ -73,7 +73,7 @@ class OrganizerCdbXmlImporter implements OrganizerImporterInterface, LoggerAware
             $qualifiesAsOrganizerSpecification = new QualifiesAsOrganizerSpecification();
             $actor = \CultureFeed_Cdb_Item_Actor::parseFromCdbXml($organizerXmlObj);
 
-            if(!$qualifiesAsOrganizerSpecification->isSatisfiedBy($actor)) {
+            if (!$qualifiesAsOrganizerSpecification->isSatisfiedBy($actor)) {
                 throw new ActorNotFoundException(sprintf(
                     "Actor %s could not be found as an Organizer",
                     $organizerId
