@@ -8,6 +8,7 @@ namespace CultuurNet\UDB3\UDB2\Organizer;
 use Broadway\Repository\RepositoryInterface;
 use CultuurNet\UDB3\Organizer\Organizer;
 use CultuurNet\UDB3\UDB2\ActorCdbXmlServiceInterface;
+use CultuurNet\UDB3\UDB2\ActorNotFoundException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
@@ -61,6 +62,23 @@ class OrganizerCdbXmlImporter implements OrganizerImporterInterface, LoggerAware
     {
         try {
             $organizerXml = $this->cdbXmlService->getCdbXmlOfActor($organizerId);
+
+            // check if the actor is an organizer
+            $organizerXmlObj = new \SimpleXMLElement(
+                $organizerXml,
+                0,
+                false,
+                $this->cdbXmlService->getCdbXmlNamespaceUri()
+            );
+            $qualifiesAsOrganizerSpecification = new QualifiesAsOrganizerSpecification();
+            $actor = \CultureFeed_Cdb_Item_Actor::parseFromCdbXml($organizerXmlObj);
+
+            if(!$qualifiesAsOrganizerSpecification->isSatisfiedBy($actor)) {
+                throw new ActorNotFoundException(sprintf(
+                    "Actor %s could not be found as an Organizer",
+                    $organizerId
+                ));
+            }
 
             $organizer = Organizer::importFromUDB2(
                 $organizerId,
