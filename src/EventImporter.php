@@ -201,9 +201,20 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
     {
         $eventXml = $this->getCdbXmlOfEvent($eventId);
 
-        $this->importDependencies($eventXml);
-
         try {
+            $cfEvent = EventItemFactory::createEventFromCdbXml(
+                $this->cdbXmlService->getCdbXmlNamespaceUri(),
+                $eventXml
+            );
+
+            if (!empty($cfEvent->getExternalUrl())) {
+                // Do not import an event that has an external url, which would
+                // mean that it already exists on another udb3 system.
+                return null;
+            }
+
+            $this->importDependencies($eventXml);
+
             $event = Event::importFromUDB2(
                 $eventId,
                 $eventXml,

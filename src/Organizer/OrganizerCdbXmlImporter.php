@@ -6,6 +6,7 @@
 namespace CultuurNet\UDB3\UDB2\Organizer;
 
 use Broadway\Repository\RepositoryInterface;
+use CultuurNet\UDB3\Cdb\ActorItemFactory;
 use CultuurNet\UDB3\Organizer\Organizer;
 use CultuurNet\UDB3\UDB2\ActorCdbXmlServiceInterface;
 use CultuurNet\UDB3\UDB2\ActorNotFoundException;
@@ -63,17 +64,21 @@ class OrganizerCdbXmlImporter implements OrganizerImporterInterface, LoggerAware
         try {
             $organizerXml = $this->cdbXmlService->getCdbXmlOfActor($organizerId);
 
-            // check if the actor is an organizer
-            $organizerXmlObj = new \SimpleXMLElement(
-                $organizerXml,
-                0,
-                false,
-                $this->cdbXmlService->getCdbXmlNamespaceUri()
+            $cfActor = ActorItemFactory::createActorFromCdbXml(
+                $this->cdbXmlService->getCdbXmlNamespaceUri(),
+                $organizerXml
             );
-            $qualifiesAsOrganizerSpecification = new QualifiesAsOrganizerSpecification();
-            $actor = \CultureFeed_Cdb_Item_Actor::parseFromCdbXml($organizerXmlObj);
 
-            if (!$qualifiesAsOrganizerSpecification->isSatisfiedBy($actor)) {
+            if (!empty($cfActor->getExternalUrl())) {
+                // Do not import an actor that has an external url, which would
+                // mean that it already exists on another udb3 system.
+                return null;
+            }
+
+            // check if the actor is an organizer
+            $qualifiesAsOrganizerSpecification = new QualifiesAsOrganizerSpecification();
+
+            if (!$qualifiesAsOrganizerSpecification->isSatisfiedBy($cfActor)) {
                 throw new ActorNotFoundException(sprintf(
                     "Actor %s could not be found as an Organizer",
                     $organizerId

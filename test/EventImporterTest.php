@@ -75,7 +75,7 @@ class EventImporterTest extends \PHPUnit_Framework_TestCase
 
         $this->eventCdbXmlService->expects($this->any())
             ->method('getCdbXmlNamespaceUri')
-            ->willReturn('http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.2/FINAL');
+            ->willReturn('http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL');
 
         $this->placeService = $this->getMock(
             PlaceService::class,
@@ -104,6 +104,30 @@ class EventImporterTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function it_does_not_create_an_event_from_cdbxml_with_an_external_url()
+    {
+        $this->store->trace();
+
+        $cdbId = '7914ed2d-9f28-4946-b9bd-ae8f7a4aea11';
+
+        $cdbXml = file_get_contents(__DIR__ . '/samples/event-with-external-url.xml');
+
+        $this->eventCdbXmlService
+            ->expects($this->once())
+            ->method('getCdbXmlOfEvent')
+            ->with($cdbId)
+            ->willReturn($cdbXml);
+
+        $event = $this->importer->createEventFromUDB2($cdbId);
+
+        $this->assertNull($event);
+
+        $this->assertTracedEvents([]);
+    }
+
+    /**
+     * @test
+     */
     public function it_updates_an_existing_event_with_cdbxml()
     {
         if (!class_exists(Title::class)) {
@@ -122,7 +146,7 @@ class EventImporterTest extends \PHPUnit_Framework_TestCase
         $this->repository->save($event);
 
         $eventXml = file_get_contents(
-            __DIR__ . '/samples/search-results-single-event.xml'
+            __DIR__ . '/samples/event.xml'
         );
 
         $this->eventCdbXmlService

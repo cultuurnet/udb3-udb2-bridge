@@ -6,6 +6,8 @@
 namespace CultuurNet\UDB3\UDB2\Place;
 
 use Broadway\Repository\RepositoryInterface;
+use CultuurNet\UDB3\Cdb\ActorItemFactory;
+use CultuurNet\UDB3\Cdb\EventItemFactory;
 use CultuurNet\UDB3\Place\Place;
 use CultuurNet\UDB3\UDB2\ActorCdbXmlServiceInterface;
 use CultuurNet\UDB3\UDB2\ActorNotFoundException;
@@ -63,17 +65,21 @@ class PlaceCdbXmlImporter implements PlaceImporterInterface, LoggerAwareInterfac
     {
         $placeXml = $this->actorCdbXmlService->getCdbXmlOfActor($placeId);
 
-        // check if the actor is an organizer
-        $placeXmlObj = new \SimpleXMLElement(
-            $placeXml,
-            0,
-            false,
-            $this->actorCdbXmlService->getCdbXmlNamespaceUri()
+        $cfActor = ActorItemFactory::createActorFromCdbXml(
+            $this->actorCdbXmlService->getCdbXmlNamespaceUri(),
+            $placeXml
         );
-        $qualifiesAsPlaceSpecification = new QualifiesAsPlaceSpecification();
-        $actor = \CultureFeed_Cdb_Item_Actor::parseFromCdbXml($placeXmlObj);
 
-        if (!$qualifiesAsPlaceSpecification->isSatisfiedBy($actor)) {
+        if (!empty($cfActor->getExternalUrl())) {
+            // Do not import an actor that has an external url, which would
+            // mean that it already exists on another udb3 system.
+            return null;
+        }
+
+        // check if the actor is an organizer
+        $qualifiesAsPlaceSpecification = new QualifiesAsPlaceSpecification();
+
+        if (!$qualifiesAsPlaceSpecification->isSatisfiedBy($cfActor)) {
             throw new ActorNotFoundException(sprintf(
                 "Actor %s could not be found as a Place",
                 $placeId
@@ -92,6 +98,17 @@ class PlaceCdbXmlImporter implements PlaceImporterInterface, LoggerAwareInterfac
     private function createPlaceFromEvent($placeId)
     {
         $placeXml = $this->eventCdbXmlService->getCdbXmlOfEvent($placeId);
+
+        $cfEvent = EventItemFactory::createEventFromCdbXml(
+            $this->eventCdbXmlService->getCdbXmlNamespaceUri(),
+            $placeXml
+        );
+
+        if (!empty($cfEvent->getExternalUrl())) {
+            // Do not import an event that has an external url, which would
+            // mean that it already exists on another udb3 system.
+            return null;
+        }
 
         $place = Place::importFromUDB2Event(
             $placeId,
