@@ -100,6 +100,33 @@ class OrganizerCdbXmlImporterTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function it_does_not_create_an_organizer_from_cdbxml_with_an_external_url()
+    {
+        $this->store->trace();
+
+        $organizerId = '404EE8DE-E828-9C07-FE7D12DC4EB24480';
+
+        $cdbXml = file_get_contents(__DIR__ . '/samples/organizer-with-external-url.xml');
+        $cdbXmlNamespaceUri = 'http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL';
+
+        $this->actorCdbXmlService->expects($this->once())
+            ->method('getCdbXmlOfActor')
+            ->willReturn($cdbXml);
+
+        $this->actorCdbXmlService->expects($this->atLeastOnce())
+            ->method('getCdbXmlNamespaceUri')
+            ->willReturn($cdbXmlNamespaceUri);
+
+        $organizer = $this->importer->createOrganizerFromUDB2($organizerId);
+
+        $this->assertNull($organizer);
+
+        $this->assertTracedEvents([]);
+    }
+
+    /**
+     * @test
+     */
     public function it_returns_nothing_if_creation_failed()
     {
         $this->actorCdbXmlService->expects($this->once())
