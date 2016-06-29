@@ -10,6 +10,7 @@ use CultuurNet\UDB3\Cdb\ActorItemFactory;
 use CultuurNet\UDB3\Cdb\EventItemFactory;
 use CultuurNet\UDB3\Place\Place;
 use CultuurNet\UDB3\UDB2\ActorCdbXmlServiceInterface;
+use CultuurNet\UDB3\UDB2\ActorNotFoundException;
 use CultuurNet\UDB3\UDB2\EventCdbXmlServiceInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -73,6 +74,16 @@ class PlaceCdbXmlImporter implements PlaceImporterInterface, LoggerAwareInterfac
             // Do not import an actor that has an external url, which would
             // mean that it already exists on another udb3 system.
             return null;
+        }
+
+        // check if the actor is an organizer
+        $qualifiesAsPlaceSpecification = new QualifiesAsPlaceSpecification();
+
+        if (!$qualifiesAsPlaceSpecification->isSatisfiedBy($cfActor)) {
+            throw new ActorNotFoundException(sprintf(
+                "Actor %s could not be found as a Place",
+                $placeId
+            ));
         }
 
         $place = Place::importFromUDB2Actor(

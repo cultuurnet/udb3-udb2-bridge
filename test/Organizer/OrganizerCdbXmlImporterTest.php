@@ -166,6 +166,29 @@ class OrganizerCdbXmlImporterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @test
+     */
+    public function it_fails_on_trying_to_import_a_location()
+    {
+        $placeId = '404EE8DE-E828-9C07-FE7D12DC4EB24480';
+
+        $cdbXml = file_get_contents(__DIR__ . '/samples/place.xml');
+        $cdbXmlNamespaceUri = 'http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL';
+
+        $this->actorCdbXmlService->expects($this->once())
+            ->method('getCdbXmlOfActor')
+            ->willReturn($cdbXml);
+
+        $this->actorCdbXmlService->expects($this->atLeastOnce())
+            ->method('getCdbXmlNamespaceUri')
+            ->willReturn($cdbXmlNamespaceUri);
+
+        $organizer = $this->importer->createOrganizerFromUDB2($placeId);
+
+        $this->assertNull($organizer);
+    }
+
+    /**
      * @param object[] $expectedEvents
      */
     protected function assertTracedEvents($expectedEvents)

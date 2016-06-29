@@ -9,6 +9,7 @@ use Broadway\Repository\RepositoryInterface;
 use CultuurNet\UDB3\Cdb\ActorItemFactory;
 use CultuurNet\UDB3\Organizer\Organizer;
 use CultuurNet\UDB3\UDB2\ActorCdbXmlServiceInterface;
+use CultuurNet\UDB3\UDB2\ActorNotFoundException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
@@ -72,6 +73,16 @@ class OrganizerCdbXmlImporter implements OrganizerImporterInterface, LoggerAware
                 // Do not import an actor that has an external url, which would
                 // mean that it already exists on another udb3 system.
                 return null;
+            }
+
+            // check if the actor is an organizer
+            $qualifiesAsOrganizerSpecification = new QualifiesAsOrganizerSpecification();
+
+            if (!$qualifiesAsOrganizerSpecification->isSatisfiedBy($cfActor)) {
+                throw new ActorNotFoundException(sprintf(
+                    "Actor %s could not be found as an Organizer",
+                    $organizerId
+                ));
             }
 
             $organizer = Organizer::importFromUDB2(
