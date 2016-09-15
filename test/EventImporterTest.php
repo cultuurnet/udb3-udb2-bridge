@@ -15,7 +15,7 @@ use CultuurNet\UDB3\Event\Events\EventUpdatedFromUDB2;
 use CultuurNet\UDB3\Event\EventType;
 use CultuurNet\UDB3\Event\ReadModel\JSONLD\OrganizerServiceInterface;
 use CultuurNet\UDB3\Event\ReadModel\JSONLD\PlaceServiceInterface;
-use CultuurNet\UDB3\Location;
+use CultuurNet\UDB3\Location\Location;
 use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\PlaceService;
 use CultuurNet\UDB3\Title;
