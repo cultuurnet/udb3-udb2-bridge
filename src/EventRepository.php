@@ -660,7 +660,7 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
             $physicalAddress->setStreet(implode(' ', $streetParts));
             $physicalAddress->setHouseNumber($number);
         } else {
-            $physicalAddress->setStreet($eventLocation->getStreet());
+            $physicalAddress->setStreet($eventLocation->getAddress()->getStreetAddress());
         }
 
         $address = new CultureFeed_Cdb_Data_Address($physicalAddress);
