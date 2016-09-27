@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains CultuurNet\UDB3\UDB2\Udb2UtilityTrait.
- */
-
 namespace CultuurNet\UDB3\UDB2;
 
 use Broadway\Domain\DomainMessage;
@@ -27,12 +22,14 @@ use CultureFeed_Cdb_Item_Base;
 use CultureFeed_Cdb_Item_Event;
 use CultuurNet\Auth\ConsumerCredentials;
 use CultuurNet\Entry\EntryAPI;
-use CultuurNet\UDB3\Address;
+use CultuurNet\UDB3\Address\Address;
 use CultuurNet\UDB3\BookingInfo;
 use CultuurNet\UDB3\Calendar;
 use CultuurNet\UDB3\CalendarInterface;
+use CultuurNet\UDB3\CalendarType;
 use CultuurNet\UDB3\ContactPoint;
 use DateTime;
+use DateTimeInterface;
 use Zend\Validator\Exception\RuntimeException;
 
 /**
@@ -157,69 +154,75 @@ trait Udb2UtilityTrait
             }
         }
 
-        // Multiple days.
-        if ($eventCalendar->getType() == Calendar::MULTIPLE) {
-            $calendar = new CultureFeed_Cdb_Data_Calendar_TimestampList();
-            foreach ($eventCalendar->getTimestamps() as $timestamp) {
-                $startdate = strtotime($timestamp->getStartDate());
-                $enddate = strtotime($timestamp->getEndDate());
-                $startHour = date('H:i:s', $startdate);
-                if ($startHour == '00:00:00') {
-                    $startHour = null;
+        switch ($eventCalendar->getType()->toNative()) {
+            case CalendarType::MULTIPLE:
+                $calendar = new CultureFeed_Cdb_Data_Calendar_TimestampList();
+                foreach ($eventCalendar->getTimestamps() as $timestamp) {
+                    $this->timestampCalendar(
+                        $timestamp->getStartDate(),
+                        $timestamp->getEndDate(),
+                        $calendar
+                    );
                 }
-                $endHour = date('H:i:s', $enddate);
-                if ($endHour == '00:00:00') {
-                    $endHour = null;
-                }
-                $calendar->add(
-                    new CultureFeed_Cdb_Data_Calendar_Timestamp(
-                        date('Y-m-d', $startdate),
-                        $startHour,
-                        $endHour
-                    )
+                break;
+            case CalendarType::SINGLE:
+                $calendar = $this->timestampCalendar(
+                    $eventCalendar->getStartDate(),
+                    $eventCalendar->getEndDate(),
+                    new CultureFeed_Cdb_Data_Calendar_TimestampList()
                 );
-            }
-        // Single day.
-        } elseif ($eventCalendar->getType() == Calendar::SINGLE) {
-            $calendar = new CultureFeed_Cdb_Data_Calendar_TimestampList();
-            $startdate = strtotime($eventCalendar->getStartDate());
-            $enddate = strtotime($eventCalendar->getEndDate());
-            $startHour = date('H:i:s', $startdate);
-            if ($startHour == '00:00:00') {
-                $startHour = null;
-            }
-            $endHour = date('H:i:s', $enddate);
-            if ($endHour == '00:00:00') {
-                $endHour = null;
-            }
-            $calendar->add(
-                new CultureFeed_Cdb_Data_Calendar_Timestamp(
-                    date('Y-m-d', $startdate),
-                    $startHour,
-                    $endHour
-                )
-            );
-        // Period.
-        } elseif ($eventCalendar->getType() == Calendar::PERIODIC) {
-            $calendar = new CultureFeed_Cdb_Data_Calendar_PeriodList();
-            $startdate = date('Y-m-d', strtotime($eventCalendar->getStartDate()));
-            $enddate = date('Y-m-d', strtotime($eventCalendar->getEndDate()));
+                break;
+            case CalendarType::PERIODIC:
+                $calendar = new CultureFeed_Cdb_Data_Calendar_PeriodList();
+                $startDate = $eventCalendar->getStartDate()->format('Y-m-d');
+                $endDate = $eventCalendar->getEndDate()->format('Y-m-d');
 
-            $period = new CultureFeed_Cdb_Data_Calendar_Period($startdate, $enddate);
-            if (!empty($weekScheme)) {
-                $calendar->setWeekScheme($weekscheme);
-            }
-            $calendar->add($period);
-
-        // Permanent
-        } elseif ($eventCalendar->getType() == Calendar::PERMANENT) {
-            $calendar = new CultureFeed_Cdb_Data_Calendar_Permanent();
-            if (!empty($weekScheme)) {
-                $calendar->setWeekScheme($weekscheme);
-            }
+                $period = new CultureFeed_Cdb_Data_Calendar_Period($startDate, $endDate);
+                if (!empty($weekScheme)) {
+                    $period->setWeekScheme($weekscheme);
+                }
+                $calendar->add($period);
+                break;
+            case CalendarType::PERMANENT:
+                $calendar = new CultureFeed_Cdb_Data_Calendar_Permanent();
+                if (!empty($weekScheme)) {
+                    $calendar->setWeekScheme($weekscheme);
+                }
+                break;
         }
 
         $cdbEvent->setCalendar($calendar);
+    }
+
+    /**
+     * @param DateTimeInterface $startDate
+     * @param DateTimeInterface $endDate
+     * @param CultureFeed_Cdb_Data_Calendar_TimestampList $calendar
+     *
+     * @return CultureFeed_Cdb_Data_Calendar_TimestampList
+     */
+    private function timestampCalendar(
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+        CultureFeed_Cdb_Data_Calendar_TimestampList $calendar
+    ) {
+        $startHour = $startDate->format('H:i:s');
+        if ($startHour == '00:00:00') {
+            $startHour = null;
+        }
+        $endHour = $endDate->format('H:i:s');
+        if ($endHour == '00:00:00') {
+            $endHour = null;
+        }
+        $calendar->add(
+            new CultureFeed_Cdb_Data_Calendar_Timestamp(
+                $startDate->format('Y-m-d'),
+                $startHour,
+                $endHour
+            )
+        );
+
+        return $calendar;
     }
 
     /**

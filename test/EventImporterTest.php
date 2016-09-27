@@ -13,6 +13,7 @@ use CultuurNet\UDB3\Address\Locality;
 use CultuurNet\UDB3\Address\PostalCode;
 use CultuurNet\UDB3\Address\Street;
 use CultuurNet\UDB3\Calendar;
+use CultuurNet\UDB3\CalendarType;
 use CultuurNet\UDB3\Event\Event;
 use CultuurNet\UDB3\Event\EventRepository;
 use CultuurNet\UDB3\Event\Events\EventUpdatedFromUDB2;
@@ -156,7 +157,10 @@ class EventImporterTest extends \PHPUnit_Framework_TestCase
                     Country::fromNative('BE')
                 )
             ),
-            new Calendar('single', '2015-01-26T13:25:21+01:00')
+            new Calendar(
+                CalendarType::SINGLE(),
+                \DateTime::createFromFormat(\DateTime::ATOM, '2015-01-26T13:25:21+01:00')
+            )
         );
         $this->repository->save($event);
 
