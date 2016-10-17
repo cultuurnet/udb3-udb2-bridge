@@ -155,6 +155,11 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
      */
     private function getActorXml(Url $url)
     {
+        $lastSlashPosition = strrpos($url, '/') + 1;
+        $cdbid = substr($url, $lastSlashPosition, strlen($url) - $lastSlashPosition);
+
+        $url = Url::fromNative('http://search-prod.lodgon.com/search/rest/detail/actor/' . $cdbid . '?noauth=true&version=3.3');
+
         $this->logger->debug('retrieving cdbxml from ' . (string)$url);
 
         $request = new Request(
