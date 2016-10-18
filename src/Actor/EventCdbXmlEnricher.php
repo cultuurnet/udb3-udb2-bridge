@@ -170,7 +170,13 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
             ]
         );
 
+        $startTime = microtime(true);
+
         $response = $this->httpClient->sendRequest($request);
+
+        $delta = round(microtime(true) - $startTime, 3) * 1000;
+        $this->logger->debug('sendRequest took ' . $delta . ' ms.');
+
 
         if (200 !== $response->getStatusCode()) {
             $this->logger->error(
