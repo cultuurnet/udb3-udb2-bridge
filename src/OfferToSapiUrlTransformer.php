@@ -8,17 +8,17 @@ class OfferToSapiUrlTransformer implements UrlTransformerInterface
 {
     /**
      * @var string
-     *  The UDB2 offer type: event or actor.
+     *  A url format with a single $s placeholder.
      */
-    private $offerType;
+    private $urlFormat;
 
     /**
      * OfferToSapiUrlTransformer constructor.
-     * @param string $offerType
+     * @param string $urlFormat
      */
-    public function __construct($offerType)
+    public function __construct($urlFormat)
     {
-        $this->offerType = $offerType;
+        $this->urlFormat = $urlFormat;
     }
 
     public function transform(Url $url)
@@ -26,8 +26,6 @@ class OfferToSapiUrlTransformer implements UrlTransformerInterface
         $lastSlashPosition = strrpos($url, '/') + 1;
         $cdbid = substr($url, $lastSlashPosition, strlen($url) - $lastSlashPosition);
 
-        return  Url::fromNative(
-            'http://search-prod.lodgon.com/search/rest/detail/' . $this->offerType . '/' . $cdbid . '?noauth=true&version=3.3'
-        );
+        return  Url::fromNative(sprintf($this->urlFormat, $cdbid));
     }
 }

@@ -220,7 +220,7 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
             'http://search-prod.lodgon.com/search/rest/detail/event/318F2ACB-F612-6F75-0037C9C29F44087A?noauth=true&version=3.3'
         );
 
-        $transformer = new OfferToSapiUrlTransformer('event');
+        $transformer = new OfferToSapiUrlTransformer('http://search-prod.lodgon.com/search/rest/detail/event/%s?noauth=true&version=3.3');
 
         $this->enricher->withUrlTransformer($transformer);
 
