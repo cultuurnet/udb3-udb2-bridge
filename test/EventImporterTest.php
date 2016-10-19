@@ -24,6 +24,8 @@ use CultuurNet\UDB3\Location\Location;
 use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\PlaceService;
 use CultuurNet\UDB3\Title;
+use CultuurNet\UDB3\Cdb\CdbId\EventRelatedCdbIdExtractor;
+use CultuurNet\UDB3\Cdb\ExternalId\ArrayMappingService;
 use ValueObjects\Geography\Country;
 use ValueObjects\String\String as StringLiteral;
 
@@ -58,6 +60,11 @@ class EventImporterTest extends \PHPUnit_Framework_TestCase
      * @var OrganizerServiceInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $organizerService;
+
+    /**
+     * @var EventRelatedCdbIdExtractor
+     */
+    protected $cdbIdExtractor;
 
     public function setUp()
     {
@@ -100,11 +107,16 @@ class EventImporterTest extends \PHPUnit_Framework_TestCase
             false
         );
 
+        $this->cdbIdExtractor = new EventRelatedCdbIdExtractor(
+            new ArrayMappingService([])
+        );
+
         $this->importer = new EventImporter(
             $this->eventCdbXmlService,
             $this->repository,
             $this->placeService,
-            $this->organizerService
+            $this->organizerService,
+            $this->cdbIdExtractor
         );
     }
 

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "85b3c93a0ce64ff76e727b8949bc5edc",
-    "content-hash": "079d6f297aa8abfc18acef9266bdfcd9",
+    "hash": "09f09a83e9f958d956bd5b76ac5ba15c",
+    "content-hash": "6bdd5b890af5b003c1e8dc8bbd202a1c",
     "packages": [
         {
             "name": "2dotstwice/collection",
@@ -397,16 +397,16 @@
         },
         {
             "name": "cultuurnet/cdb",
-            "version": "2.2.x-dev",
+            "version": "dev-feature/III-1452",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/Cdb.git",
-                "reference": "e9942f3acb33e0893d69985b44a11d6f615cbc9c"
+                "reference": "5d65fbf3b51fca9e5cf2bbda2d7f2eb448067682"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/Cdb/zipball/e9942f3acb33e0893d69985b44a11d6f615cbc9c",
-                "reference": "e9942f3acb33e0893d69985b44a11d6f615cbc9c",
+                "url": "https://api.github.com/repos/cultuurnet/Cdb/zipball/5d65fbf3b51fca9e5cf2bbda2d7f2eb448067682",
+                "reference": "5d65fbf3b51fca9e5cf2bbda2d7f2eb448067682",
                 "shasum": ""
             },
             "require-dev": {
@@ -428,7 +428,7 @@
                 "Apache-2.0"
             ],
             "description": "PHP library for hydrating/manipulating CultuurNet's Cdb XML documents",
-            "time": "2016-10-17 14:17:27"
+            "time": "2016-10-19 13:39:17"
         },
         {
             "name": "cultuurnet/clock",
@@ -889,16 +889,16 @@
         },
         {
             "name": "cultuurnet/udb3",
-            "version": "dev-master",
+            "version": "dev-feature/III-1452",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb3-php.git",
-                "reference": "18211f6ad1b08305ab0afd9304cde237144b0309"
+                "reference": "ddee41946aa8d4540d6f68e59ff831381302ab77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/18211f6ad1b08305ab0afd9304cde237144b0309",
-                "reference": "18211f6ad1b08305ab0afd9304cde237144b0309",
+                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/ddee41946aa8d4540d6f68e59ff831381302ab77",
+                "reference": "ddee41946aa8d4540d6f68e59ff831381302ab77",
                 "shasum": ""
             },
             "require": {
@@ -907,7 +907,7 @@
                 "chrisboulton/php-resque": "~1.2",
                 "cultuurnet/auth": "~1.2",
                 "cultuurnet/calendar-summary": "~1.0.2",
-                "cultuurnet/cdb": "~2.2.0",
+                "cultuurnet/cdb": "dev-feature/III-1452 as 2.2.0",
                 "cultuurnet/clock": "~0.1",
                 "cultuurnet/culturefeed-php": "dev-master as 1.6",
                 "cultuurnet/deserializer": "~0.1",
@@ -971,7 +971,7 @@
                 }
             ],
             "description": "UDB3 PHP libraries",
-            "time": "2016-10-19 08:58:34"
+            "time": "2016-10-19 15:21:56"
         },
         {
             "name": "cultuurnet/udb3-jwt",
@@ -1969,16 +1969,16 @@
         },
         {
             "name": "league/flysystem",
-            "version": "1.0.30",
+            "version": "1.0.31",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "75138bb14160f3ba963750aa95e08d1d394fb198"
+                "reference": "521a233642773505222a5dd53231ccf5b0607d5a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/75138bb14160f3ba963750aa95e08d1d394fb198",
-                "reference": "75138bb14160f3ba963750aa95e08d1d394fb198",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/521a233642773505222a5dd53231ccf5b0607d5a",
+                "reference": "521a233642773505222a5dd53231ccf5b0607d5a",
                 "shasum": ""
             },
             "require": {
@@ -2048,7 +2048,7 @@
                 "sftp",
                 "storage"
             ],
-            "time": "2016-10-18 16:20:02"
+            "time": "2016-10-19 13:15:54"
         },
         {
             "name": "league/flysystem-ziparchive",
@@ -5226,9 +5226,25 @@
             "time": "2016-08-09 15:02:57"
         }
     ],
-    "aliases": [],
+    "aliases": [
+        {
+            "alias": "0.1",
+            "alias_normalized": "0.1.0.0",
+            "version": "dev-feature/III-1452",
+            "package": "cultuurnet/udb3"
+        },
+        {
+            "alias": "2.2.0",
+            "alias_normalized": "2.2.0.0",
+            "version": "dev-feature/III-1452",
+            "package": "cultuurnet/cdb"
+        }
+    ],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "cultuurnet/udb3": 20,
+        "cultuurnet/cdb": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],

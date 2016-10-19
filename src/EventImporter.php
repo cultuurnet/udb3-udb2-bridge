@@ -17,6 +17,7 @@ use CultuurNet\UDB3\Event\Event;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\PlaceService;
+use CultuurNet\UDB3\Cdb\CdbId\EventRelatedCdbIdExtractorInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
@@ -51,18 +52,29 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
     protected $placeService;
 
     /**
+     * @var EventRelatedCdbIdExtractorInterface
+     */
+    protected $cdbIdExtractor;
+
+    /**
      * @param EventCdbXmlServiceInterface $cdbXmlService
+     * @param RepositoryInterface $repository
+     * @param PlaceService $placeService
+     * @param OrganizerService $organizerService
+     * @param EventRelatedCdbIdExtractorInterface $cdbIdExtractor
      */
     public function __construct(
         EventCdbXmlServiceInterface $cdbXmlService,
         RepositoryInterface $repository,
         PlaceService $placeService,
-        OrganizerService $organizerService
+        OrganizerService $organizerService,
+        EventRelatedCdbIdExtractorInterface $cdbIdExtractor
     ) {
         $this->cdbXmlService = $cdbXmlService;
         $this->repository = $repository;
         $this->placeService = $placeService;
         $this->organizerService = $organizerService;
+        $this->cdbIdExtractor = $cdbIdExtractor;
         $this->logger = new NullLogger();
     }
 
@@ -277,32 +289,31 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
             $eventXml
         );
 
-        try {
-            $location = $udb2Event->getLocation();
-            if ($location && $location->getCdbid()) {
+        $locationCdbId = $this->cdbIdExtractor->getRelatedPlaceCdbId($udb2Event);
+        $organizerCdbId = $this->cdbIdExtractor->getRelatedOrganizerCdbId($udb2Event);
+
+        if ($locationCdbId) {
+            try {
                 // Loading the place will implicitly import it, or throw an error
                 // if the place is not known.
-                $this->placeService->getEntity($location->getCdbid());
+                $this->placeService->getEntity($locationCdbId);
+            } catch (EntityNotFoundException $e) {
+                $this->logger->error(
+                    "Unable to retrieve location with ID {$locationCdbId}, of event {$udb2Event->getCdbId()}."
+                );
             }
-        } catch (EntityNotFoundException $e) {
-            $this->logger->error(
-                "Unable to retrieve location with ID {$location->getCdbid(
-                )}, of event {$udb2Event->getCdbId()}."
-            );
         }
 
-        try {
-            $organizer = $udb2Event->getOrganiser();
-            if ($organizer && $organizer->getCdbid()) {
+        if ($organizerCdbId) {
+            try {
                 // Loading the organizer will implicitly import it, or throw an error
                 // if the organizer is not known.
-                $this->organizerService->getEntity($organizer->getCdbid());
+                $this->organizerService->getEntity($organizerCdbId);
+            } catch (EntityNotFoundException $e) {
+                $this->logger->error(
+                    "Unable to retrieve organizer with ID {$organizerCdbId}, of event {$udb2Event->getCdbId()}."
+                );
             }
-        } catch (EntityNotFoundException $e) {
-            $this->logger->error(
-                "Unable to retrieve organizer with ID {$organizer->getCdbid(
-                )}, of event {$udb2Event->getCdbId()}."
-            );
         }
     }
 }
