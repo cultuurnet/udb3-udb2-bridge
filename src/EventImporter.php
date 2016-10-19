@@ -17,7 +17,7 @@ use CultuurNet\UDB3\Event\Event;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\OrganizerService;
 use CultuurNet\UDB3\PlaceService;
-use CultuurNet\UDB3\Cdb\CdbId\EventRelatedCdbIdExtractorInterface;
+use CultuurNet\UDB3\Cdb\CdbId\EventCdbIdExtractorInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
@@ -52,7 +52,7 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
     protected $placeService;
 
     /**
-     * @var EventRelatedCdbIdExtractorInterface
+     * @var EventCdbIdExtractorInterface
      */
     protected $cdbIdExtractor;
 
@@ -61,14 +61,14 @@ class EventImporter implements EventListenerInterface, EventImporterInterface, L
      * @param RepositoryInterface $repository
      * @param PlaceService $placeService
      * @param OrganizerService $organizerService
-     * @param EventRelatedCdbIdExtractorInterface $cdbIdExtractor
+     * @param EventCdbIdExtractorInterface $cdbIdExtractor
      */
     public function __construct(
         EventCdbXmlServiceInterface $cdbXmlService,
         RepositoryInterface $repository,
         PlaceService $placeService,
         OrganizerService $organizerService,
-        EventRelatedCdbIdExtractorInterface $cdbIdExtractor
+        EventCdbIdExtractorInterface $cdbIdExtractor
     ) {
         $this->cdbXmlService = $cdbXmlService;
         $this->repository = $repository;
