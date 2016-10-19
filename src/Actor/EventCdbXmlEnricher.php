@@ -15,6 +15,7 @@ use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorUpdatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\ActorNotFoundException;
+use CultuurNet\UDB3\UDB2\UrlTransformingTrait;
 use DOMDocument;
 use GuzzleHttp\Psr7\Request;
 use Http\Client\HttpClient;
@@ -34,6 +35,7 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
 {
     use DelegateEventHandlingToSpecificMethodTrait;
     use LoggerAwareTrait;
+    use UrlTransformingTrait;
 
     /**
      * @var HttpClient
@@ -155,10 +157,7 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
      */
     private function getActorXml(Url $url)
     {
-        $lastSlashPosition = strrpos($url, '/') + 1;
-        $cdbid = substr($url, $lastSlashPosition, strlen($url) - $lastSlashPosition);
-
-        $url = Url::fromNative('http://search-prod.lodgon.com/search/rest/detail/actor/' . $cdbid . '?noauth=true&version=3.3');
+        $url = $this->transformUrl($url);
 
         $this->logger->debug('retrieving cdbxml from ' . (string)$url);
 

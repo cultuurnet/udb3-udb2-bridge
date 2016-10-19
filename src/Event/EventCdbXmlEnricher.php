@@ -1,7 +1,4 @@
 <?php
-/**
- * @file
- */
 
 namespace CultuurNet\UDB3\UDB2\Event;
 
@@ -18,6 +15,7 @@ use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\UDB2\Event\Events\EventCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Event\Events\EventUpdatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\EventNotFoundException;
+use CultuurNet\UDB3\UDB2\UrlTransformingTrait;
 use DomDocument;
 use GuzzleHttp\Psr7\Request;
 use Http\Client\HttpClient;
@@ -36,6 +34,7 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
 {
     use LoggerAwareTrait;
     use DelegateEventHandlingToSpecificMethodTrait;
+    use UrlTransformingTrait;
 
     /**
      * @var EventBusInterface
@@ -118,10 +117,7 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
      */
     private function retrieveXml(Url $url)
     {
-        $lastSlashPosition = strrpos($url, '/') + 1;
-        $cdbid = substr($url, $lastSlashPosition, strlen($url) - $lastSlashPosition);
-
-        $url = Url::fromNative('http://search-prod.lodgon.com/search/rest/detail/event/' . $cdbid . '?noauth=true&version=3.3');
+        $url = $this->transformUrl($url);
 
         $this->logger->debug('retrieving cdbxml from ' . (string)$url);
 
