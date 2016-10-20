@@ -1,7 +1,4 @@
 <?php
-/**
- * @file
- */
 
 namespace CultuurNet\UDB3\UDB2\Actor;
 
@@ -14,6 +11,7 @@ use CultuurNet\UDB2DomainEvents\ActorUpdated;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorUpdatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\ActorCdbXmlServiceInterface;
+use CultuurNet\UDB3\UDB2\OfferToSapiUrlTransformer;
 use CultuurNet\UDB3\UDB2\OutdatedXmlRepresentationException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -149,9 +147,9 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
 
     private function newActorCreated(\DateTimeImmutable $time)
     {
-        $actorId = new String('foo');
+        $actorId = new String('318F2ACB-F612-6F75-0037C9C29F44087A');
         $author = new String('me@example.com');
-        $url = Url::fromNative('http://www.some.url');
+        $url = Url::fromNative('https://io.uitdatabank.be/event/318F2ACB-F612-6F75-0037C9C29F44087A');
 
         return new ActorCreated(
             $actorId,
@@ -163,9 +161,9 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
 
     private function newActorUpdated(\DateTimeImmutable $time)
     {
-        $actorId = new String('foo');
+        $actorId = new String('318F2ACB-F612-6F75-0037C9C29F44087A');
         $author = new String('me@example.com');
-        $url = Url::fromNative('http://www.some.url');
+        $url = Url::fromNative('https://io.uitdatabank.be/event/318F2ACB-F612-6F75-0037C9C29F44087A');
 
         return new ActorUpdated(
             $actorId,
@@ -209,5 +207,23 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
             $expectedEvents,
             $events
         );
+    }
+
+    /**
+     * @dataProvider messagesProvider
+     * @test
+     * @param ActorUpdated|ActorCreated $incomingEvent
+     * @param ActorUpdatedEnrichedWithCdbXml|ActorCreatedEnrichedWithCdbXml $newEvent
+     */
+    public function it_should_retrieve_cdbxml_from_sapi_with_a_transformer($incomingEvent) {
+        $this->expectHttpClientToReturnCdbXmlFromUrl(
+            'http://search-prod.lodgon.com/search/rest/detail/event/318F2ACB-F612-6F75-0037C9C29F44087A?noauth=true&version=3.3'
+        );
+
+        $transformer = new OfferToSapiUrlTransformer('http://search-prod.lodgon.com/search/rest/detail/event/%s?noauth=true&version=3.3');
+
+        $this->enricher->withUrlTransformer($transformer);
+
+        $this->publish($incomingEvent);
     }
 }

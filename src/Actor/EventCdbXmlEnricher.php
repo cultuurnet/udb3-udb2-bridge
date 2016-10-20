@@ -15,6 +15,7 @@ use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorUpdatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\ActorNotFoundException;
+use CultuurNet\UDB3\UDB2\UrlTransformingTrait;
 use DOMDocument;
 use GuzzleHttp\Psr7\Request;
 use Http\Client\HttpClient;
@@ -34,6 +35,7 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
 {
     use DelegateEventHandlingToSpecificMethodTrait;
     use LoggerAwareTrait;
+    use UrlTransformingTrait;
 
     /**
      * @var HttpClient
@@ -155,6 +157,8 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
      */
     private function getActorXml(Url $url)
     {
+        $url = $this->transformUrl($url);
+
         $this->logger->debug('retrieving cdbxml from ' . (string)$url);
 
         $request = new Request(
@@ -165,7 +169,13 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
             ]
         );
 
+        $startTime = microtime(true);
+
         $response = $this->httpClient->sendRequest($request);
+
+        $delta = round(microtime(true) - $startTime, 3) * 1000;
+        $this->logger->debug('sendRequest took ' . $delta . ' ms.');
+
 
         if (200 !== $response->getStatusCode()) {
             $this->logger->error(

@@ -1,7 +1,4 @@
 <?php
-/**
- * @file
- */
 
 namespace CultuurNet\UDB3\UDB2\Event;
 
@@ -18,6 +15,7 @@ use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\UDB2\Event\Events\EventCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Event\Events\EventUpdatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\EventNotFoundException;
+use CultuurNet\UDB3\UDB2\UrlTransformingTrait;
 use DomDocument;
 use GuzzleHttp\Psr7\Request;
 use Http\Client\HttpClient;
@@ -36,6 +34,7 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
 {
     use LoggerAwareTrait;
     use DelegateEventHandlingToSpecificMethodTrait;
+    use UrlTransformingTrait;
 
     /**
      * @var EventBusInterface
@@ -118,6 +117,8 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
      */
     private function retrieveXml(Url $url)
     {
+        $url = $this->transformUrl($url);
+
         $this->logger->debug('retrieving cdbxml from ' . (string)$url);
 
         $request = new Request(
@@ -128,8 +129,13 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
             ]
         );
 
+        $startTime = microtime(true);
+
         $response = $this->httpClient->sendRequest($request);
 
+        $delta = round(microtime(true) - $startTime, 3) * 1000;
+        $this->logger->debug('sendRequest took ' . $delta . ' ms.');
+        
         if (200 !== $response->getStatusCode()) {
             $this->logger->error(
                 'Unable to retrieve cdbxml, server responded with ' .
