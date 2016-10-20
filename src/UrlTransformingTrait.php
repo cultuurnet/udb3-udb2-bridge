@@ -21,6 +21,10 @@ trait UrlTransformingTrait
         return $this;
     }
 
+    /**
+     * @param Url $url
+     * @return Url
+     */
     public function transformUrl(Url $url)
     {
         return $this->urlTransformer ? $this->urlTransformer->transform($url) : $url;

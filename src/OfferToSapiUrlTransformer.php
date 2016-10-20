@@ -21,6 +21,9 @@ class OfferToSapiUrlTransformer implements UrlTransformerInterface
         $this->urlFormat = $urlFormat;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function transform(Url $url)
     {
         $lastSlashPosition = strrpos($url, '/') + 1;
