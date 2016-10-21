@@ -112,13 +112,40 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
 
     /**
      * @param Url $url
-     *
      * @return StringLiteral
+     * @throws EventNotFoundException
      */
     private function retrieveXml(Url $url)
     {
+        $originalUrl = $url;
         $url = $this->transformUrl($url);
 
+        try {
+            $response = $this->internalSendRequest($url);
+        } catch (EventNotFoundException $exception) {
+            if ($originalUrl != $url) {
+                // Fallback when url was replaced.
+                $response = $this->internalSendRequest($originalUrl);
+            } else {
+                // No fallback just throw it.
+                throw $exception;
+            }
+        }
+
+        $xml = $response->getBody()->getContents();
+
+        $eventXml = $this->extractEventElement($xml);
+
+        return new StringLiteral($eventXml);
+    }
+
+    /**
+     * @param Url $url
+     * @return \Psr\Http\Message\ResponseInterface
+     * @throws EventNotFoundException
+     */
+    private function internalSendRequest(Url $url)
+    {
         $this->logger->debug('retrieving cdbxml from ' . (string)$url);
 
         $request = new Request(
@@ -135,14 +162,11 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
 
         $delta = round(microtime(true) - $startTime, 3) * 1000;
         $this->logger->debug('sendRequest took ' . $delta . ' ms.');
-        
+
         if (200 !== $response->getStatusCode()) {
             $this->logger->error(
                 'Unable to retrieve cdbxml, server responded with ' .
-                $response->getStatusCode() . ' ' . $response->getReasonPhrase(),
-                [
-                    'url' => (string)$url
-                ]
+                $response->getStatusCode() . ' ' . $response->getReasonPhrase()
             );
 
             throw new EventNotFoundException(
@@ -150,11 +174,7 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
             );
         }
 
-        $xml = $response->getBody()->getContents();
-
-        $eventXml = $this->extractEventElement($xml);
-
-        return new StringLiteral($eventXml);
+        return $response;
     }
 
     /**
