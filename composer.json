@@ -13,11 +13,11 @@
     }
   ],
   "require": {
-    "cultuurnet/udb3": "~0.1",
+    "cultuurnet/udb3": "dev-feature/III-1452 as 0.1",
     "cultuurnet/udb2-domain-events": "~0.1",
     "cultuurnet/auth": "~1.2",
     "cultuurnet/entry": "~0.1",
-    "cultuurnet/cdb": "~2.2.0",
+    "cultuurnet/cdb": "dev-feature/III-1452 as 2.2.0",
     "php-http/httplug": "~1.0.0",
     "guzzlehttp/psr7": "~1.2.3"
   },
