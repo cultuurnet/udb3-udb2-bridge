@@ -11,6 +11,7 @@ use CultuurNet\UDB3\Event\Events\EventImportedFromUDB2;
 use CultuurNet\UDB3\Event\Events\EventUpdatedFromUDB2;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\LabelCollection;
+use CultuurNet\UDB3\Offer\Commands\AbstractSyncLabels;
 use CultuurNet\UDB3\Place\Commands\SyncLabels as SyncLabelsOnPlace;
 use CultuurNet\UDB3\Place\Events\PlaceImportedFromUDB2;
 use CultuurNet\UDB3\Place\Events\PlaceUpdatedFromUDB2;
@@ -51,7 +52,7 @@ class LabelImporter implements EventListenerInterface, LoggerAwareInterface
             $eventImportedFromUDB2->getCdbXml()
         );
 
-        $this->commandBus->dispatch(new SyncLabelsOnEvent(
+        $this->dispatch(new SyncLabelsOnEvent(
             $eventImportedFromUDB2->getEventId(),
             LabelCollection::fromStrings($event->getKeywords())
         ));
@@ -68,7 +69,7 @@ class LabelImporter implements EventListenerInterface, LoggerAwareInterface
             $placeImportedFromUDB2->getCdbXml()
         );
 
-        $this->commandBus->dispatch(new SyncLabelsOnPlace(
+        $this->dispatch(new SyncLabelsOnPlace(
             $placeImportedFromUDB2->getActorId(),
             LabelCollection::fromStrings($place->getKeywords())
         ));
@@ -85,7 +86,7 @@ class LabelImporter implements EventListenerInterface, LoggerAwareInterface
             $eventUpdatedFromUDB2->getCdbXml()
         );
 
-        $this->commandBus->dispatch(new SyncLabelsOnEvent(
+        $this->dispatch(new SyncLabelsOnEvent(
             $eventUpdatedFromUDB2->getEventId(),
             LabelCollection::fromStrings($event->getKeywords())
         ));
@@ -102,9 +103,19 @@ class LabelImporter implements EventListenerInterface, LoggerAwareInterface
             $placeUpdatedFromUDB2->getCdbXml()
         );
 
-        $this->commandBus->dispatch(new SyncLabelsOnPlace(
+        $this->dispatch(new SyncLabelsOnPlace(
             $placeUpdatedFromUDB2->getActorId(),
             LabelCollection::fromStrings($place->getKeywords())
         ));
+    }
+
+    private function dispatch(AbstractSyncLabels $syncLabels)
+    {
+        $this->logger->info(
+            'Dispatching SyncLabels with label collection: '
+            . join(', ', $syncLabels->getLabels()->toStrings())
+        );
+
+        $this->commandBus->dispatch($syncLabels);
     }
 }
