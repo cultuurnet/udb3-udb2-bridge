@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "85b3c93a0ce64ff76e727b8949bc5edc",
-    "content-hash": "079d6f297aa8abfc18acef9266bdfcd9",
+    "hash": "6d3c367afa68f64fac709b0ae8888649",
+    "content-hash": "6155b0f58884df5dd64d90285d5f735b",
     "packages": [
         {
             "name": "2dotstwice/collection",
@@ -59,16 +59,16 @@
         },
         {
             "name": "beberlei/assert",
-            "version": "2.6.5",
+            "version": "v2.6.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/beberlei/assert.git",
-                "reference": "fbadde44717ea3eb98fba35425d49731185bf418"
+                "reference": "2b4c9249a7ceef51402d39bd797aae16cfd8f36f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/beberlei/assert/zipball/fbadde44717ea3eb98fba35425d49731185bf418",
-                "reference": "fbadde44717ea3eb98fba35425d49731185bf418",
+                "url": "https://api.github.com/repos/beberlei/assert/zipball/2b4c9249a7ceef51402d39bd797aae16cfd8f36f",
+                "reference": "2b4c9249a7ceef51402d39bd797aae16cfd8f36f",
                 "shasum": ""
             },
             "require": {
@@ -110,7 +110,7 @@
                 "assertion",
                 "validation"
             ],
-            "time": "2016-10-11 17:13:28"
+            "time": "2016-11-14 16:46:13"
         },
         {
             "name": "broadway/broadway",
@@ -477,12 +477,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/culturefeed-php.git",
-                "reference": "929b2580b21ad67882c061dbf694cc547205fd9d"
+                "reference": "30a0fb439312612450f6220ebc1f59edd4b90840"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/culturefeed-php/zipball/929b2580b21ad67882c061dbf694cc547205fd9d",
-                "reference": "929b2580b21ad67882c061dbf694cc547205fd9d",
+                "url": "https://api.github.com/repos/cultuurnet/culturefeed-php/zipball/30a0fb439312612450f6220ebc1f59edd4b90840",
+                "reference": "30a0fb439312612450f6220ebc1f59edd4b90840",
                 "shasum": ""
             },
             "require": {
@@ -537,7 +537,7 @@
                 }
             ],
             "description": "Culturefeed PHP library",
-            "time": "2016-08-05 11:22:45"
+            "time": "2016-11-03 00:26:03"
         },
         {
             "name": "cultuurnet/deserializer",
@@ -689,12 +689,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/symfony-security-jwt.git",
-                "reference": "8e79565b80bfb091da02677c605973f468e9392f"
+                "reference": "a6aed851723228d05897ce99bf7f33272523faaf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/symfony-security-jwt/zipball/8e79565b80bfb091da02677c605973f468e9392f",
-                "reference": "8e79565b80bfb091da02677c605973f468e9392f",
+                "url": "https://api.github.com/repos/cultuurnet/symfony-security-jwt/zipball/a6aed851723228d05897ce99bf7f33272523faaf",
+                "reference": "a6aed851723228d05897ce99bf7f33272523faaf",
                 "shasum": ""
             },
             "require": {
@@ -723,7 +723,7 @@
                 "Apache-2.0"
             ],
             "description": "JWT implementation for the Symfony Security component",
-            "time": "2016-05-02 14:33:28"
+            "time": "2016-11-08 13:53:56"
         },
         {
             "name": "cultuurnet/symfony-security-oauth",
@@ -889,16 +889,16 @@
         },
         {
             "name": "cultuurnet/udb3",
-            "version": "dev-master",
+            "version": "dev-feature/III-1607",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb3-php.git",
-                "reference": "3d61ee217bf114fb7a3ae517ef6cf98a92d551ff"
+                "reference": "972a9bb386b80e1b0629334297802bc914d10946"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/3d61ee217bf114fb7a3ae517ef6cf98a92d551ff",
-                "reference": "3d61ee217bf114fb7a3ae517ef6cf98a92d551ff",
+                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/972a9bb386b80e1b0629334297802bc914d10946",
+                "reference": "972a9bb386b80e1b0629334297802bc914d10946",
                 "shasum": ""
             },
             "require": {
@@ -971,7 +971,7 @@
                 }
             ],
             "description": "UDB3 PHP libraries",
-            "time": "2016-10-27 09:29:28"
+            "time": "2016-11-15 13:32:25"
         },
         {
             "name": "cultuurnet/udb3-jwt",
@@ -1204,16 +1204,16 @@
         },
         {
             "name": "doctrine/cache",
-            "version": "v1.6.0",
+            "version": "v1.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/cache.git",
-                "reference": "f8af318d14bdb0eff0336795b428b547bd39ccb6"
+                "reference": "b6f544a20f4807e81f7044d31e679ccbb1866dc3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/cache/zipball/f8af318d14bdb0eff0336795b428b547bd39ccb6",
-                "reference": "f8af318d14bdb0eff0336795b428b547bd39ccb6",
+                "url": "https://api.github.com/repos/doctrine/cache/zipball/b6f544a20f4807e81f7044d31e679ccbb1866dc3",
+                "reference": "b6f544a20f4807e81f7044d31e679ccbb1866dc3",
                 "shasum": ""
             },
             "require": {
@@ -1270,7 +1270,7 @@
                 "cache",
                 "caching"
             ],
-            "time": "2015-12-31 16:37:02"
+            "time": "2016-10-29 11:16:17"
         },
         {
             "name": "doctrine/collections",
@@ -1911,16 +1911,16 @@
         },
         {
             "name": "lcobucci/jwt",
-            "version": "3.2.0",
+            "version": "3.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/lcobucci/jwt.git",
-                "reference": "7668cb045296f290588d04c391569c7b7fc1f899"
+                "reference": "ddce703826f9c5229781933b1a39069e38e6a0f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lcobucci/jwt/zipball/7668cb045296f290588d04c391569c7b7fc1f899",
-                "reference": "7668cb045296f290588d04c391569c7b7fc1f899",
+                "url": "https://api.github.com/repos/lcobucci/jwt/zipball/ddce703826f9c5229781933b1a39069e38e6a0f3",
+                "reference": "ddce703826f9c5229781933b1a39069e38e6a0f3",
                 "shasum": ""
             },
             "require": {
@@ -1965,7 +1965,7 @@
                 "JWS",
                 "jwt"
             ],
-            "time": "2016-08-13 23:12:58"
+            "time": "2016-10-31 20:09:32"
         },
         {
             "name": "league/flysystem",
@@ -3237,16 +3237,16 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.2.0",
+            "version": "v1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "dff51f72b0706335131b00a7f49606168c582594"
+                "reference": "e79d363049d1c2128f133a2667e4f4190904f7f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/dff51f72b0706335131b00a7f49606168c582594",
-                "reference": "dff51f72b0706335131b00a7f49606168c582594",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/e79d363049d1c2128f133a2667e4f4190904f7f4",
+                "reference": "e79d363049d1c2128f133a2667e4f4190904f7f4",
                 "shasum": ""
             },
             "require": {
@@ -3258,7 +3258,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.2-dev"
+                    "dev-master": "1.3-dev"
                 }
             },
             "autoload": {
@@ -3292,20 +3292,20 @@
                 "portable",
                 "shim"
             ],
-            "time": "2016-05-18 14:26:46"
+            "time": "2016-11-14 01:06:16"
         },
         {
             "name": "symfony/polyfill-php55",
-            "version": "v1.2.0",
+            "version": "v1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php55.git",
-                "reference": "bf2ff9ad6be1a4772cb873e4eea94d70daa95c6d"
+                "reference": "03e3f0350bca2220e3623a0e340eef194405fc67"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php55/zipball/bf2ff9ad6be1a4772cb873e4eea94d70daa95c6d",
-                "reference": "bf2ff9ad6be1a4772cb873e4eea94d70daa95c6d",
+                "url": "https://api.github.com/repos/symfony/polyfill-php55/zipball/03e3f0350bca2220e3623a0e340eef194405fc67",
+                "reference": "03e3f0350bca2220e3623a0e340eef194405fc67",
                 "shasum": ""
             },
             "require": {
@@ -3315,7 +3315,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.2-dev"
+                    "dev-master": "1.3-dev"
                 }
             },
             "autoload": {
@@ -3348,7 +3348,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2016-05-18 14:26:46"
+            "time": "2016-11-14 01:06:16"
         },
         {
             "name": "symfony/security",
@@ -4337,16 +4337,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "4.8.27",
+            "version": "4.8.28",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "c062dddcb68e44b563f66ee319ddae2b5a322a90"
+                "reference": "558a3a0d28b4cb7e4a593a4fbd2220e787076225"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c062dddcb68e44b563f66ee319ddae2b5a322a90",
-                "reference": "c062dddcb68e44b563f66ee319ddae2b5a322a90",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/558a3a0d28b4cb7e4a593a4fbd2220e787076225",
+                "reference": "558a3a0d28b4cb7e4a593a4fbd2220e787076225",
                 "shasum": ""
             },
             "require": {
@@ -4405,7 +4405,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2016-07-21 06:48:14"
+            "time": "2016-11-14 06:25:28"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -4812,16 +4812,16 @@
         },
         {
             "name": "sebastian/recursion-context",
-            "version": "1.0.2",
+            "version": "1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/recursion-context.git",
-                "reference": "913401df809e99e4f47b27cdd781f4a258d58791"
+                "reference": "938df7a6478e72795e5f8266cff24d06e3136f2e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/recursion-context/zipball/913401df809e99e4f47b27cdd781f4a258d58791",
-                "reference": "913401df809e99e4f47b27cdd781f4a258d58791",
+                "url": "https://api.github.com/repos/sebastianbergmann/recursion-context/zipball/938df7a6478e72795e5f8266cff24d06e3136f2e",
+                "reference": "938df7a6478e72795e5f8266cff24d06e3136f2e",
                 "shasum": ""
             },
             "require": {
@@ -4861,7 +4861,7 @@
             ],
             "description": "Provides functionality to recursively process PHP variables",
             "homepage": "http://www.github.com/sebastianbergmann/recursion-context",
-            "time": "2015-11-11 19:50:13"
+            "time": "2016-11-15 06:55:36"
         },
         {
             "name": "sebastian/version",
@@ -5227,9 +5227,18 @@
             "time": "2016-08-09 15:02:57"
         }
     ],
-    "aliases": [],
+    "aliases": [
+        {
+            "alias": "0.1",
+            "alias_normalized": "0.1.0.0",
+            "version": "dev-feature/III-1607",
+            "package": "cultuurnet/udb3"
+        }
+    ],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "cultuurnet/udb3": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
