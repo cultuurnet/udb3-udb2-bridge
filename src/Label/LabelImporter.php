@@ -113,7 +113,7 @@ class LabelImporter implements EventListenerInterface, LoggerAwareInterface
     {
         $this->logger->info(
             'Dispatching SyncLabels with label collection: '
-            . join(', ', $syncLabels->getLabels()->toStrings())
+            . join(', ', $syncLabels->getLabelCollection()->toStrings())
         );
 
         $this->commandBus->dispatch($syncLabels);

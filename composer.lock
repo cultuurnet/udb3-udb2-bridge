@@ -401,12 +401,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/Cdb.git",
-                "reference": "5d65fbf3b51fca9e5cf2bbda2d7f2eb448067682"
+                "reference": "985609149aa2820d2e5d149a993c9b7d2f108035"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/Cdb/zipball/5d65fbf3b51fca9e5cf2bbda2d7f2eb448067682",
-                "reference": "5d65fbf3b51fca9e5cf2bbda2d7f2eb448067682",
+                "url": "https://api.github.com/repos/cultuurnet/Cdb/zipball/985609149aa2820d2e5d149a993c9b7d2f108035",
+                "reference": "985609149aa2820d2e5d149a993c9b7d2f108035",
                 "shasum": ""
             },
             "require-dev": {
@@ -428,7 +428,7 @@
                 "Apache-2.0"
             ],
             "description": "PHP library for hydrating/manipulating CultuurNet's Cdb XML documents",
-            "time": "2016-10-19 13:39:17"
+            "time": "2016-11-16 08:49:37"
         },
         {
             "name": "cultuurnet/clock",
@@ -893,12 +893,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb3-php.git",
-                "reference": "972a9bb386b80e1b0629334297802bc914d10946"
+                "reference": "6b0151a22a3ddcdb6ebbab1d60a022fbdeaa3fb0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/972a9bb386b80e1b0629334297802bc914d10946",
-                "reference": "972a9bb386b80e1b0629334297802bc914d10946",
+                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/6b0151a22a3ddcdb6ebbab1d60a022fbdeaa3fb0",
+                "reference": "6b0151a22a3ddcdb6ebbab1d60a022fbdeaa3fb0",
                 "shasum": ""
             },
             "require": {
@@ -971,7 +971,7 @@
                 }
             ],
             "description": "UDB3 PHP libraries",
-            "time": "2016-11-15 13:32:25"
+            "time": "2016-11-16 12:53:53"
         },
         {
             "name": "cultuurnet/udb3-jwt",
@@ -4288,16 +4288,16 @@
         },
         {
             "name": "phpunit/php-token-stream",
-            "version": "1.4.8",
+            "version": "1.4.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-token-stream.git",
-                "reference": "3144ae21711fb6cac0b1ab4cbe63b75ce3d4e8da"
+                "reference": "3b402f65a4cc90abf6e1104e388b896ce209631b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/3144ae21711fb6cac0b1ab4cbe63b75ce3d4e8da",
-                "reference": "3144ae21711fb6cac0b1ab4cbe63b75ce3d4e8da",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/3b402f65a4cc90abf6e1104e388b896ce209631b",
+                "reference": "3b402f65a4cc90abf6e1104e388b896ce209631b",
                 "shasum": ""
             },
             "require": {
@@ -4333,7 +4333,7 @@
             "keywords": [
                 "tokenizer"
             ],
-            "time": "2015-09-15 10:49:45"
+            "time": "2016-11-15 14:06:22"
         },
         {
             "name": "phpunit/phpunit",
