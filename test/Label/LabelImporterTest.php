@@ -3,9 +3,21 @@
 namespace CultuurNet\UDB3\UDB2\Label;
 
 use Broadway\CommandHandling\CommandBusInterface;
+use CultuurNet\UDB3\Event\Commands\SyncLabels as SyncLabelsOnEvent;
+use CultuurNet\UDB3\Event\Events\EventImportedFromUDB2;
+use CultuurNet\UDB3\Event\Events\EventUpdatedFromUDB2;
+use CultuurNet\UDB3\LabelCollection;
+use CultuurNet\UDB3\Place\Commands\SyncLabels as SyncLabelsOnPlace;
+use CultuurNet\UDB3\Place\Events\PlaceImportedFromUDB2;
+use CultuurNet\UDB3\Place\Events\PlaceUpdatedFromUDB2;
 
 class LabelImporterTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var CommandBusInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $commandBus;
+
     /**
      * @var LabelImporter
      */
@@ -13,25 +25,33 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $commandBus = $this->getMock(CommandBusInterface::class);
+        $this->commandBus = $this->getMock(CommandBusInterface::class);
 
-        $this->labelImporter = new LabelImporter($commandBus);
+        $this->labelImporter = new LabelImporter($this->commandBus);
     }
 
     /**
      * @test
      */
-    public function it_dispatches_label_added_commands_when_applying_event_imported_from_udb2()
+    public function it_dispatches_sync_labels_commands_when_applying_event_imported_from_udb2()
     {
-        $this->assertTrue(false);
-    }
+        $cdbXml = file_get_contents(__DIR__ . '/Samples/event.xml');
+        $cdbXmlNamespaceUri = \CultureFeed_Cdb_Xml::namespaceUriForVersion('3.3');
 
-    /**
-     * @test
-     */
-    public function it_does_not_dispatch_label_added_commands_when_event_imported_from_udb2_has_no_labels()
-    {
-        $this->assertTrue(false);
+        $eventImportedFromUDB2 = new EventImportedFromUDB2(
+            'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1',
+            $cdbXml,
+            $cdbXmlNamespaceUri
+        );
+
+        $this->commandBus->expects($this->once())
+            ->method('dispatch')
+            ->with(new SyncLabelsOnEvent(
+                $eventImportedFromUDB2->getEventId(),
+                LabelCollection::fromStrings(['2dotstwice', 'cultuurnet'])
+            ));
+
+        $this->labelImporter->applyEventImportedFromUDB2($eventImportedFromUDB2);
     }
 
     /**
@@ -39,14 +59,70 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
      */
     public function it_dispatches_label_added_commands_when_applying_place_imported_from_udb2()
     {
-        $this->assertTrue(false);
+        $cdbXml = file_get_contents(__DIR__ . '/Samples/place.xml');
+        $cdbXmlNamespaceUri = \CultureFeed_Cdb_Xml::namespaceUriForVersion('3.3');
+
+        $placeImportedFromUDB2 = new PlaceImportedFromUDB2(
+            '764066ab-826f-48c2-897d-a329ebce953f',
+            $cdbXml,
+            $cdbXmlNamespaceUri
+        );
+
+        $this->commandBus->expects($this->once())
+            ->method('dispatch')
+            ->with(new SyncLabelsOnPlace(
+                $placeImportedFromUDB2->getActorId(),
+                LabelCollection::fromStrings(['2dotstwice', 'cultuurnet'])
+            ));
+
+        $this->labelImporter->applyPlaceImportedFromUDB2($placeImportedFromUDB2);
     }
 
     /**
      * @test
      */
-    public function it_does_not_dispatch_label_added_commands_when_place_imported_from_udb2_has_no_labels()
+    public function it_dispatches_sync_labels_commands_when_applying_event_updated_from_udb2()
     {
-        $this->assertTrue(false);
+        $cdbXml = file_get_contents(__DIR__ . '/Samples/event.xml');
+        $cdbXmlNamespaceUri = \CultureFeed_Cdb_Xml::namespaceUriForVersion('3.3');
+
+        $eventUpdatedFromUDB2 = new EventUpdatedFromUDB2(
+            'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1',
+            $cdbXml,
+            $cdbXmlNamespaceUri
+        );
+
+        $this->commandBus->expects($this->once())
+            ->method('dispatch')
+            ->with(new SyncLabelsOnEvent(
+                $eventUpdatedFromUDB2->getEventId(),
+                LabelCollection::fromStrings(['2dotstwice', 'cultuurnet'])
+            ));
+
+        $this->labelImporter->applyEventUpdatedFromUDB2($eventUpdatedFromUDB2);
+    }
+
+    /**
+     * @test
+     */
+    public function it_dispatches_label_added_commands_when_applying_place_updated_from_udb2()
+    {
+        $cdbXml = file_get_contents(__DIR__ . '/Samples/place.xml');
+        $cdbXmlNamespaceUri = \CultureFeed_Cdb_Xml::namespaceUriForVersion('3.3');
+
+        $placeUpdatedFromUDB2 = new PlaceUpdatedFromUDB2(
+            '764066ab-826f-48c2-897d-a329ebce953f',
+            $cdbXml,
+            $cdbXmlNamespaceUri
+        );
+
+        $this->commandBus->expects($this->once())
+            ->method('dispatch')
+            ->with(new SyncLabelsOnPlace(
+                $placeUpdatedFromUDB2->getActorId(),
+                LabelCollection::fromStrings(['2dotstwice', 'cultuurnet'])
+            ));
+
+        $this->labelImporter->applyPlaceUpdatedFromUDB2($placeUpdatedFromUDB2);
     }
 }
