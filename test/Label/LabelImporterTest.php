@@ -6,6 +6,7 @@ use Broadway\CommandHandling\CommandBusInterface;
 use CultuurNet\UDB3\Event\Commands\SyncLabels as SyncLabelsOnEvent;
 use CultuurNet\UDB3\Event\Events\EventImportedFromUDB2;
 use CultuurNet\UDB3\Event\Events\EventUpdatedFromUDB2;
+use CultuurNet\UDB3\Label;
 use CultuurNet\UDB3\LabelCollection;
 use CultuurNet\UDB3\Place\Commands\SyncLabels as SyncLabelsOnPlace;
 use CultuurNet\UDB3\Place\Events\PlaceImportedFromUDB2;
@@ -23,11 +24,23 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
      */
     private $labelImporter;
 
+    /**
+     * @var LabelCollection
+     */
+    private $labelCollection;
+
     protected function setUp()
     {
         $this->commandBus = $this->getMock(CommandBusInterface::class);
 
         $this->labelImporter = new LabelImporter($this->commandBus);
+
+        $this->labelCollection = new LabelCollection(
+            [
+                new Label('2dotstwice'),
+                new Label('cultuurnet', false),
+            ]
+        );
     }
 
     /**
@@ -48,7 +61,7 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
             ->method('dispatch')
             ->with(new SyncLabelsOnEvent(
                 $eventImportedFromUDB2->getEventId(),
-                LabelCollection::fromStrings(['2dotstwice', 'cultuurnet'])
+                $this->labelCollection
             ));
 
         $this->labelImporter->applyEventImportedFromUDB2($eventImportedFromUDB2);
@@ -72,7 +85,7 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
             ->method('dispatch')
             ->with(new SyncLabelsOnPlace(
                 $placeImportedFromUDB2->getActorId(),
-                LabelCollection::fromStrings(['2dotstwice', 'cultuurnet'])
+                $this->labelCollection
             ));
 
         $this->labelImporter->applyPlaceImportedFromUDB2($placeImportedFromUDB2);
@@ -96,7 +109,7 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
             ->method('dispatch')
             ->with(new SyncLabelsOnEvent(
                 $eventUpdatedFromUDB2->getEventId(),
-                LabelCollection::fromStrings(['2dotstwice', 'cultuurnet'])
+                $this->labelCollection
             ));
 
         $this->labelImporter->applyEventUpdatedFromUDB2($eventUpdatedFromUDB2);
@@ -120,7 +133,7 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
             ->method('dispatch')
             ->with(new SyncLabelsOnPlace(
                 $placeUpdatedFromUDB2->getActorId(),
-                LabelCollection::fromStrings(['2dotstwice', 'cultuurnet'])
+                $this->labelCollection
             ));
 
         $this->labelImporter->applyPlaceUpdatedFromUDB2($placeUpdatedFromUDB2);
