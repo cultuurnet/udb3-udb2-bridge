@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6d3c367afa68f64fac709b0ae8888649",
-    "content-hash": "6155b0f58884df5dd64d90285d5f735b",
+    "hash": "85b3c93a0ce64ff76e727b8949bc5edc",
+    "content-hash": "079d6f297aa8abfc18acef9266bdfcd9",
     "packages": [
         {
             "name": "2dotstwice/collection",
@@ -274,6 +274,50 @@
                 "resque"
             ],
             "time": "2012-10-13 07:28:16"
+        },
+        {
+            "name": "commerceguys/intl",
+            "version": "v0.7.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/commerceguys/intl.git",
+                "reference": "ebeeb62fb08fe5842f064acd8163d7c7a1534fe0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/commerceguys/intl/zipball/ebeeb62fb08fe5842f064acd8163d7c7a1534fe0",
+                "reference": "ebeeb62fb08fe5842f064acd8163d7c7a1534fe0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "mikey179/vfsstream": "1.*",
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "CommerceGuys\\Intl\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bojan Zivanovic"
+                }
+            ],
+            "description": "Internationalization library powered by CLDR data.",
+            "time": "2016-10-26 12:26:01"
         },
         {
             "name": "container-interop/container-interop",
@@ -889,22 +933,23 @@
         },
         {
             "name": "cultuurnet/udb3",
-            "version": "dev-feature/III-1607",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb3-php.git",
-                "reference": "6b0151a22a3ddcdb6ebbab1d60a022fbdeaa3fb0"
+                "reference": "966a0a0eb5abff8e18d42244df6872e5fa2d0cd0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/6b0151a22a3ddcdb6ebbab1d60a022fbdeaa3fb0",
-                "reference": "6b0151a22a3ddcdb6ebbab1d60a022fbdeaa3fb0",
+                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/966a0a0eb5abff8e18d42244df6872e5fa2d0cd0",
+                "reference": "966a0a0eb5abff8e18d42244df6872e5fa2d0cd0",
                 "shasum": ""
             },
             "require": {
                 "2dotstwice/collection": "~1.1",
                 "broadway/broadway": "~0.5.2",
                 "chrisboulton/php-resque": "~1.2",
+                "commerceguys/intl": "^0.7.1",
                 "cultuurnet/auth": "~1.2",
                 "cultuurnet/calendar-summary": "~1.0.2",
                 "cultuurnet/cdb": "~2.2.0",
@@ -971,7 +1016,7 @@
                 }
             ],
             "description": "UDB3 PHP libraries",
-            "time": "2016-11-16 12:53:53"
+            "time": "2016-11-17 09:17:39"
         },
         {
             "name": "cultuurnet/udb3-jwt",
@@ -5227,18 +5272,9 @@
             "time": "2016-08-09 15:02:57"
         }
     ],
-    "aliases": [
-        {
-            "alias": "0.1",
-            "alias_normalized": "0.1.0.0",
-            "version": "dev-feature/III-1607",
-            "package": "cultuurnet/udb3"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "cultuurnet/udb3": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
