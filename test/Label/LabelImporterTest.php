@@ -27,7 +27,7 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
     /**
      * @var LabelCollection
      */
-    private $labelCollecion;
+    private $labelCollection;
 
     protected function setUp()
     {
@@ -35,7 +35,7 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
 
         $this->labelImporter = new LabelImporter($this->commandBus);
 
-        $this->labelCollecion = new LabelCollection(
+        $this->labelCollection = new LabelCollection(
             [
                 new Label('2dotstwice'),
                 new Label('cultuurnet', false),
@@ -61,7 +61,7 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
             ->method('dispatch')
             ->with(new SyncLabelsOnEvent(
                 $eventImportedFromUDB2->getEventId(),
-                $this->labelCollecion
+                $this->labelCollection
             ));
 
         $this->labelImporter->applyEventImportedFromUDB2($eventImportedFromUDB2);
@@ -85,7 +85,7 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
             ->method('dispatch')
             ->with(new SyncLabelsOnPlace(
                 $placeImportedFromUDB2->getActorId(),
-                $this->labelCollecion
+                $this->labelCollection
             ));
 
         $this->labelImporter->applyPlaceImportedFromUDB2($placeImportedFromUDB2);
@@ -109,7 +109,7 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
             ->method('dispatch')
             ->with(new SyncLabelsOnEvent(
                 $eventUpdatedFromUDB2->getEventId(),
-                $this->labelCollecion
+                $this->labelCollection
             ));
 
         $this->labelImporter->applyEventUpdatedFromUDB2($eventUpdatedFromUDB2);
@@ -133,7 +133,7 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
             ->method('dispatch')
             ->with(new SyncLabelsOnPlace(
                 $placeUpdatedFromUDB2->getActorId(),
-                $this->labelCollecion
+                $this->labelCollection
             ));
 
         $this->labelImporter->applyPlaceUpdatedFromUDB2($placeUpdatedFromUDB2);
