@@ -10,6 +10,7 @@ use CultuurNet\UDB3\Event\Commands\SyncLabels as SyncLabelsOnEvent;
 use CultuurNet\UDB3\Event\Events\EventImportedFromUDB2;
 use CultuurNet\UDB3\Event\Events\EventUpdatedFromUDB2;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
+use CultuurNet\UDB3\Label;
 use CultuurNet\UDB3\LabelCollection;
 use CultuurNet\UDB3\Offer\Commands\AbstractSyncLabels;
 use CultuurNet\UDB3\Place\Commands\SyncLabels as SyncLabelsOnPlace;
@@ -54,7 +55,7 @@ class LabelImporter implements EventListenerInterface, LoggerAwareInterface
 
         $this->dispatch(new SyncLabelsOnEvent(
             $eventImportedFromUDB2->getEventId(),
-            LabelCollection::fromStrings($event->getKeywords())
+            $this->createLabelCollectionFromKeywords($event->getKeywords(true))
         ));
     }
 
@@ -71,7 +72,7 @@ class LabelImporter implements EventListenerInterface, LoggerAwareInterface
 
         $this->dispatch(new SyncLabelsOnPlace(
             $placeImportedFromUDB2->getActorId(),
-            LabelCollection::fromStrings($place->getKeywords())
+            $this->createLabelCollectionFromKeywords($place->getKeywords(true))
         ));
     }
 
@@ -88,7 +89,7 @@ class LabelImporter implements EventListenerInterface, LoggerAwareInterface
 
         $this->dispatch(new SyncLabelsOnEvent(
             $eventUpdatedFromUDB2->getEventId(),
-            LabelCollection::fromStrings($event->getKeywords())
+            $this->createLabelCollectionFromKeywords($event->getKeywords(true))
         ));
     }
 
@@ -105,10 +106,13 @@ class LabelImporter implements EventListenerInterface, LoggerAwareInterface
 
         $this->dispatch(new SyncLabelsOnPlace(
             $placeUpdatedFromUDB2->getActorId(),
-            LabelCollection::fromStrings($place->getKeywords())
+            $this->createLabelCollectionFromKeywords($place->getKeywords(true))
         ));
     }
 
+    /**
+     * @param AbstractSyncLabels $syncLabels
+     */
     private function dispatch(AbstractSyncLabels $syncLabels)
     {
         $this->logger->info(
@@ -117,5 +121,20 @@ class LabelImporter implements EventListenerInterface, LoggerAwareInterface
         );
 
         $this->commandBus->dispatch($syncLabels);
+    }
+
+    /**
+     * @param \CultureFeed_Cdb_Data_Keyword[] $keywords
+     * @return LabelCollection
+     */
+    private function createLabelCollectionFromKeywords(array $keywords)
+    {
+        $labels = [];
+
+        foreach ($keywords as $keyword) {
+            $labels[] = new Label($keyword->getValue(), $keyword->isVisible());
+        }
+
+        return new LabelCollection($labels);
     }
 }
