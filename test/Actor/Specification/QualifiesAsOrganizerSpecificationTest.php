@@ -1,11 +1,6 @@
 <?php
-/**
- * @file
- */
 
-namespace CultuurNet\UDB3\UDB2\Organizer;
-
-use CultuurNet\UDB3\UDB2\Actor\ActorSpecificationInterface;
+namespace CultuurNet\UDB3\UDB2\Actor\Specification;
 
 class QualifiesAsOrganizerSpecificationTest extends \PHPUnit_Framework_TestCase
 {

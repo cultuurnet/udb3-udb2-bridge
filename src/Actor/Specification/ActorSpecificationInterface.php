@@ -1,9 +1,6 @@
 <?php
-/**
- * @file
- */
 
-namespace CultuurNet\UDB3\UDB2\Actor;
+namespace CultuurNet\UDB3\UDB2\Actor\Specification;
 
 interface ActorSpecificationInterface
 {

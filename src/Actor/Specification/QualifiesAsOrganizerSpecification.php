@@ -1,13 +1,8 @@
 <?php
-/**
- * @file
- */
 
-namespace CultuurNet\UDB3\UDB2\Place;
+namespace CultuurNet\UDB3\UDB2\Actor\Specification;
 
-use CultuurNet\UDB3\UDB2\Actor\ActorSpecificationInterface;
-
-class QualifiesAsPlaceSpecification implements ActorSpecificationInterface
+class QualifiesAsOrganizerSpecification implements ActorSpecificationInterface
 {
     /**
      * @inheritdoc
@@ -17,6 +12,6 @@ class QualifiesAsPlaceSpecification implements ActorSpecificationInterface
         $categories = $actor->getCategories();
         return
             $categories instanceof \CultureFeed_Cdb_Data_CategoryList &&
-            $categories->hasCategory('8.15.0.0.0');
+            $categories->hasCategory('8.11.0.0.0');
     }
 }

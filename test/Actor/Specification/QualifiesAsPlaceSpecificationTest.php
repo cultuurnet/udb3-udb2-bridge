@@ -1,11 +1,6 @@
 <?php
-/**
- * @file
- */
 
-namespace CultuurNet\UDB3\UDB2\Place;
-
-use CultuurNet\UDB3\UDB2\Place\QualifiesAsPlaceSpecification;
+namespace CultuurNet\UDB3\UDB2\Actor\Specification;
 
 class QualifiesAsPlaceSpecificationTest extends \PHPUnit_Framework_TestCase
 {
