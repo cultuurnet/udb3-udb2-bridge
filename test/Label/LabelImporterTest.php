@@ -17,11 +17,6 @@ use CultuurNet\UDB3\Place\Events\PlaceUpdatedFromUDB2;
 class LabelImporterTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var CommandBusInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $commandBus;
-
-    /**
      * @var LabelServiceInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $labelService;
@@ -31,28 +26,11 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
      */
     private $labelImporter;
 
-    /**
-     * @var LabelCollection
-     */
-    private $labelCollection;
-
     protected function setUp()
     {
-        $this->commandBus = $this->getMock(CommandBusInterface::class);
-
         $this->labelService = $this->getMock(LabelServiceInterface::class);
 
-        $this->labelImporter = new LabelImporter(
-            $this->commandBus,
-            $this->labelService
-        );
-
-        $this->labelCollection = new LabelCollection(
-            [
-                new Label('2dotstwice'),
-                new Label('cultuurnet', false),
-            ]
-        );
+        $this->labelImporter = new LabelImporter($this->labelService);
 
         $this->labelService->expects($this->at(0))
             ->method('createLabelAggregateIfNew')
@@ -77,13 +55,6 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
             $cdbXmlNamespaceUri
         );
 
-        $this->commandBus->expects($this->once())
-            ->method('dispatch')
-            ->with(new SyncLabelsOnEvent(
-                $eventImportedFromUDB2->getEventId(),
-                $this->labelCollection
-            ));
-
         $this->labelImporter->applyEventImportedFromUDB2($eventImportedFromUDB2);
     }
 
@@ -100,13 +71,6 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
             $cdbXml,
             $cdbXmlNamespaceUri
         );
-
-        $this->commandBus->expects($this->once())
-            ->method('dispatch')
-            ->with(new SyncLabelsOnPlace(
-                $placeImportedFromUDB2->getActorId(),
-                $this->labelCollection
-            ));
 
         $this->labelImporter->applyPlaceImportedFromUDB2($placeImportedFromUDB2);
     }
@@ -125,13 +89,6 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
             $cdbXmlNamespaceUri
         );
 
-        $this->commandBus->expects($this->once())
-            ->method('dispatch')
-            ->with(new SyncLabelsOnEvent(
-                $eventUpdatedFromUDB2->getEventId(),
-                $this->labelCollection
-            ));
-
         $this->labelImporter->applyEventUpdatedFromUDB2($eventUpdatedFromUDB2);
     }
 
@@ -148,13 +105,6 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
             $cdbXml,
             $cdbXmlNamespaceUri
         );
-
-        $this->commandBus->expects($this->once())
-            ->method('dispatch')
-            ->with(new SyncLabelsOnPlace(
-                $placeUpdatedFromUDB2->getActorId(),
-                $this->labelCollection
-            ));
 
         $this->labelImporter->applyPlaceUpdatedFromUDB2($placeUpdatedFromUDB2);
     }
