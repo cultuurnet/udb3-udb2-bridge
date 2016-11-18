@@ -937,12 +937,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb3-php.git",
-                "reference": "2cc6f50961b3a9d06ad17f077b10727eefcb49eb"
+                "reference": "3b5144fd3e784058c4bb1196585293f18ca8e846"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/2cc6f50961b3a9d06ad17f077b10727eefcb49eb",
-                "reference": "2cc6f50961b3a9d06ad17f077b10727eefcb49eb",
+                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/3b5144fd3e784058c4bb1196585293f18ca8e846",
+                "reference": "3b5144fd3e784058c4bb1196585293f18ca8e846",
                 "shasum": ""
             },
             "require": {
@@ -1016,7 +1016,7 @@
                 }
             ],
             "description": "UDB3 PHP libraries",
-            "time": "2016-11-18 09:46:28"
+            "time": "2016-11-18 12:28:24"
         },
         {
             "name": "cultuurnet/udb3-jwt",
