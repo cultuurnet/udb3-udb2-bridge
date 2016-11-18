@@ -10,6 +10,8 @@ use CultuurNet\UDB3\Event\Events\EventUpdatedFromUDB2;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\Label\LabelServiceInterface;
 use CultuurNet\UDB3\Label\ValueObjects\LabelName;
+use CultuurNet\UDB3\Organizer\Events\OrganizerImportedFromUDB2;
+use CultuurNet\UDB3\Organizer\Events\OrganizerUpdatedFromUDB2;
 use CultuurNet\UDB3\Place\Events\PlaceImportedFromUDB2;
 use CultuurNet\UDB3\Place\Events\PlaceUpdatedFromUDB2;
 use Psr\Log\LoggerAwareInterface;
@@ -65,6 +67,20 @@ class LabelImporter implements EventListenerInterface, LoggerAwareInterface
     }
 
     /**
+     * @param OrganizerImportedFromUDB2 $organizerImportedFromUDB2
+     */
+    public function applyOrganizerImportedFromUDB2(
+        OrganizerImportedFromUDB2 $organizerImportedFromUDB2
+    ) {
+        $organizer = ActorItemFactory::createActorFromCdbXml(
+            $organizerImportedFromUDB2->getCdbXmlNamespaceUri(),
+            $organizerImportedFromUDB2->getCdbXml()
+        );
+
+        $this->createLabelAggregatesFromCdbItem($organizer);
+    }
+
+    /**
      * @param EventUpdatedFromUDB2 $eventUpdatedFromUDB2
      */
     public function applyEventUpdatedFromUDB2(
@@ -90,6 +106,20 @@ class LabelImporter implements EventListenerInterface, LoggerAwareInterface
         );
 
         $this->createLabelAggregatesFromCdbItem($place);
+    }
+
+    /**
+     * @param OrganizerUpdatedFromUDB2 $organizerUpdatedFromUDB2
+     */
+    public function applyOrganizerUpdatedFromUDB2(
+        OrganizerUpdatedFromUDB2 $organizerUpdatedFromUDB2
+    ) {
+        $organizer = ActorItemFactory::createActorFromCdbXml(
+            $organizerUpdatedFromUDB2->getCdbXmlNamespaceUri(),
+            $organizerUpdatedFromUDB2->getCdbXml()
+        );
+
+        $this->createLabelAggregatesFromCdbItem($organizer);
     }
 
     /**
