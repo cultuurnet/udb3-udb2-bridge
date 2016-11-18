@@ -1,17 +1,11 @@
 <?php
-/**
- * @file
- */
 
 namespace CultuurNet\UDB3\UDB2\Event;
 
-use Broadway\Domain\AggregateRoot;
-use CultuurNet\UDB3\Cdb\UpdateableWithCdbXmlInterface;
 use CultuurNet\UDB3\Event\Event;
-use CultuurNet\UDB3\UDB2\Offer\OfferFactoryInterface;
 use ValueObjects\String\String as StringLiteral;
 
-class EventFactory implements OfferFactoryInterface
+class EventToUDB3EventFactory implements EventToUDB3AggregateFactoryInterface
 {
     public function createFromCdbXml(
         StringLiteral $id,

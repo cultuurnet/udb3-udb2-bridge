@@ -1,16 +1,14 @@
 <?php
 
-namespace CultuurNet\UDB3\UDB2\Place;
+namespace CultuurNet\UDB3\UDB2\Event;
 
 use CultuurNet\UDB3\Place\Place;
-use CultuurNet\UDB3\UDB2\Actor\ActorFactoryInterface;
-use CultuurNet\UDB3\UDB2\Offer\OfferFactoryInterface;
 use ValueObjects\String\String as StringLiteral;
 
 /**
  * Creates UDB3 place entities based on UDB2 event cdb xml.
  */
-class PlaceFromEventFactory implements OfferFactoryInterface
+class EventToUDB3PlaceFactory implements EventToUDB3AggregateFactoryInterface
 {
     /**
      * @inheritdoc

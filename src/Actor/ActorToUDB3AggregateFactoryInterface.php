@@ -14,7 +14,7 @@ use CultuurNet\UDB3\Cdb\UpdateableWithCdbXmlInterface;
  * The entity created should implement both AggregateRoot and
  * UpdateableWithCdbXmlInterface.
  */
-interface ActorFactoryInterface
+interface ActorToUDB3AggregateFactoryInterface
 {
     /**
      * @param string $id

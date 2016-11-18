@@ -1,9 +1,6 @@
 <?php
-/**
- * @file
- */
 
-namespace CultuurNet\UDB3\UDB2\Offer;
+namespace CultuurNet\UDB3\UDB2\Event;
 
 use Broadway\Domain\AggregateRoot;
 use CultuurNet\UDB3\Cdb\UpdateableWithCdbXmlInterface;
@@ -15,7 +12,7 @@ use ValueObjects\String\String as StringLiteral;
  * The entity created should implement both AggregateRoot and
  * UpdateableWithCdbXmlInterface.
  */
-interface OfferFactoryInterface
+interface EventToUDB3AggregateFactoryInterface
 {
     /**
      * @param StringLiteral $id

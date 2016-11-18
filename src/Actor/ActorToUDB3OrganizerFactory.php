@@ -3,15 +3,15 @@
  * @file
  */
 
-namespace CultuurNet\UDB3\UDB2\Organizer;
+namespace CultuurNet\UDB3\UDB2\Actor;
 
 use CultuurNet\UDB3\Organizer\Organizer;
-use CultuurNet\UDB3\UDB2\Actor\ActorFactoryInterface;
+use CultuurNet\UDB3\UDB2\Actor\ActorToUDB3AggregateFactoryInterface;
 
 /**
  * Creates UDB3 organizer entities based on UDB2 actor cdb xml.
  */
-class OrganizerFactory implements ActorFactoryInterface
+class ActorToUDB3OrganizerFactory implements ActorToUDB3AggregateFactoryInterface
 {
     /**
      * @inheritdoc

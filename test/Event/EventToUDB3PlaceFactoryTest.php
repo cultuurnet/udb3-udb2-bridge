@@ -1,25 +1,24 @@
 <?php
 
-namespace CultuurNet\UDB3\UDB2\Place;
+namespace CultuurNet\UDB3\UDB2\Event;
 
 use Broadway\Domain\AggregateRoot;
 use Broadway\Domain\DomainMessage;
-use CultuurNet\UDB3\Place\Events\PlaceImportedFromUDB2;
 use CultuurNet\UDB3\Place\Events\PlaceImportedFromUDB2Event;
 use CultuurNet\UDB3\Place\Place;
 use ValueObjects\String\String;
 
-class PlaceFromEventFactoryTest extends \PHPUnit_Framework_TestCase
+class EventToUDB3PlaceFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @test
      */
     public function it_creates_a_place_entity_based_on_cdbxml()
     {
-        $factory = new PlaceFromEventFactory();
+        $factory = new EventToUDB3PlaceFactory();
 
         $id = '404EE8DE-E828-9C07-FE7D12DC4EB24480';
-        $cdbXml = file_get_contents(__DIR__ . '/../samples/event.xml');
+        $cdbXml = file_get_contents(__DIR__ . '/samples/event.xml');
         $cdbXmlNamespaceUri = 'http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL';
 
         $place = $factory->createFromCdbXml(

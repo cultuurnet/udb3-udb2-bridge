@@ -24,7 +24,7 @@ use ValueObjects\String\String as StringLiteral;
  * implementation of ActorSpecificationInterface.
  *
  * Instantiation of new entities is delegated to an implementation of
- * ActorFactoryInterface.
+ * ActorToUDB3AggregateFactoryInterface.
  *
  * Entities targeted by the ActorEventApplier need to implement
  * UpdateableWithCdbXmlInterface.
@@ -45,18 +45,18 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
     protected $actorSpecification;
 
     /**
-     * @var ActorFactoryInterface
+     * @var ActorToUDB3AggregateFactoryInterface
      */
     protected $actorFactory;
 
     /**
      * @param RepositoryInterface $repository
-     * @param ActorFactoryInterface $actorFactory
+     * @param ActorToUDB3AggregateFactoryInterface $actorFactory
      * @param ActorSpecificationInterface $actorSpecification
      */
     public function __construct(
         RepositoryInterface $repository,
-        ActorFactoryInterface $actorFactory,
+        ActorToUDB3AggregateFactoryInterface $actorFactory,
         ActorSpecificationInterface $actorSpecification
     ) {
         $this->repository = $repository;
