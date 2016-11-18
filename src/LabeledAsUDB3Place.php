@@ -8,7 +8,6 @@ namespace CultuurNet\UDB3\UDB2;
 use CultureFeed_Cdb_Item_Event;
 use CultuurNet\UDB3\Cdb\Event\SpecificationInterface;
 use CultuurNet\UDB3\Label;
-use InvalidArgumentException;
 
 class LabeledAsUDB3Place implements SpecificationInterface
 {

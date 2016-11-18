@@ -14,7 +14,6 @@ use CultuurNet\UDB2DomainEvents\EventUpdated;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\UDB2\Event\Events\EventCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Event\Events\EventUpdatedEnrichedWithCdbXml;
-use CultuurNet\UDB3\UDB2\Event\EventNotFoundException;
 use CultuurNet\UDB3\UDB2\UrlTransformingTrait;
 use DomDocument;
 use GuzzleHttp\Psr7\Request;

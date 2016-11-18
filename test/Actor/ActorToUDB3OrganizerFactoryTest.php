@@ -9,7 +9,6 @@ use Broadway\Domain\AggregateRoot;
 use Broadway\Domain\DomainMessage;
 use CultuurNet\UDB3\Organizer\Events\OrganizerImportedFromUDB2;
 use CultuurNet\UDB3\Organizer\Organizer;
-use CultuurNet\UDB3\UDB2\Actor\ActorToUDB3OrganizerFactory;
 
 class ActorToUDB3OrganizerFactoryTest extends \PHPUnit_Framework_TestCase
 {

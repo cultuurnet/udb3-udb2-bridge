@@ -3,7 +3,6 @@
 namespace CultuurNet\UDB3\UDB2\Actor;
 
 use CultuurNet\UDB3\Place\Place;
-use CultuurNet\UDB3\UDB2\Actor\ActorToUDB3AggregateFactoryInterface;
 
 /**
  * Creates UDB3 place entities based on UDB2 event cdb xml.
