@@ -11,6 +11,8 @@ use CultuurNet\UDB3\Event\Events\EventImportedFromUDB2;
 use CultuurNet\UDB3\Event\Events\EventUpdatedFromUDB2;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\Label;
+use CultuurNet\UDB3\Label\LabelServiceInterface;
+use CultuurNet\UDB3\Label\ValueObjects\LabelName;
 use CultuurNet\UDB3\LabelCollection;
 use CultuurNet\UDB3\Offer\Commands\AbstractSyncLabels;
 use CultuurNet\UDB3\Place\Commands\SyncLabels as SyncLabelsOnPlace;
@@ -31,14 +33,21 @@ class LabelImporter implements EventListenerInterface, LoggerAwareInterface
     private $commandBus;
 
     /**
+     * @var LabelServiceInterface
+     */
+    private $labelService;
+
+    /**
      * LabelImporter constructor.
      * @param CommandBusInterface $commandBus
+     * @param LabelServiceInterface $labelService
      */
     public function __construct(
-        CommandBusInterface $commandBus
+        CommandBusInterface $commandBus,
+        LabelServiceInterface $labelService
     ) {
         $this->commandBus = $commandBus;
-
+        $this->labelService = $labelService;
         $this->logger = new NullLogger();
     }
 
@@ -119,6 +128,13 @@ class LabelImporter implements EventListenerInterface, LoggerAwareInterface
             'Dispatching SyncLabels with label collection: '
             . join(', ', $syncLabels->getLabelCollection()->toStrings())
         );
+
+        foreach ($syncLabels->getLabelCollection()->asArray() as $label) {
+            $this->labelService->createLabelAggregateIfNew(
+                new LabelName((string) $label),
+                $label->isVisible()
+            );
+        }
 
         $this->commandBus->dispatch($syncLabels);
     }

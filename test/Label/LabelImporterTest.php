@@ -7,6 +7,8 @@ use CultuurNet\UDB3\Event\Commands\SyncLabels as SyncLabelsOnEvent;
 use CultuurNet\UDB3\Event\Events\EventImportedFromUDB2;
 use CultuurNet\UDB3\Event\Events\EventUpdatedFromUDB2;
 use CultuurNet\UDB3\Label;
+use CultuurNet\UDB3\Label\LabelServiceInterface;
+use CultuurNet\UDB3\Label\ValueObjects\LabelName;
 use CultuurNet\UDB3\LabelCollection;
 use CultuurNet\UDB3\Place\Commands\SyncLabels as SyncLabelsOnPlace;
 use CultuurNet\UDB3\Place\Events\PlaceImportedFromUDB2;
@@ -18,6 +20,11 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
      * @var CommandBusInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $commandBus;
+
+    /**
+     * @var LabelServiceInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $labelService;
 
     /**
      * @var LabelImporter
@@ -33,7 +40,12 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
     {
         $this->commandBus = $this->getMock(CommandBusInterface::class);
 
-        $this->labelImporter = new LabelImporter($this->commandBus);
+        $this->labelService = $this->getMock(LabelServiceInterface::class);
+
+        $this->labelImporter = new LabelImporter(
+            $this->commandBus,
+            $this->labelService
+        );
 
         $this->labelCollection = new LabelCollection(
             [
@@ -41,6 +53,14 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
                 new Label('cultuurnet', false),
             ]
         );
+
+        $this->labelService->expects($this->at(0))
+            ->method('createLabelAggregateIfNew')
+            ->with(new LabelName('2dotstwice'), true);
+
+        $this->labelService->expects($this->at(1))
+            ->method('createLabelAggregateIfNew')
+            ->with(new LabelName('cultuurnet'), false);
     }
 
     /**
