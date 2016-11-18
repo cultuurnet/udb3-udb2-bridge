@@ -14,7 +14,7 @@ use CultuurNet\UDB3\Cdb\ActorItemFactory;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorUpdatedEnrichedWithCdbXml;
-use CultuurNet\UDB3\UDB2\ActorNotFoundException;
+use CultuurNet\UDB3\UDB2\Actor\ActorNotFoundException;
 use CultuurNet\UDB3\UDB2\UrlTransformingTrait;
 use DOMDocument;
 use GuzzleHttp\Psr7\Request;
