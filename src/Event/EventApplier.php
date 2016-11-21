@@ -14,11 +14,9 @@ use CultuurNet\UDB3\Cdb\CdbXmlContainerInterface;
 use CultuurNet\UDB3\Cdb\Event\SpecificationInterface;
 use CultuurNet\UDB3\Cdb\EventItemFactory;
 use CultuurNet\UDB3\Cdb\UpdateableWithCdbXmlInterface;
-use CultuurNet\UDB3\Event\EventRepository;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\UDB2\Event\Events\EventCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Event\Events\EventUpdatedEnrichedWithCdbXml;
-use CultuurNet\UDB3\UDB2\Offer\OfferFactoryInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
@@ -41,7 +39,7 @@ class EventApplier implements EventListenerInterface, LoggerAwareInterface
     protected $offerSpecification;
 
     /**
-     * OfferFactoryInterface
+     * EventToUDB3AggregateFactoryInterface
      */
     protected $offerFactory;
 
@@ -52,7 +50,7 @@ class EventApplier implements EventListenerInterface, LoggerAwareInterface
     public function __construct(
         SpecificationInterface $offerSpecification,
         RepositoryInterface $eventRepository,
-        OfferFactoryInterface $offerFactory
+        EventToUDB3AggregateFactoryInterface $offerFactory
     ) {
         $this->offerSpecification = $offerSpecification;
         $this->eventRepository = $eventRepository;
