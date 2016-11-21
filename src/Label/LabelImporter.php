@@ -125,7 +125,8 @@ class LabelImporter implements EventListenerInterface, LoggerAwareInterface
     /**
      * @param \CultureFeed_Cdb_Item_Base $cdbItem
      */
-    private function createLabelAggregatesFromCdbItem(\CultureFeed_Cdb_Item_Base $cdbItem) {
+    private function createLabelAggregatesFromCdbItem(\CultureFeed_Cdb_Item_Base $cdbItem)
+    {
         /* @var \CultureFeed_Cdb_Data_Keyword[] $keywords */
         $keywords = $cdbItem->getKeywords(true);
 
