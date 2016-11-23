@@ -47,7 +47,7 @@ use CultuurNet\UDB3\Event\Events\TranslationApplied;
 use CultuurNet\UDB3\Event\Events\TranslationDeleted;
 use CultuurNet\UDB3\Event\Events\TypicalAgeRangeDeleted;
 use CultuurNet\UDB3\Event\Events\TypicalAgeRangeUpdated;
-use CultuurNet\UDB3\Event\Events\LabelDeleted;
+use CultuurNet\UDB3\Event\Events\LabelRemoved;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\Location\Location;
 use CultuurNet\UDB3\OrganizerService;
@@ -174,17 +174,17 @@ class EventRepository implements RepositoryInterface, LoggerAwareInterface
     }
 
     /**
-     * @param LabelDeleted $labelDeleted
+     * @param LabelRemoved $labelRemoved
      * @param DomainMessage $domainMessage
      */
-    private function applyLabelDeleted(
-        LabelDeleted $labelDeleted,
+    private function applyLabelRemoved(
+        LabelRemoved $labelRemoved,
         DomainMessage $domainMessage
     ) {
         $this->createEntryAPI($domainMessage)
             ->deleteKeyword(
-                $labelDeleted->getItemId(),
-                $labelDeleted->getLabel()
+                $labelRemoved->getItemId(),
+                $labelRemoved->getLabel()
             );
     }
 

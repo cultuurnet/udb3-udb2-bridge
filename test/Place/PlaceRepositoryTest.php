@@ -183,7 +183,7 @@ class PlaceRepositoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function it_deletes_a_label()
+    public function it_removes_a_label()
     {
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
         $place = $this->createItem($id, 'place.xml');
@@ -196,7 +196,7 @@ class PlaceRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $expectedKeyword = new Label('Keyword B');
 
-        $place->deleteLabel(
+        $place->removeLabel(
             new Label('Keyword B')
         );
 
@@ -214,14 +214,14 @@ class PlaceRepositoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function it_does_not_delete_a_label_that_does_not_exist()
+    public function it_does_not_remove_a_label_that_does_not_exist()
     {
         $id = 'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1';
         $place = $this->createItem($id, 'place.xml');
 
         $this->innerRepository->save($place);
 
-        $place->deleteLabel(
+        $place->removeLabel(
             new Label('Keyword B')
         );
 

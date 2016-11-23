@@ -30,7 +30,7 @@ use CultuurNet\UDB3\Place\Events\ImageAdded;
 use CultuurNet\UDB3\Place\Events\ImageRemoved;
 use CultuurNet\UDB3\Place\Events\ImageUpdated;
 use CultuurNet\UDB3\Place\Events\LabelAdded;
-use CultuurNet\UDB3\Place\Events\LabelDeleted;
+use CultuurNet\UDB3\Place\Events\LabelRemoved;
 use CultuurNet\UDB3\Place\Events\MainImageSelected;
 use CultuurNet\UDB3\Place\Events\MajorInfoUpdated;
 use CultuurNet\UDB3\Place\Events\OrganizerDeleted;
@@ -501,17 +501,17 @@ class PlaceRepository extends ActorRepository implements RepositoryInterface, Lo
     }
 
     /**
-     * @param LabelDeleted $labelDeleted
+     * @param LabelRemoved $labelRemoved
      * @param DomainMessage $domainMessage
      */
-    private function applyLabelDeleted(
-        LabelDeleted $labelDeleted,
+    private function applyLabelRemoved(
+        LabelRemoved $labelRemoved,
         DomainMessage $domainMessage
     ) {
         $this->createEntryAPI($domainMessage)
             ->deleteKeyword(
-                $labelDeleted->getItemId(),
-                $labelDeleted->getLabel()
+                $labelRemoved->getItemId(),
+                $labelRemoved->getLabel()
             );
     }
 
