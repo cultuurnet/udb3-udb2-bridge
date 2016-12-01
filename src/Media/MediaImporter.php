@@ -4,6 +4,7 @@ namespace CultuurNet\UDB3\UDB2\Media;
 
 use Broadway\EventHandling\EventListenerInterface;
 use CultureFeed_Cdb_Data_File;
+use CultuurNet\UDB3\Actor\ActorImportedFromUDB2;
 use CultuurNet\UDB3\Cdb\ActorItemFactory;
 use CultuurNet\UDB3\Cdb\EventItemFactory;
 use CultuurNet\UDB3\Event\Events\EventImportedFromUDB2;
@@ -11,6 +12,7 @@ use CultuurNet\UDB3\Event\Events\EventUpdatedFromUDB2;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\Media\MediaManagerInterface;
 use CultuurNet\UDB3\Media\Properties\MIMEType;
+use CultuurNet\UDB3\Offer\Events\AbstractOrganizerUpdated;
 use CultuurNet\UDB3\Organizer\Events\OrganizerImportedFromUDB2;
 use CultuurNet\UDB3\Organizer\Events\OrganizerUpdatedFromUDB2;
 use CultuurNet\UDB3\Place\Events\PlaceImportedFromUDB2;
@@ -95,12 +97,7 @@ class MediaImporter implements EventListenerInterface, LoggerAwareInterface
     public function applyPlaceImportedFromUDB2(
         PlaceImportedFromUDB2 $placeImportedFromUDB2
     ) {
-        $place = ActorItemFactory::createActorFromCdbXml(
-            $placeImportedFromUDB2->getCdbXmlNamespaceUri(),
-            $placeImportedFromUDB2->getCdbXml()
-        );
-
-        $this->createMediaObjectsFromCdbItem($place);
+        $this->createMediaObjectsFromActorImportEvent($placeImportedFromUDB2);
     }
 
     /**
@@ -109,12 +106,7 @@ class MediaImporter implements EventListenerInterface, LoggerAwareInterface
     public function applyPlaceUpdatedFromUDB2(
         PlaceUpdatedFromUDB2 $placeUpdatedFromUDB2
     ) {
-        $place = ActorItemFactory::createActorFromCdbXml(
-            $placeUpdatedFromUDB2->getCdbXmlNamespaceUri(),
-            $placeUpdatedFromUDB2->getCdbXml()
-        );
-
-        $this->createMediaObjectsFromCdbItem($place);
+        $this->createMediaObjectsFromActorImportEvent($placeUpdatedFromUDB2);
     }
 
     /**
@@ -123,12 +115,7 @@ class MediaImporter implements EventListenerInterface, LoggerAwareInterface
     public function applyOrganizerImportedFromUDB2(
         OrganizerImportedFromUDB2 $organizerImportedFromUDB2
     ) {
-        $organizer = ActorItemFactory::createActorFromCdbXml(
-            $organizerImportedFromUDB2->getCdbXmlNamespaceUri(),
-            $organizerImportedFromUDB2->getCdbXml()
-        );
-
-        $this->createMediaObjectsFromCdbItem($organizer);
+        $this->createMediaObjectsFromActorImportEvent($organizerImportedFromUDB2);
     }
 
     /**
@@ -137,12 +124,20 @@ class MediaImporter implements EventListenerInterface, LoggerAwareInterface
     public function applyOrganizerUpdatedFromUDB2(
         OrganizerUpdatedFromUDB2 $organizerUpdatedFromUDB2
     ) {
-        $organizer = ActorItemFactory::createActorFromCdbXml(
-            $organizerUpdatedFromUDB2->getCdbXmlNamespaceUri(),
-            $organizerUpdatedFromUDB2->getCdbXml()
+        $this->createMediaObjectsFromActorImportEvent($organizerUpdatedFromUDB2);
+    }
+
+    /**
+     * @param ActorImportedFromUDB2 $importEvent
+     */
+    private function createMediaObjectsFromActorImportEvent(ActorImportedFromUDB2 $importEvent)
+    {
+        $actor = ActorItemFactory::createActorFromCdbXml(
+            $importEvent->getCdbXmlNamespaceUri(),
+            $importEvent->getCdbXml()
         );
 
-        $this->createMediaObjectsFromCdbItem($organizer);
+        $this->createMediaObjectsFromCdbItem($actor);
     }
 
     /**
