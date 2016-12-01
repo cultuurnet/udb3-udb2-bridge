@@ -937,12 +937,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb3-php.git",
-                "reference": "e19071ee34b1769f95cfd31f6eff10edd6b0ffdf"
+                "reference": "6ab1cee37cb8d3fcde9e9e89509208d73536c8de"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/e19071ee34b1769f95cfd31f6eff10edd6b0ffdf",
-                "reference": "e19071ee34b1769f95cfd31f6eff10edd6b0ffdf",
+                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/6ab1cee37cb8d3fcde9e9e89509208d73536c8de",
+                "reference": "6ab1cee37cb8d3fcde9e9e89509208d73536c8de",
                 "shasum": ""
             },
             "require": {
@@ -1016,7 +1016,7 @@
                 }
             ],
             "description": "UDB3 PHP libraries",
-            "time": "2016-11-30 15:31:20"
+            "time": "2016-12-01 07:21:18"
         },
         {
             "name": "cultuurnet/udb3-jwt",
@@ -1385,16 +1385,16 @@
         },
         {
             "name": "doctrine/common",
-            "version": "v2.6.1",
+            "version": "v2.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/common.git",
-                "reference": "a579557bc689580c19fee4e27487a67fe60defc0"
+                "reference": "7bce00698899aa2c06fe7365c76e4d78ddb15fa3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/common/zipball/a579557bc689580c19fee4e27487a67fe60defc0",
-                "reference": "a579557bc689580c19fee4e27487a67fe60defc0",
+                "url": "https://api.github.com/repos/doctrine/common/zipball/7bce00698899aa2c06fe7365c76e4d78ddb15fa3",
+                "reference": "7bce00698899aa2c06fe7365c76e4d78ddb15fa3",
                 "shasum": ""
             },
             "require": {
@@ -1454,7 +1454,7 @@
                 "persistence",
                 "spl"
             ],
-            "time": "2015-12-25 13:18:31"
+            "time": "2016-11-30 16:50:46"
         },
         {
             "name": "doctrine/dbal",

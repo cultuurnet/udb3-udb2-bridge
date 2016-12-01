@@ -102,7 +102,7 @@ class MediaImporter implements EventListenerInterface, LoggerAwareInterface
 
             $this->mediaManager->create(
                 UUID::fromNative((string) BaseUuid::uuid5($namespace, (string) $normalizedUri)),
-                new MIMEType('image/' . $picture->getFileType()),
+                MIMEType::fromSubtype($picture->getFileType()),
                 new String($description ? $description : 'no description'),
                 new String($picture->getCopyright()),
                 Url::fromNative($normalizedUri)
