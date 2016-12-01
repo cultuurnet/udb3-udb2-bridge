@@ -12,7 +12,6 @@ use CultuurNet\UDB3\Event\Events\EventUpdatedFromUDB2;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\Media\MediaManagerInterface;
 use CultuurNet\UDB3\Media\Properties\MIMEType;
-use CultuurNet\UDB3\Offer\Events\AbstractOrganizerUpdated;
 use CultuurNet\UDB3\Organizer\Events\OrganizerImportedFromUDB2;
 use CultuurNet\UDB3\Organizer\Events\OrganizerUpdatedFromUDB2;
 use CultuurNet\UDB3\Place\Events\PlaceImportedFromUDB2;
@@ -53,7 +52,7 @@ class MediaImporter implements EventListenerInterface, LoggerAwareInterface
         $this->mediaManager = $mediaManager;
         $this->uriNormalizer = new Pipeline([
             new Normalize(),
-            new UriSchemeNormalize(),
+            new NormalizeUriScheme(),
         ]);
         $this->logger = new NullLogger();
     }

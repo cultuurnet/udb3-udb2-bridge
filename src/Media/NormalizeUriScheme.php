@@ -6,7 +6,7 @@ use League\Uri\Interfaces\Uri;
 use League\Uri\Modifiers\AbstractUriModifier;
 use Psr\Http\Message\UriInterface;
 
-class UriSchemeNormalize extends AbstractUriModifier
+class NormalizeUriScheme extends AbstractUriModifier
 {
     /**
      * Return a Uri object modified according to the modifier
