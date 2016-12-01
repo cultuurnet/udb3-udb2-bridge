@@ -36,23 +36,6 @@ class MediaImporterTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function it_should_normalize_urls()
-    {
-        $normalizer = $this->importer->getNormalizer();
-
-        $uri = Http::createFromString("http://스타벅스코리아.com/to/the/sky/");
-        $altUri = Http::createFromString("https://xn--oy2b35ckwhba574atvuzkc.com/path/../to/the/./sky/");
-
-
-        $newUri    = $normalizer->__invoke($uri);
-        $newAltUri = $normalizer->__invoke($altUri);
-
-        $this->assertEquals($newUri->__toString(), $newAltUri->__toString());
-    }
-
-    /**
-     * @test
-     */
     public function it_should_create_media_objects_from_event_media_when_importing_from_udb2()
     {
         $cdbXml = file_get_contents(__DIR__ . '/../Label/Samples/event.xml');

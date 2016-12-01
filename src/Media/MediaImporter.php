@@ -16,15 +16,9 @@ use CultuurNet\UDB3\Organizer\Events\OrganizerImportedFromUDB2;
 use CultuurNet\UDB3\Organizer\Events\OrganizerUpdatedFromUDB2;
 use CultuurNet\UDB3\Place\Events\PlaceImportedFromUDB2;
 use CultuurNet\UDB3\Place\Events\PlaceUpdatedFromUDB2;
-use League\Uri\Modifiers\AbstractUriModifier;
-use League\Uri\Modifiers\Normalize;
-use League\Uri\Modifiers\Pipeline;
-use League\Uri\Schemes\Http;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
-use Rhumsaa\Uuid\Uuid as BaseUuid;
-use ValueObjects\Identity\UUID;
 use ValueObjects\String\String;
 use ValueObjects\Web\Url;
 
@@ -39,27 +33,13 @@ class MediaImporter implements EventListenerInterface, LoggerAwareInterface
     private $mediaManager;
 
     /**
-     * @var AbstractUriModifier
-     */
-    private $uriNormalizer;
-
-    /**
      * @param MediaManagerInterface $mediaManager
      */
     public function __construct(
         MediaManagerInterface $mediaManager
     ) {
         $this->mediaManager = $mediaManager;
-        $this->uriNormalizer = new Pipeline([
-            new Normalize(),
-            new NormalizeUriScheme(),
-        ]);
         $this->logger = new NullLogger();
-    }
-
-    public function getNormalizer()
-    {
-        return $this->uriNormalizer;
     }
 
     /**
@@ -159,17 +139,15 @@ class MediaImporter implements EventListenerInterface, LoggerAwareInterface
         );
 
         foreach ($pictures as $picture) {
-            $originalUri = Http::createFromString($picture->getHLink());
-            $normalizedUri = $this->uriNormalizer->__invoke($originalUri);
-            $namespace = BaseUuid::uuid5('00000000-0000-0000-0000-000000000000', $normalizedUri->getHost());
+            $udb2Media = new Media($picture);
             $description = $picture->getDescription();
 
             $this->mediaManager->create(
-                UUID::fromNative((string) BaseUuid::uuid5($namespace, (string) $normalizedUri)),
+                $udb2Media->identify(),
                 MIMEType::fromSubtype($picture->getFileType()),
                 new String($description ? $description : 'no description'),
                 new String($picture->getCopyright()),
-                Url::fromNative($normalizedUri)
+                Url::fromNative($udb2Media->normalizeUri())
             );
         }
     }
