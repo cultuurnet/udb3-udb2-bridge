@@ -90,6 +90,34 @@ class MediaImporter implements EventListenerInterface, LoggerAwareInterface
     }
 
     /**
+     * @param PlaceImportedFromUDB2 $placeImportedFromUDB2
+     */
+    public function applyPlaceImportedFromUDB2(
+        PlaceImportedFromUDB2 $placeImportedFromUDB2
+    ) {
+        $place = ActorItemFactory::createActorFromCdbXml(
+            $placeImportedFromUDB2->getCdbXmlNamespaceUri(),
+            $placeImportedFromUDB2->getCdbXml()
+        );
+
+        $this->createMediaObjectsFromCdbItem($place);
+    }
+
+    /**
+     * @param PlaceUpdatedFromUDB2 $placeUpdatedFromUDB2
+     */
+    public function applyPlaceUpdatedFromUDB2(
+        PlaceUpdatedFromUDB2 $placeUpdatedFromUDB2
+    ) {
+        $place = ActorItemFactory::createActorFromCdbXml(
+            $placeUpdatedFromUDB2->getCdbXmlNamespaceUri(),
+            $placeUpdatedFromUDB2->getCdbXml()
+        );
+
+        $this->createMediaObjectsFromCdbItem($place);
+    }
+
+    /**
      * @param \CultureFeed_Cdb_Item_Base $cdbItem
      */
     private function createMediaObjectsFromCdbItem(\CultureFeed_Cdb_Item_Base $cdbItem)
