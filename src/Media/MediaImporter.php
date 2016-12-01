@@ -118,6 +118,34 @@ class MediaImporter implements EventListenerInterface, LoggerAwareInterface
     }
 
     /**
+     * @param OrganizerImportedFromUDB2 $organizerImportedFromUDB2
+     */
+    public function applyOrganizerImportedFromUDB2(
+        OrganizerImportedFromUDB2 $organizerImportedFromUDB2
+    ) {
+        $organizer = ActorItemFactory::createActorFromCdbXml(
+            $organizerImportedFromUDB2->getCdbXmlNamespaceUri(),
+            $organizerImportedFromUDB2->getCdbXml()
+        );
+
+        $this->createMediaObjectsFromCdbItem($organizer);
+    }
+
+    /**
+     * @param OrganizerUpdatedFromUDB2 $organizerUpdatedFromUDB2
+     */
+    public function applyOrganizerUpdatedFromUDB2(
+        OrganizerUpdatedFromUDB2 $organizerUpdatedFromUDB2
+    ) {
+        $organizer = ActorItemFactory::createActorFromCdbXml(
+            $organizerUpdatedFromUDB2->getCdbXmlNamespaceUri(),
+            $organizerUpdatedFromUDB2->getCdbXml()
+        );
+
+        $this->createMediaObjectsFromCdbItem($organizer);
+    }
+
+    /**
      * @param \CultureFeed_Cdb_Item_Base $cdbItem
      */
     private function createMediaObjectsFromCdbItem(\CultureFeed_Cdb_Item_Base $cdbItem)
