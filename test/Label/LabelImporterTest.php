@@ -183,4 +183,52 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
             )
         );
     }
+
+    /**
+     * @test
+     */
+    public function it_dispatches_label_added_commands_when_applying_organizer_imported_from_udb2_with_same_labels_but_different_casing()
+    {
+        $cdbXml = file_get_contents(__DIR__ . '/Samples/organizer_with_same_labels_different_casing.xml');
+        $cdbXmlNamespaceUri = \CultureFeed_Cdb_Xml::namespaceUriForVersion('3.3');
+
+        $organizerUpdatedFromUDB2 = new OrganizerUpdatedFromUDB2(
+            '0105bc28-2368-4f89-8ea1-001c6c301065',
+            $cdbXml,
+            $cdbXmlNamespaceUri
+        );
+
+        $this->labelImporter->handle(
+            DomainMessage::recordNow(
+                '0105bc28-2368-4f89-8ea1-001c6c301065',
+                1,
+                new Metadata([]),
+                $organizerUpdatedFromUDB2
+            )
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function it_dispatches_label_added_commands_when_applying_organizer_imported_from_udb2_with_same_labels_but_different_casing_and_visibility()
+    {
+        $cdbXml = file_get_contents(__DIR__ . '/Samples/organizer_with_same_labels_different_casing_and_visibility.xml');
+        $cdbXmlNamespaceUri = \CultureFeed_Cdb_Xml::namespaceUriForVersion('3.3');
+
+        $organizerUpdatedFromUDB2 = new OrganizerUpdatedFromUDB2(
+            '0105bc28-2368-4f89-8ea1-001c6c301065',
+            $cdbXml,
+            $cdbXmlNamespaceUri
+        );
+
+        $this->labelImporter->handle(
+            DomainMessage::recordNow(
+                '0105bc28-2368-4f89-8ea1-001c6c301065',
+                1,
+                new Metadata([]),
+                $organizerUpdatedFromUDB2
+            )
+        );
+    }
 }
