@@ -1,9 +1,9 @@
-Feature: Import of labels from UDB2 to UDB3.
+Feature: Import of keywords from UDB2 to UDB3.
 
   @issue-III-1667
-  Scenario: import UDB2 labels with different casing.
+  Scenario: import UDB2 keywords with different casing.
     Given an actor in UDB2
-    And the actor has 2 labels with only different casing:
+    And the actor has the following keywords:
     """
     <keywords>
       <keyword>2dotstwice</keyword>
@@ -11,16 +11,16 @@ Feature: Import of labels from UDB2 to UDB3.
     </keywords>
     """
     When this actor is imported in UDB3
-    Then only the first label gets imported in UDB3
+    Then only the label "2dotstwice" gets imported in UDB3
     And the json projection contains label property:
     """
     "labels": ["2dotstwice"]
     """
 
   @issue-III-1667
-  Scenario: import UDB2 label with different casing and visibility.
+  Scenario: import UDB2 keywords with different casing and visibility.
     Given an actor in UDB2
-    And the actor has 2 labels with different casing and different visibility:
+    And the actor has the following keywords:
     """
     <keywords>
       <keyword visible="false">2dotstwice</keyword>
@@ -28,7 +28,7 @@ Feature: Import of labels from UDB2 to UDB3.
     </keywords>
     """
     When this actor is imported in UDB3
-    Then only the first label gets imported in UDB3
+    Then only the label "2dotstwice" gets imported in UDB3
     And the json projection contains labels:
     """
     "hiddenLabels": ["2dotstwice"]
