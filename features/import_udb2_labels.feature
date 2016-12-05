@@ -14,7 +14,7 @@ Feature: Import of labels from UDB2 to UDB3.
     Then only the first label gets imported in UDB3
     And the json projection contains label property:
     """
-    "labels": {"2dotstwice"}
+    "labels": ["2dotstwice"]
     """
 
   @issue-III-1667
@@ -31,5 +31,5 @@ Feature: Import of labels from UDB2 to UDB3.
     Then only the first label gets imported in UDB3
     And the json projection contains labels:
     """
-    "hiddenLabels": {"2dotstwice"}
+    "hiddenLabels": ["2dotstwice"]
     """
