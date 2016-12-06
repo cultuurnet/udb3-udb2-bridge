@@ -8,8 +8,10 @@ use CultuurNet\UDB3\Cdb\EventItemFactory;
 use CultuurNet\UDB3\Event\Events\EventImportedFromUDB2;
 use CultuurNet\UDB3\Event\Events\EventUpdatedFromUDB2;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
+use CultuurNet\UDB3\Label;
 use CultuurNet\UDB3\Label\LabelServiceInterface;
 use CultuurNet\UDB3\Label\ValueObjects\LabelName;
+use CultuurNet\UDB3\LabelCollection;
 use CultuurNet\UDB3\Organizer\Events\OrganizerImportedFromUDB2;
 use CultuurNet\UDB3\Organizer\Events\OrganizerUpdatedFromUDB2;
 use CultuurNet\UDB3\Place\Events\PlaceImportedFromUDB2;
@@ -127,13 +129,14 @@ class LabelImporter implements EventListenerInterface, LoggerAwareInterface
      */
     private function createLabelAggregatesFromCdbItem(\CultureFeed_Cdb_Item_Base $cdbItem)
     {
-        /* @var \CultureFeed_Cdb_Data_Keyword[] $keywords */
-        $keywords = $cdbItem->getKeywords(true);
+        $labelCollection = LabelCollection::fromKeywords(
+            $cdbItem->getKeywords(true)
+        );
 
-        foreach ($keywords as $keyword) {
+        foreach ($labelCollection->asArray() as $label) {
             $this->labelService->createLabelAggregateIfNew(
-                new LabelName($keyword->getValue()),
-                $keyword->isVisible()
+                new LabelName((string) $label),
+                $label->isVisible()
             );
         }
     }
