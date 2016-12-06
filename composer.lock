@@ -585,16 +585,16 @@
         },
         {
             "name": "cultuurnet/deserializer",
-            "version": "dev-feature/III-1325",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/deserializer.git",
-                "reference": "ff9b8eeedd0ae3a0e22b3821141ab13a88645af1"
+                "reference": "8428e1bc9e0447dee18ed9bee0f66d112c8285ed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/deserializer/zipball/ff9b8eeedd0ae3a0e22b3821141ab13a88645af1",
-                "reference": "ff9b8eeedd0ae3a0e22b3821141ab13a88645af1",
+                "url": "https://api.github.com/repos/cultuurnet/deserializer/zipball/8428e1bc9e0447dee18ed9bee0f66d112c8285ed",
+                "reference": "8428e1bc9e0447dee18ed9bee0f66d112c8285ed",
                 "shasum": ""
             },
             "require": {
@@ -609,8 +609,7 @@
             "extra": {
                 "branch-alias": {
                     "dev-master": "0.x-dev",
-                    "dev-1.x": "1.x-dev",
-                    "dev-feature/III-1325": "0.x-dev"
+                    "dev-1.x": "1.x-dev"
                 }
             },
             "autoload": {
@@ -620,7 +619,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-3.0"
+                "Apache-2.0"
             ],
             "authors": [
                 {
@@ -629,7 +628,7 @@
                 }
             ],
             "description": "Internet media type deserialization library",
-            "time": "2016-09-16 08:12:43"
+            "time": "2016-10-19 08:49:50"
         },
         {
             "name": "cultuurnet/entry",
@@ -937,12 +936,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb3-php.git",
-                "reference": "0e1155cb63d4e09f1d203ebf13f1a52ad50720bb"
+                "reference": "c9e2d775d0d0eb3b8ba062fceaca7f88a2075e57"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/0e1155cb63d4e09f1d203ebf13f1a52ad50720bb",
-                "reference": "0e1155cb63d4e09f1d203ebf13f1a52ad50720bb",
+                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/c9e2d775d0d0eb3b8ba062fceaca7f88a2075e57",
+                "reference": "c9e2d775d0d0eb3b8ba062fceaca7f88a2075e57",
                 "shasum": ""
             },
             "require": {
@@ -1016,7 +1015,7 @@
                 }
             ],
             "description": "UDB3 PHP libraries",
-            "time": "2016-12-05 13:01:33"
+            "time": "2016-12-06 07:36:34"
         },
         {
             "name": "cultuurnet/udb3-jwt",
@@ -4858,16 +4857,16 @@
         },
         {
             "name": "sebastian/recursion-context",
-            "version": "1.0.4",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/recursion-context.git",
-                "reference": "938df7a6478e72795e5f8266cff24d06e3136f2e"
+                "reference": "913401df809e99e4f47b27cdd781f4a258d58791"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/recursion-context/zipball/938df7a6478e72795e5f8266cff24d06e3136f2e",
-                "reference": "938df7a6478e72795e5f8266cff24d06e3136f2e",
+                "url": "https://api.github.com/repos/sebastianbergmann/recursion-context/zipball/913401df809e99e4f47b27cdd781f4a258d58791",
+                "reference": "913401df809e99e4f47b27cdd781f4a258d58791",
                 "shasum": ""
             },
             "require": {
@@ -4907,7 +4906,7 @@
             ],
             "description": "Provides functionality to recursively process PHP variables",
             "homepage": "http://www.github.com/sebastianbergmann/recursion-context",
-            "time": "2016-11-15 06:55:36"
+            "time": "2015-11-11 19:50:13"
         },
         {
             "name": "sebastian/version",
