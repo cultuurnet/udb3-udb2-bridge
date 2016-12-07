@@ -184,7 +184,6 @@ class ActorEventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInt
         $xml = $response->getBody()->getContents();
 
         $xmlErrors = $this->xmlValidationService->validate($xml);
-
         if (!empty($xmlErrors)) {
             throw XMLValidationException::fromXMLValidationErrors($xmlErrors);
         }
