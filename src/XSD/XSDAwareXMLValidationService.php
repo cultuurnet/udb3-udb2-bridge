@@ -18,28 +18,17 @@ class XSDAwareXMLValidationService implements XMLValidationServiceInterface
     private $minimumReportLevel;
 
     /**
-     * @var bool
-     */
-    private $includeErrorsWithoutLineNumber;
-
-    /**
      * @param XSDReaderInterface $xsdReader
      *
      * @param int $minimumReportLevel
      *   One of LIBXML_ERR_WARNING, LIBXML_ERR_ERROR, LIBXML_ERR_FATAL
-     *
-     * @param bool $includeErrorsWithoutLineNumber
-     *   Most (if not all) errors without line number are XSD validation
-     *   errors that are caused by an earlier XML validation error.
      */
     public function __construct(
         XSDReaderInterface $xsdReader,
-        $minimumReportLevel = LIBXML_ERR_ERROR,
-        $includeErrorsWithoutLineNumber = false
+        $minimumReportLevel = LIBXML_ERR_ERROR
     ) {
         $this->xsdReader = $xsdReader;
         $this->minimumReportLevel = (int) $minimumReportLevel;
-        $this->includeErrorsWithoutLineNumber = $includeErrorsWithoutLineNumber;
     }
 
     /**
@@ -68,8 +57,7 @@ class XSDAwareXMLValidationService implements XMLValidationServiceInterface
             $libXMLErrors = array_filter(
                 libxml_get_errors(),
                 function (\LibXMLError $libXMLError) {
-                    return $libXMLError->level >= $this->minimumReportLevel &&
-                        ($libXMLError->line >= 0 || $this->includeErrorsWithoutLineNumber);
+                    return $libXMLError->level >= $this->minimumReportLevel;
                 }
             );
 

@@ -39,13 +39,17 @@ class XSDAwareXMLValidationServiceTest extends \PHPUnit_Framework_TestCase
     {
         $xml = file_get_contents(__DIR__ . '/samples/event_3.3_invalid_format.xml');
 
-        $expectedErrors = [
-            new XMLValidationError('Opening and ending tag mismatch: cdbxml line 2 and oops', 51, 8),
+        // We assert the error messages here instead of the complete errors
+        // with line and column numbers, because the line number of the second
+        // error could either be -1 or 0 depending on the environment.
+        $expectedErrorMessages = [
+            'Opening and ending tag mismatch: cdbxml line 2 and oops',
+            'The document has no document element.',
         ];
 
         $actualErrors = $this->validationService->validate($xml);
 
-        $this->assertEquals($expectedErrors, $actualErrors);
+        $this->assertEquals($expectedErrorMessages, $this->getErrorMessages($actualErrors));
     }
 
     /**
@@ -86,29 +90,11 @@ class XSDAwareXMLValidationServiceTest extends \PHPUnit_Framework_TestCase
         ];
         $actualErrors = $this->validationService->validate($xml);
 
-        $fatalErrorValidationService = new XSDAwareXMLValidationService($this->xsdReader, LIBXML_ERR_FATAL, false);
+        $fatalErrorValidationService = new XSDAwareXMLValidationService($this->xsdReader, LIBXML_ERR_FATAL);
         $fatalErrors = $fatalErrorValidationService->validate($xml);
 
         $this->assertEquals($expectedErrors, $actualErrors);
         $this->assertEmpty($fatalErrors);
-    }
-
-    /**
-     * @test
-     */
-    public function it_includes_errors_without_line_number_if_configured_to_do_so()
-    {
-        $xml = file_get_contents(__DIR__ . '/samples/event_3.3_invalid_format.xml');
-        $validationService = new XSDAwareXMLValidationService($this->xsdReader, LIBXML_ERR_ERROR, true);
-
-        $expectedErrors = [
-            new XMLValidationError('Opening and ending tag mismatch: cdbxml line 2 and oops', 51, 8),
-            new XMLValidationError('The document has no document element.', -1, 0),
-        ];
-
-        $actualErrors = $validationService->validate($xml);
-
-        $this->assertEquals($expectedErrors, $actualErrors);
     }
 
     /**
@@ -167,5 +153,19 @@ class XSDAwareXMLValidationServiceTest extends \PHPUnit_Framework_TestCase
         libxml_use_internal_errors(true);
         $this->validationService->validate($xml);
         $this->assertTrue(libxml_use_internal_errors());
+    }
+
+    /**
+     * @param array $xmlValidationErrors
+     * @return string[]
+     */
+    private function getErrorMessages(array $xmlValidationErrors)
+    {
+        return array_map(
+            function (XMLValidationError $xmlValidationError) {
+                return $xmlValidationError->getMessage();
+            },
+            $xmlValidationErrors
+        );
     }
 }
