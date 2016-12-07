@@ -14,6 +14,9 @@ use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorUpdatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\UrlTransformingTrait;
+use CultuurNet\UDB3\UDB2\XML\XMLValidationError;
+use CultuurNet\UDB3\UDB2\XML\XMLValidationException;
+use CultuurNet\UDB3\UDB2\XML\XMLValidationServiceInterface;
 use DOMDocument;
 use GuzzleHttp\Psr7\Request;
 use Http\Client\HttpClient;
@@ -29,7 +32,7 @@ use XMLReader;
  * Creates new event messages based on incoming UDB2 events, enriching them with
  * cdb xml so other components do not need to take care of that themselves.
  */
-class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterface
+class ActorEventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterface
 {
     use DelegateEventHandlingToSpecificMethodTrait;
     use LoggerAwareTrait;
@@ -51,15 +54,23 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
     protected $logContext;
 
     /**
+     * @var XMLValidationServiceInterface
+     */
+    protected $xmlValidationService;
+
+    /**
      * @param EventBusInterface $eventBus
      * @param HttpClient $httpClient
+     * @param XMLValidationServiceInterface $xmlValidationService
      */
     public function __construct(
         EventBusInterface $eventBus,
-        HttpClient $httpClient
+        HttpClient $httpClient,
+        XMLValidationServiceInterface $xmlValidationService
     ) {
         $this->eventBus = $eventBus;
         $this->httpClient = $httpClient;
+        $this->xmlValidationService = $xmlValidationService;
         $this->logger = new NullLogger();
     }
 
@@ -151,6 +162,7 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
      * @param Url $url
      * @return StringLiteral
      * @throws ActorNotFoundException
+     * @throws XMLValidationException
      */
     private function getActorXml(Url $url)
     {
@@ -170,6 +182,12 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
         }
 
         $xml = $response->getBody()->getContents();
+
+        $xmlErrors = $this->xmlValidationService->validate($xml);
+
+        if (!empty($xmlErrors)) {
+            throw XMLValidationException::fromXMLValidationErrors($xmlErrors);
+        }
 
         $eventXml = $this->extractActorElement($xml);
 
