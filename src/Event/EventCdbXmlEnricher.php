@@ -15,6 +15,8 @@ use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\UDB2\Event\Events\EventCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Event\Events\EventUpdatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\UrlTransformingTrait;
+use CultuurNet\UDB3\UDB2\XML\XMLValidationException;
+use CultuurNet\UDB3\UDB2\XML\XMLValidationServiceInterface;
 use DomDocument;
 use GuzzleHttp\Psr7\Request;
 use Http\Client\HttpClient;
@@ -46,19 +48,28 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
     protected $httpClient;
 
     /**
+     * @var XMLValidationServiceInterface
+     */
+    protected $xmlValidationService;
+
+    /**
      * @var StringLiteral
      */
     protected $cdbXmlNamespaceUri;
 
     /**
      * @param EventBusInterface $eventBus
+     * @param HttpClient $httpClient
+     * @param XMLValidationServiceInterface $xmlValidationService
      */
     public function __construct(
         EventBusInterface $eventBus,
-        HttpClient $httpClient
+        HttpClient $httpClient,
+        XMLValidationServiceInterface $xmlValidationService
     ) {
         $this->eventBus = $eventBus;
         $this->httpClient = $httpClient;
+        $this->xmlValidationService = $xmlValidationService;
         $this->cdbXmlNamespaceUri = new StringLiteral(
             CultureFeed_Cdb_Xml::namespaceUriForVersion('3.3')
         );
@@ -113,6 +124,7 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
      * @param Url $url
      * @return StringLiteral
      * @throws EventNotFoundException
+     * @throws XMLValidationException
      */
     private function retrieveXml(Url $url)
     {
@@ -132,6 +144,11 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
         }
 
         $xml = $response->getBody()->getContents();
+
+        $xmlErrors = $this->xmlValidationService->validate($xml);
+        if (!empty($xmlErrors)) {
+            throw XMLValidationException::fromXMLValidationErrors($xmlErrors);
+        }
 
         $eventXml = $this->extractEventElement($xml);
 
