@@ -14,9 +14,11 @@ use CultuurNet\UDB3\Cdb\CdbXmlContainerInterface;
 use CultuurNet\UDB3\Cdb\Event\SpecificationInterface;
 use CultuurNet\UDB3\Cdb\EventItemFactory;
 use CultuurNet\UDB3\Cdb\UpdateableWithCdbXmlInterface;
+use CultuurNet\UDB3\Event\Event;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\UDB2\Event\Events\EventCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Event\Events\EventUpdatedEnrichedWithCdbXml;
+use CultuurNet\UDB3\UDB2\Media\MediaImporter;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
@@ -44,17 +46,25 @@ class EventApplier implements EventListenerInterface, LoggerAwareInterface
     protected $offerFactory;
 
     /**
+     * @var MediaImporter
+     */
+    protected $mediaImporter;
+
+    /**
      * @param SpecificationInterface $offerSpecification
      * @param RepositoryInterface $eventRepository
      */
     public function __construct(
         SpecificationInterface $offerSpecification,
         RepositoryInterface $eventRepository,
-        EventToUDB3AggregateFactoryInterface $offerFactory
+        EventToUDB3AggregateFactoryInterface $offerFactory,
+        MediaImporter $mediaImporter
     ) {
         $this->offerSpecification = $offerSpecification;
         $this->eventRepository = $eventRepository;
         $this->offerFactory = $offerFactory;
+        $this->mediaImporter = $mediaImporter;
+
         $this->logger = new NullLogger();
     }
 
@@ -212,6 +222,9 @@ class EventApplier implements EventListenerInterface, LoggerAwareInterface
             $cdbXml->getCdbXmlNamespaceUri()
         );
 
+        $imageCollection = $this->mediaImporter->importImages($cdbXml);
+        $entity->updateImagesFromUDB2($imageCollection);
+
         $this->eventRepository->save($entity);
     }
 
@@ -228,6 +241,9 @@ class EventApplier implements EventListenerInterface, LoggerAwareInterface
             new StringLiteral($cdbXml->getCdbXml()),
             new StringLiteral($cdbXml->getCdbXmlNamespaceUri())
         );
+
+        $imageCollection = $this->mediaImporter->importImages($cdbXml);
+        $entity->importImagesFromUDB2($imageCollection);
 
         $this->eventRepository->save($entity);
     }
