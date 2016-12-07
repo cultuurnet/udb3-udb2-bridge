@@ -35,6 +35,16 @@ class XSDAwareXMLValidationServiceTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function it_returns_no_errors_for_valid_prefixed_xml_that_conforms_to_the_xsd()
+    {
+        $xml = file_get_contents(__DIR__ . '/samples/actor_3.3_valid_prefixed.xml');
+        $errors = $this->validationService->validate($xml);
+        $this->assertEmpty($errors);
+    }
+
+    /**
+     * @test
+     */
     public function it_returns_xml_validation_errors()
     {
         $xml = file_get_contents(__DIR__ . '/samples/event_3.3_invalid_format.xml');
@@ -44,6 +54,26 @@ class XSDAwareXMLValidationServiceTest extends \PHPUnit_Framework_TestCase
         // error could either be -1 or 0 depending on the environment.
         $expectedErrorMessages = [
             'Opening and ending tag mismatch: cdbxml line 2 and oops',
+            'The document has no document element.',
+        ];
+
+        $actualErrors = $this->validationService->validate($xml);
+
+        $this->assertEquals($expectedErrorMessages, $this->getErrorMessages($actualErrors));
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_xml_validation_errors_for_prefixed_xml()
+    {
+        $xml = file_get_contents(__DIR__ . '/samples/actor_3.3_invalid_format_prefixed.xml');
+
+        // We assert the error messages here instead of the complete errors
+        // with line and column numbers, because the line number of the second
+        // error could either be -1 or 0 depending on the environment.
+        $expectedErrorMessages = [
+            'Opening and ending tag mismatch: cdbxml line 2 and foo',
             'The document has no document element.',
         ];
 
@@ -67,6 +97,26 @@ class XSDAwareXMLValidationServiceTest extends \PHPUnit_Framework_TestCase
 
         $expectedErrors = [
             new XMLValidationError($expectedMessage, 3, 0),
+        ];
+
+        $actualErrors = $this->validationService->validate($xml);
+
+        $this->assertEquals($expectedErrors, $actualErrors);
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_xsd_validation_errors_for_prefixed_xml()
+    {
+        $xml = file_get_contents(__DIR__ . '/samples/actor_3.3_missing_categories_prefixed.xml');
+
+        // @codingStandardsIgnoreStart
+        $expectedMessage = "Element '{http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL}contactinfo': This element is not expected. Expected is ( {http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL}categories ).";
+        // @codingStandardsIgnoreEnd
+
+        $expectedErrors = [
+            new XMLValidationError($expectedMessage, 24, 0),
         ];
 
         $actualErrors = $this->validationService->validate($xml);
