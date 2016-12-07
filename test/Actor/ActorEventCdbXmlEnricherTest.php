@@ -10,7 +10,6 @@ use CultuurNet\UDB2DomainEvents\ActorCreated;
 use CultuurNet\UDB2DomainEvents\ActorUpdated;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorUpdatedEnrichedWithCdbXml;
-use CultuurNet\UDB3\UDB2\ActorCdbXmlServiceInterface;
 use CultuurNet\UDB3\UDB2\OfferToSapiUrlTransformer;
 use CultuurNet\UDB3\UDB2\XML\XMLValidationError;
 use CultuurNet\UDB3\UDB2\XML\XMLValidationException;
