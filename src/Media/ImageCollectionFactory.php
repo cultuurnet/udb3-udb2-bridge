@@ -30,12 +30,26 @@ class ImageCollectionFactory implements ImageCollectionFactoryInterface
      */
     protected $uriNormalizer;
 
+    /**
+     * @var string|null
+     */
+    protected $uuidRegex;
+
     public function __construct()
     {
+
         $this->uriNormalizer = new Pipeline([
             new Normalize(),
             new NormalizeUriScheme(),
         ]);
+    }
+
+    public function withUuidRegex($mediaIdentifierRegex)
+    {
+        $c = clone $this;
+        $c->uuidRegex = $mediaIdentifierRegex;
+
+        return $c;
     }
 
     /**
@@ -74,6 +88,10 @@ class ImageCollectionFactory implements ImageCollectionFactoryInterface
      */
     private function identify(Http $httpUri)
     {
+        if (isset($this->uuidRegex) && \preg_match('/'.$this->uuidRegex.'/', (string) $httpUri, $matches)) {
+            return UUID::fromNative($matches['uuid']);
+        }
+
         $namespace = BaseUuid::uuid5('00000000-0000-0000-0000-000000000000', $httpUri->getHost());
         return UUID::fromNative((string) BaseUuid::uuid5($namespace, (string) $httpUri));
     }
