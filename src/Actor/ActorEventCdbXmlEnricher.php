@@ -185,8 +185,12 @@ class ActorEventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInt
 
         $xmlErrors = $this->xmlValidationService->validate($xml);
         if (!empty($xmlErrors)) {
-            throw XMLValidationException::fromXMLValidationErrors($xmlErrors);
+            $exception = XMLValidationException::fromXMLValidationErrors($xmlErrors);
+            $this->logger->error('cdbxml is invalid!', ['errors' => $exception->getMessage()]);
+            throw $exception;
         }
+
+        $this->logger->debug('cdbxml is valid');
 
         $eventXml = $this->extractActorElement($xml);
 
@@ -219,7 +223,7 @@ class ActorEventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInt
 
         if (200 !== $response->getStatusCode()) {
             $this->logger->error(
-                'Unable to retrieve cdbxml, server responded with ' .
+                'unable to retrieve cdbxml, server responded with ' .
                 $response->getStatusCode() . ' ' . $response->getReasonPhrase()
             );
 
@@ -227,6 +231,8 @@ class ActorEventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInt
                 'Unable to retrieve actor from ' . (string)$url
             );
         }
+
+        $this->logger->debug('retrieved cdbxml');
 
         return $response;
     }
@@ -245,6 +251,8 @@ class ActorEventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInt
             switch ($reader->nodeType) {
                 case ($reader::ELEMENT):
                     if ($reader->localName === 'actor') {
+                        $this->logger->debug('found actor in cdbxml');
+
                         $node = $reader->expand();
                         $dom = new DomDocument('1.0');
                         $n = $dom->importNode($node, true);
@@ -253,6 +261,8 @@ class ActorEventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInt
                     }
             }
         }
+
+        $this->logger->error('no actor found in cdbxml!');
 
         throw new \RuntimeException(
             "Actor could not be found in the Entry API response body."
