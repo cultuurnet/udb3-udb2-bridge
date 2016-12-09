@@ -888,12 +888,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb2-domain-events.git",
-                "reference": "5254e81f506a535c362e49a9ce4eb242c1e38967"
+                "reference": "d0cb53b93adbcee66d6dcd0eebfb77db2e9aa6ce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb2-domain-events/zipball/5254e81f506a535c362e49a9ce4eb242c1e38967",
-                "reference": "5254e81f506a535c362e49a9ce4eb242c1e38967",
+                "url": "https://api.github.com/repos/cultuurnet/udb2-domain-events/zipball/d0cb53b93adbcee66d6dcd0eebfb77db2e9aa6ce",
+                "reference": "d0cb53b93adbcee66d6dcd0eebfb77db2e9aa6ce",
                 "shasum": ""
             },
             "require": {
@@ -929,7 +929,7 @@
                 }
             ],
             "description": "PHP models for domain events in UiTdatabank version 2",
-            "time": "2016-04-21 13:04:31"
+            "time": "2016-12-09 10:41:03"
         },
         {
             "name": "cultuurnet/udb3",
@@ -937,12 +937,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cultuurnet/udb3-php.git",
-                "reference": "549f904e941377656e8d7656b64d2384cdcfd41c"
+                "reference": "2afa6954992e3cf6d3f1546ab70a28eff3d6deb6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/549f904e941377656e8d7656b64d2384cdcfd41c",
-                "reference": "549f904e941377656e8d7656b64d2384cdcfd41c",
+                "url": "https://api.github.com/repos/cultuurnet/udb3-php/zipball/2afa6954992e3cf6d3f1546ab70a28eff3d6deb6",
+                "reference": "2afa6954992e3cf6d3f1546ab70a28eff3d6deb6",
                 "shasum": ""
             },
             "require": {
@@ -1016,7 +1016,7 @@
                 }
             ],
             "description": "UDB3 PHP libraries",
-            "time": "2016-12-07 15:02:57"
+            "time": "2016-12-09 15:50:22"
         },
         {
             "name": "cultuurnet/udb3-jwt",
@@ -4512,16 +4512,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "4.8.30",
+            "version": "4.8.31",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "a534e04d0bd39c557c2881c341efd06fa6f1292a"
+                "reference": "98b2b39a520766bec663ff5b7ff1b729db9dbfe3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/a534e04d0bd39c557c2881c341efd06fa6f1292a",
-                "reference": "a534e04d0bd39c557c2881c341efd06fa6f1292a",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/98b2b39a520766bec663ff5b7ff1b729db9dbfe3",
+                "reference": "98b2b39a520766bec663ff5b7ff1b729db9dbfe3",
                 "shasum": ""
             },
             "require": {
@@ -4580,7 +4580,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2016-12-01 17:05:48"
+            "time": "2016-12-09 02:45:31"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
