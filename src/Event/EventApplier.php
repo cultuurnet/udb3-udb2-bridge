@@ -2,7 +2,6 @@
 
 namespace CultuurNet\UDB3\UDB2\Event;
 
-use Broadway\Domain\AggregateRoot;
 use Broadway\EventHandling\EventListenerInterface;
 use Broadway\Repository\AggregateNotFoundException;
 use Broadway\Repository\RepositoryInterface;
@@ -11,6 +10,7 @@ use CultuurNet\UDB3\Cdb\CdbXmlContainerInterface;
 use CultuurNet\UDB3\Cdb\Event\SpecificationInterface;
 use CultuurNet\UDB3\Cdb\EventItemFactory;
 use CultuurNet\UDB3\Cdb\UpdateableWithCdbXmlInterface;
+use CultuurNet\UDB3\Event\Event;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\UDB2\Event\Events\EventCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Event\Events\EventUpdatedEnrichedWithCdbXml;
@@ -46,6 +46,11 @@ class EventApplier implements EventListenerInterface, LoggerAwareInterface
      * @var MediaImporter
      */
     protected $mediaImporter;
+
+    /**
+     * @var RepositoryInterface
+     */
+    protected $eventRepository;
 
     /**
      * @param SpecificationInterface $offerSpecification
@@ -211,7 +216,7 @@ class EventApplier implements EventListenerInterface, LoggerAwareInterface
         StringLiteral $entityId,
         CdbXmlContainerInterface $cdbXml
     ) {
-        /** @var UpdateableWithCdbXmlInterface|AggregateRoot $entity */
+        /** @var UpdateableWithCdbXmlInterface|Event $entity */
         $entity = $this->eventRepository->load((string)$entityId);
 
         $entity->updateWithCdbXml(
@@ -245,6 +250,7 @@ class EventApplier implements EventListenerInterface, LoggerAwareInterface
             );
         }
 
+        /** @var UpdateableWithCdbXmlInterface|Event $entity */
         $entity = $this->offerFactory->createFromCdbXml(
             $id,
             new StringLiteral($cdbXml->getCdbXml()),

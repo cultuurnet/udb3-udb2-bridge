@@ -10,11 +10,15 @@ use CultuurNet\UDB3\Cdb\ActorItemFactory;
 use CultuurNet\UDB3\Cdb\CdbXmlContainerInterface;
 use CultuurNet\UDB3\Cdb\UpdateableWithCdbXmlInterface;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
+use CultuurNet\UDB3\Place\Place;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorUpdatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Actor\Specification\ActorSpecificationInterface;
+use CultuurNet\UDB3\UDB2\Media\MediaImporter;
+use CultuurNet\UDB3\UDB2\OfferAlreadyImportedException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use ValueObjects\String\String as StringLiteral;
 
 /**
@@ -50,6 +54,11 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
     protected $actorFactory;
 
     /**
+     * @var MediaImporter
+     */
+    protected $mediaImporter;
+
+    /**
      * @param RepositoryInterface $repository
      * @param ActorToUDB3AggregateFactoryInterface $actorFactory
      * @param ActorSpecificationInterface $actorSpecification
@@ -57,13 +66,15 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
     public function __construct(
         RepositoryInterface $repository,
         ActorToUDB3AggregateFactoryInterface $actorFactory,
-        ActorSpecificationInterface $actorSpecification
+        ActorSpecificationInterface $actorSpecification,
+        MediaImporter $mediaImporter
     ) {
         $this->repository = $repository;
-
         $this->actorSpecification = $actorSpecification;
-
         $this->actorFactory = $actorFactory;
+        $this->mediaImporter = $mediaImporter;
+
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -169,9 +180,9 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
             $this->debug(
                 'Actor succesfully created.'
             );
-        } catch (\Exception $e) {
+        } catch (OfferAlreadyImportedException $e) {
             $this->debug(
-                'Creation failed, trying to update as a fallback.'
+                'An offer with the same id already exists, trying to update as a fallback.'
             );
 
             $this->update($entityId, $cdbXml);
@@ -200,6 +211,11 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
             $cdbXml->getCdbXmlNamespaceUri()
         );
 
+        if ($entity instanceof Place) {
+            $imageCollection = $this->mediaImporter->importImages($cdbXml);
+            $entity->updateImagesFromUDB2($imageCollection);
+        }
+
         $this->repository->save($entity);
     }
 
@@ -211,11 +227,29 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
         StringLiteral $id,
         CdbXmlContainerInterface $cdbXml
     ) {
+        try {
+            $this->repository->load((string) $id);
+            throw new OfferAlreadyImportedException('An offer with id: ' . $id . 'was already imported.');
+        } catch (AggregateNotFoundException $e) {
+            $this->logger->info(
+                'No existing offer with the same id found so it is save to import.',
+                [
+                    'offer-id' => (string)$id,
+                ]
+            );
+        }
+
+        /** @var UpdateableWithCdbXmlInterface|AggregateRoot $entity */
         $entity = $this->actorFactory->createFromCdbXml(
             (string) $id,
             $cdbXml->getCdbXml(),
             $cdbXml->getCdbXmlNamespaceUri()
         );
+
+        if ($entity instanceof Place) {
+            $imageCollection = $this->mediaImporter->importImages($cdbXml);
+            $entity->importImagesFromUDB2($imageCollection);
+        }
 
         $this->repository->save($entity);
     }
