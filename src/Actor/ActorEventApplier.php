@@ -54,7 +54,7 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
     protected $actorFactory;
 
     /**
-     * @var MediaImporter
+     * @var MediaImporter|null
      */
     protected $mediaImporter;
 
@@ -62,12 +62,13 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
      * @param RepositoryInterface $repository
      * @param ActorToUDB3AggregateFactoryInterface $actorFactory
      * @param ActorSpecificationInterface $actorSpecification
+     * @param MediaImporter $mediaImporter
      */
     public function __construct(
         RepositoryInterface $repository,
         ActorToUDB3AggregateFactoryInterface $actorFactory,
         ActorSpecificationInterface $actorSpecification,
-        MediaImporter $mediaImporter
+        MediaImporter $mediaImporter = null
     ) {
         $this->repository = $repository;
         $this->actorSpecification = $actorSpecification;
@@ -211,7 +212,7 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
             $cdbXml->getCdbXmlNamespaceUri()
         );
 
-        if ($entity instanceof Place) {
+        if ($this->mediaImporter) {
             $imageCollection = $this->mediaImporter->importImages($cdbXml);
             $entity->updateImagesFromUDB2($imageCollection);
         }
@@ -246,7 +247,7 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
             $cdbXml->getCdbXmlNamespaceUri()
         );
 
-        if ($entity instanceof Place) {
+        if ($this->mediaImporter) {
             $imageCollection = $this->mediaImporter->importImages($cdbXml);
             $entity->importImagesFromUDB2($imageCollection);
         }
