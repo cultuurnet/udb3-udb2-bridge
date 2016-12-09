@@ -14,7 +14,6 @@ use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorUpdatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\UrlTransformingTrait;
-use CultuurNet\UDB3\UDB2\XML\XMLValidationError;
 use CultuurNet\UDB3\UDB2\XML\XMLValidationException;
 use CultuurNet\UDB3\UDB2\XML\XMLValidationServiceInterface;
 use DOMDocument;
@@ -54,19 +53,19 @@ class ActorEventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInt
     protected $logContext;
 
     /**
-     * @var XMLValidationServiceInterface
+     * @var XMLValidationServiceInterface|null
      */
     protected $xmlValidationService;
 
     /**
      * @param EventBusInterface $eventBus
      * @param HttpClient $httpClient
-     * @param XMLValidationServiceInterface $xmlValidationService
+     * @param XMLValidationServiceInterface|null $xmlValidationService
      */
     public function __construct(
         EventBusInterface $eventBus,
         HttpClient $httpClient,
-        XMLValidationServiceInterface $xmlValidationService
+        XMLValidationServiceInterface $xmlValidationService = null
     ) {
         $this->eventBus = $eventBus;
         $this->httpClient = $httpClient;
@@ -183,14 +182,7 @@ class ActorEventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInt
 
         $xml = $response->getBody()->getContents();
 
-        $xmlErrors = $this->xmlValidationService->validate($xml);
-        if (!empty($xmlErrors)) {
-            $exception = XMLValidationException::fromXMLValidationErrors($xmlErrors);
-            $this->logger->error('cdbxml is invalid!', ['errors' => $exception->getMessage()]);
-            throw $exception;
-        }
-
-        $this->logger->debug('cdbxml is valid');
+        $this->guardValidXml($xml);
 
         $eventXml = $this->extractActorElement($xml);
 
@@ -267,5 +259,25 @@ class ActorEventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInt
         throw new \RuntimeException(
             "Actor could not be found in the Entry API response body."
         );
+    }
+
+    /**
+     * @param string $xml
+     */
+    private function guardValidXml($xml)
+    {
+        if ($this->xmlValidationService) {
+            $xmlErrors = $this->xmlValidationService->validate($xml);
+            if (!empty($xmlErrors)) {
+                $exception = XMLValidationException::fromXMLValidationErrors($xmlErrors);
+                $this->logger->error(
+                    'cdbxml is invalid!',
+                    ['errors' => $exception->getMessage()]
+                );
+                throw $exception;
+            }
+
+            $this->logger->debug('cdbxml is valid');
+        }
     }
 }

@@ -17,7 +17,7 @@ use CultuurNet\UDB3\UDB2\Event\Events\EventUpdatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\UrlTransformingTrait;
 use CultuurNet\UDB3\UDB2\XML\XMLValidationException;
 use CultuurNet\UDB3\UDB2\XML\XMLValidationServiceInterface;
-use DomDocument;
+use DOMDocument;
 use GuzzleHttp\Psr7\Request;
 use Http\Client\HttpClient;
 use Psr\Log\LoggerAwareInterface;
@@ -48,7 +48,7 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
     protected $httpClient;
 
     /**
-     * @var XMLValidationServiceInterface
+     * @var XMLValidationServiceInterface|null
      */
     protected $xmlValidationService;
 
@@ -60,12 +60,12 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
     /**
      * @param EventBusInterface $eventBus
      * @param HttpClient $httpClient
-     * @param XMLValidationServiceInterface $xmlValidationService
+     * @param XMLValidationServiceInterface|null $xmlValidationService
      */
     public function __construct(
         EventBusInterface $eventBus,
         HttpClient $httpClient,
-        XMLValidationServiceInterface $xmlValidationService
+        XMLValidationServiceInterface $xmlValidationService = null
     ) {
         $this->eventBus = $eventBus;
         $this->httpClient = $httpClient;
@@ -137,14 +137,7 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
 
         $xml = $response->getBody()->getContents();
 
-        $xmlErrors = $this->xmlValidationService->validate($xml);
-        if (!empty($xmlErrors)) {
-            $exception = XMLValidationException::fromXMLValidationErrors($xmlErrors);
-            $this->logger->error('cdbxml is invalid!', ['errors' => $exception->getMessage()]);
-            throw $exception;
-        }
-
-        $this->logger->debug('cdbxml is valid');
+        $this->guardValidXml($xml);
 
         $eventXml = $this->extractEventElement($xml);
 
@@ -227,7 +220,7 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
                         $this->logger->debug('found event in cdbxml');
 
                         $node = $reader->expand();
-                        $dom = new DomDocument('1.0');
+                        $dom = new DOMDocument('1.0');
                         $n = $dom->importNode($node, true);
                         $dom->appendChild($n);
                         return $dom->saveXML();
@@ -240,5 +233,25 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
         throw new \RuntimeException(
             "Event could not be found in the Entry API response body."
         );
+    }
+
+    /**
+     * @param string $xml
+     */
+    private function guardValidXml($xml)
+    {
+        if ($this->xmlValidationService) {
+            $xmlErrors = $this->xmlValidationService->validate($xml);
+            if (!empty($xmlErrors)) {
+                $exception = XMLValidationException::fromXMLValidationErrors($xmlErrors);
+                $this->logger->error(
+                    'cdbxml is invalid!',
+                    ['errors' => $exception->getMessage()]
+                );
+                throw $exception;
+            }
+
+            $this->logger->debug('cdbxml is valid');
+        }
     }
 }
