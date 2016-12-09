@@ -15,6 +15,7 @@ use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\UDB2\Event\Events\EventCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Event\Events\EventUpdatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Media\MediaImporter;
+use CultuurNet\UDB3\UDB2\OfferAlreadyImportedException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
@@ -183,9 +184,9 @@ class EventApplier implements EventListenerInterface, LoggerAwareInterface
                     'offer-id' => (string)$entityId,
                 ]
             );
-        } catch (\Exception $e) {
+        } catch (OfferAlreadyImportedException $e) {
             $this->logger->debug(
-                'Creation failed, trying to update as a fallback.',
+                'An offer with the same id already exists, trying to update as a fallback.',
                 [
                     'offer-id' => (string)$entityId,
                 ]
@@ -232,6 +233,18 @@ class EventApplier implements EventListenerInterface, LoggerAwareInterface
         StringLiteral $id,
         CdbXmlContainerInterface $cdbXml
     ) {
+        try {
+            $this->eventRepository->load((string) $id);
+            throw new OfferAlreadyImportedException('An offer with id: ' . $id . 'was already imported.');
+        } catch (AggregateNotFoundException $e) {
+            $this->logger->info(
+                'No existing offer with the same id found so it is save to import.',
+                [
+                    'offer-id' => (string)$id,
+                ]
+            );
+        }
+
         $entity = $this->offerFactory->createFromCdbXml(
             $id,
             new StringLiteral($cdbXml->getCdbXml()),
