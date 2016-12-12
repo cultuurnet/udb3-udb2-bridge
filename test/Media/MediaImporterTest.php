@@ -2,7 +2,7 @@
 
 namespace CultuurNet\UDB3\UDB2\Media;
 
-use CultuurNet\UDB3\Event\Events\EventImportedFromUDB2;
+use CultuurNet\UDB3\Cdb\EventItemFactory;
 use CultuurNet\UDB3\Media\Image;
 use CultuurNet\UDB3\Media\ImageCollection;
 use CultuurNet\UDB3\Media\MediaManagerInterface;
@@ -43,10 +43,9 @@ class MediaImporterTest extends \PHPUnit_Framework_TestCase
         $cdbXml = file_get_contents(__DIR__ . '/../Label/Samples/event.xml');
         $cdbXmlNamespaceUri = \CultureFeed_Cdb_Xml::namespaceUriForVersion('3.3');
 
-        $eventImportedFromUdb2 = new EventImportedFromUDB2(
-            'd53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1',
-            $cdbXml,
-            $cdbXmlNamespaceUri
+        $cdbEvent = EventItemFactory::createEventFromCdbXml(
+            $cdbXmlNamespaceUri,
+            $cdbXml
         );
 
         $this->imageCollectionFactory
@@ -72,6 +71,6 @@ class MediaImporterTest extends \PHPUnit_Framework_TestCase
                 Url::fromNative('http://85.255.197.172/images/20140108/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg')
             );
 
-        $this->importer->importImages($eventImportedFromUdb2);
+        $this->importer->importImages($cdbEvent);
     }
 }

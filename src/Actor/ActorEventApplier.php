@@ -213,7 +213,12 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
         );
 
         if ($this->mediaImporter) {
-            $imageCollection = $this->mediaImporter->importImages($cdbXml);
+            $cdbActor = ActorItemFactory::createActorFromCdbXml(
+                $cdbXml->getCdbXmlNamespaceUri(),
+                $cdbXml->getCdbXml()
+            );
+
+            $imageCollection = $this->mediaImporter->importImages($cdbActor);
             $entity->updateImagesFromUDB2($imageCollection);
         }
 
@@ -233,7 +238,7 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
             throw new OfferAlreadyImportedException('An offer with id: ' . $id . 'was already imported.');
         } catch (AggregateNotFoundException $e) {
             $this->logger->info(
-                'No existing offer with the same id found so it is save to import.',
+                'No existing offer with the same id found so it is safe to import.',
                 [
                     'offer-id' => (string)$id,
                 ]
@@ -248,7 +253,12 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
         );
 
         if ($this->mediaImporter) {
-            $imageCollection = $this->mediaImporter->importImages($cdbXml);
+            $cdbActor = ActorItemFactory::createActorFromCdbXml(
+                $cdbXml->getCdbXmlNamespaceUri(),
+                $cdbXml->getCdbXml()
+            );
+
+            $imageCollection = $this->mediaImporter->importImages($cdbActor);
             $entity->importImagesFromUDB2($imageCollection);
         }
 

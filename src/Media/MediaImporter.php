@@ -40,19 +40,14 @@ class MediaImporter implements LoggerAwareInterface
     }
 
     /**
-     * @param CdbXmlContainerInterface $cdbxml
+     * @param CultureFeed_Cdb_Item_Base $cdbItem
      * @return ImageCollection
      */
-    public function importImages(CdbXmlContainerInterface $cdbxml)
+    public function importImages(CultureFeed_Cdb_Item_Base $cdbItem)
     {
-        $udb2Event = EventItemFactory::createEventFromCdbXml(
-            $cdbxml->getCdbXmlNamespaceUri(),
-            $cdbxml->getCdbXml()
-        );
-
         $imageCollection = $this
             ->imageCollectionFactory
-            ->fromUdb2Media($this->getMedia($udb2Event));
+            ->fromUdb2Media($this->getMedia($cdbItem));
 
         $imageArray = $imageCollection->toArray();
         array_walk($imageArray, [$this, 'importImage']);
