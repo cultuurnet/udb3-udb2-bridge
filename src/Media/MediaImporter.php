@@ -4,14 +4,15 @@ namespace CultuurNet\UDB3\UDB2\Media;
 
 use CultureFeed_Cdb_Data_Media;
 use CultureFeed_Cdb_Item_Base;
-use CultuurNet\UDB3\Cdb\CdbXmlContainerInterface;
-use CultuurNet\UDB3\Cdb\EventItemFactory;
 use CultuurNet\UDB3\Media\Image;
 use CultuurNet\UDB3\Media\ImageCollection;
 use CultuurNet\UDB3\Media\MediaManagerInterface;
+use CultuurNet\UDB3\Media\Properties\CopyrightHolder;
+use CultuurNet\UDB3\Media\Properties\Description;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
+use ValueObjects\String\String as StringLiteral;
 
 class MediaImporter implements LoggerAwareInterface
 {
@@ -45,9 +46,15 @@ class MediaImporter implements LoggerAwareInterface
      */
     public function importImages(CultureFeed_Cdb_Item_Base $cdbItem)
     {
+        $title = $this->getTitle($cdbItem);
+
         $imageCollection = $this
             ->imageCollectionFactory
-            ->fromUdb2Media($this->getMedia($cdbItem));
+            ->fromUdb2Media(
+                $this->getMedia($cdbItem),
+                new Description($title),
+                new CopyrightHolder($title)
+            );
 
         $imageArray = $imageCollection->toArray();
         array_walk($imageArray, [$this, 'importImage']);
@@ -81,5 +88,17 @@ class MediaImporter implements LoggerAwareInterface
         return $details
             ->current()
             ->getMedia();
+    }
+
+    /**
+     * @param CultureFeed_Cdb_Item_Base $cdbItem
+     * @return string
+     */
+    protected function getTitle(CultureFeed_Cdb_Item_Base $cdbItem)
+    {
+        $details = $cdbItem->getDetails();
+        $details->rewind();
+
+        return $details->current()->getTitle();
     }
 }

@@ -6,6 +6,8 @@ use CultuurNet\UDB3\Cdb\EventItemFactory;
 use CultuurNet\UDB3\Media\Image;
 use CultuurNet\UDB3\Media\ImageCollection;
 use CultuurNet\UDB3\Media\MediaManagerInterface;
+use CultuurNet\UDB3\Media\Properties\CopyrightHolder;
+use CultuurNet\UDB3\Media\Properties\Description;
 use CultuurNet\UDB3\Media\Properties\MIMEType;
 use ValueObjects\Identity\UUID;
 use ValueObjects\String\String as StringLiteral;
@@ -54,8 +56,8 @@ class MediaImporterTest extends \PHPUnit_Framework_TestCase
                 new Image(
                     UUID::fromNative('f26433f0-97ef-5c07-8ea9-ef00a64dcb59'),
                     MIMEType::fromNative('image/jpeg'),
-                    StringLiteral::fromNative('no description'),
-                    StringLiteral::fromNative('Zelf gemaakt'),
+                    new Description('no description'),
+                    new CopyrightHolder('Zelf gemaakt'),
                     Url::fromNative('http://85.255.197.172/images/20140108/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg')
                 )
             ]));
@@ -66,8 +68,8 @@ class MediaImporterTest extends \PHPUnit_Framework_TestCase
             ->with(
                 UUID::fromNative('f26433f0-97ef-5c07-8ea9-ef00a64dcb59'),
                 MIMEType::fromNative('image/jpeg'),
-                StringLiteral::fromNative('no description'),
-                StringLiteral::fromNative('Zelf gemaakt'),
+                new Description('no description'),
+                new CopyrightHolder('Zelf gemaakt'),
                 Url::fromNative('http://85.255.197.172/images/20140108/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg')
             );
 
