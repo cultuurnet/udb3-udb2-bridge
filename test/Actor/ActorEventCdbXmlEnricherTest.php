@@ -10,8 +10,10 @@ use CultuurNet\UDB2DomainEvents\ActorCreated;
 use CultuurNet\UDB2DomainEvents\ActorUpdated;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorUpdatedEnrichedWithCdbXml;
-use CultuurNet\UDB3\UDB2\ActorCdbXmlServiceInterface;
 use CultuurNet\UDB3\UDB2\OfferToSapiUrlTransformer;
+use CultuurNet\UDB3\UDB2\XML\XMLValidationError;
+use CultuurNet\UDB3\UDB2\XML\XMLValidationException;
+use CultuurNet\UDB3\UDB2\XML\XMLValidationServiceInterface;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Http\Client\HttpClient;
@@ -19,7 +21,7 @@ use ValueObjects\Identity\UUID;
 use ValueObjects\String\String;
 use ValueObjects\Web\Url;
 
-class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
+class ActorEventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var TraceableEventBus
@@ -32,7 +34,12 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
     private $httpClient;
 
     /**
-     * @var EventCdbXmlEnricher
+     * @var XMLValidationServiceInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $xmlValidationService;
+
+    /**
+     * @var ActorEventCdbXmlEnricher
      */
     private $enricher;
 
@@ -44,46 +51,81 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
 
         $this->eventBus->trace();
 
-        $this->httpClient = $this->getMock(
-            HttpClient::class
-        );
+        $this->httpClient = $this->getMock(HttpClient::class);
 
-        $this->enricher = new EventCdbXmlEnricher(
+        $this->xmlValidationService = $this->getMock(XMLValidationServiceInterface::class);
+
+        $this->enricher = new ActorEventCdbXmlEnricher(
             $this->eventBus,
-            $this->httpClient
+            $this->httpClient,
+            $this->xmlValidationService
         );
     }
 
-    private function expectHttpClientToReturnCdbXmlFromUrl($url)
-    {
-        $request = new Request(
-            'GET',
-            (string)$url,
+    /**
+     * @dataProvider messagesProvider
+     * @test
+     * @param ActorUpdated|ActorCreated $incomingEvent
+     * @param ActorUpdatedEnrichedWithCdbXml|ActorCreatedEnrichedWithCdbXml $newEvent
+     */
+    public function it_publishes_a_new_message_enriched_with_xml(
+        $incomingEvent,
+        $newEvent
+    ) {
+        $this->expectHttpClientToReturnCdbXmlFromUrl(
+            $incomingEvent->getUrl()
+        );
+
+        $this->expectCdbXmlToBeValid($this->cdbXml());
+
+        $this->publish($incomingEvent);
+
+        $this->assertTracedEvents(
             [
-                'Accept' => 'application/xml',
+                $newEvent
             ]
         );
+    }
 
-        $response = new Response(
-            200,
-            [],
-            $this->cdbXml()
+    /**
+     * @dataProvider messagesProvider
+     * @test
+     * @param ActorUpdated|ActorCreated $incomingEvent
+     */
+    public function it_throws_an_exception_when_the_imported_cdbxml_is_invalid(
+        $incomingEvent
+    ) {
+        $this->expectHttpClientToReturnCdbXmlFromUrl(
+            $incomingEvent->getUrl()
         );
 
-        $this->httpClient->expects($this->once())
-            ->method('sendRequest')
-            ->with($request)
-            ->willReturn($response);
+        $errors = [new XMLValidationError('Oops', 0, 0)];
+
+        $this->expectCdbXmlToBeInvalid(
+            $this->cdbXml(),
+            $errors
+        );
+
+        $this->setExpectedException(XMLValidationException::class, 'Oops (Line: 0, column: 0)');
+
+        $this->publish($incomingEvent);
     }
 
-    private function cdbXml()
-    {
-        return file_get_contents(__DIR__ . '/Events/actor.xml');
-    }
+    /**
+     * @dataProvider messagesProvider
+     * @test
+     * @param ActorUpdated|ActorCreated $incomingEvent
+     */
+    public function it_should_retrieve_cdbxml_from_sapi_with_a_transformer($incomingEvent) {
+        $this->expectHttpClientToReturnCdbXmlFromUrl(
+            'http://search-prod.lodgon.com/search/rest/detail/event/318F2ACB-F612-6F75-0037C9C29F44087A?noauth=true&version=3.3'
+        );
 
-    private function cdbXmlNamespaceUri()
-    {
-        return 'http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL';
+        $transformer = new OfferToSapiUrlTransformer('http://search-prod.lodgon.com/search/rest/detail/event/%s?noauth=true&version=3.3');
+
+        $this->enricher->withUrlTransformer($transformer);
+
+        $this->publish($incomingEvent);
     }
 
     /**
@@ -132,6 +174,61 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    private function expectHttpClientToReturnCdbXmlFromUrl($url)
+    {
+        $request = new Request(
+            'GET',
+            (string)$url,
+            [
+                'Accept' => 'application/xml',
+            ]
+        );
+
+        $response = new Response(
+            200,
+            [],
+            $this->cdbXml()
+        );
+
+        $this->httpClient->expects($this->once())
+            ->method('sendRequest')
+            ->with($request)
+            ->willReturn($response);
+    }
+
+    /**
+     * @param string $cdbxml
+     */
+    private function expectCdbXmlToBeValid($cdbxml)
+    {
+        $this->xmlValidationService->expects($this->once())
+            ->method('validate')
+            ->with($cdbxml)
+            ->willReturn([]);
+    }
+
+    /**
+     * @param string $cdbxml
+     * @param XMLValidationError[] $errors
+     */
+    private function expectCdbXmlToBeInvalid($cdbxml, array $errors)
+    {
+        $this->xmlValidationService->expects($this->once())
+            ->method('validate')
+            ->with($cdbxml)
+            ->willReturn($errors);
+    }
+
+    private function cdbXml()
+    {
+        return file_get_contents(__DIR__ . '/Events/actor.xml');
+    }
+
+    private function cdbXmlNamespaceUri()
+    {
+        return 'http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL';
+    }
+
     private function publish($payload)
     {
         $this->enricher->handle(
@@ -173,29 +270,6 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider messagesProvider
-     * @test
-     * @param ActorUpdated|ActorCreated $incomingEvent
-     * @param ActorUpdatedEnrichedWithCdbXml|ActorCreatedEnrichedWithCdbXml $newEvent
-     */
-    public function it_publishes_a_new_message_enriched_with_xml(
-        $incomingEvent,
-        $newEvent
-    ) {
-        $this->expectHttpClientToReturnCdbXmlFromUrl(
-            $incomingEvent->getUrl()
-        );
-
-        $this->publish($incomingEvent);
-
-        $this->assertTracedEvents(
-            [
-                $newEvent
-            ]
-        );
-    }
-
-    /**
      * @param object[] $expectedEvents
      */
     protected function assertTracedEvents($expectedEvents)
@@ -206,23 +280,5 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
             $expectedEvents,
             $events
         );
-    }
-
-    /**
-     * @dataProvider messagesProvider
-     * @test
-     * @param ActorUpdated|ActorCreated $incomingEvent
-     * @param ActorUpdatedEnrichedWithCdbXml|ActorCreatedEnrichedWithCdbXml $newEvent
-     */
-    public function it_should_retrieve_cdbxml_from_sapi_with_a_transformer($incomingEvent) {
-        $this->expectHttpClientToReturnCdbXmlFromUrl(
-            'http://search-prod.lodgon.com/search/rest/detail/event/318F2ACB-F612-6F75-0037C9C29F44087A?noauth=true&version=3.3'
-        );
-
-        $transformer = new OfferToSapiUrlTransformer('http://search-prod.lodgon.com/search/rest/detail/event/%s?noauth=true&version=3.3');
-
-        $this->enricher->withUrlTransformer($transformer);
-
-        $this->publish($incomingEvent);
     }
 }
