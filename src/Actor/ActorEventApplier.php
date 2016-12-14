@@ -25,7 +25,7 @@ use ValueObjects\String\String as StringLiteral;
 /**
  * Applies incoming UDB2 actor events enriched with cdb xml on UDB3 organizers.
  *
- * Wether the UDB2 actor event should be processed is defined by an
+ * Whether the UDB2 actor event should be processed is defined by an
  * implementation of ActorSpecificationInterface.
  *
  * Instantiation of new entities is delegated to an implementation of

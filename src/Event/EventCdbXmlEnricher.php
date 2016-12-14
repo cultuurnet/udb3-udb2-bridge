@@ -15,7 +15,9 @@ use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\UDB2\Event\Events\EventCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Event\Events\EventUpdatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\UrlTransformingTrait;
-use DomDocument;
+use CultuurNet\UDB3\UDB2\XML\XMLValidationException;
+use CultuurNet\UDB3\UDB2\XML\XMLValidationServiceInterface;
+use DOMDocument;
 use GuzzleHttp\Psr7\Request;
 use Http\Client\HttpClient;
 use Psr\Log\LoggerAwareInterface;
@@ -46,19 +48,28 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
     protected $httpClient;
 
     /**
+     * @var XMLValidationServiceInterface|null
+     */
+    protected $xmlValidationService;
+
+    /**
      * @var StringLiteral
      */
     protected $cdbXmlNamespaceUri;
 
     /**
      * @param EventBusInterface $eventBus
+     * @param HttpClient $httpClient
+     * @param XMLValidationServiceInterface|null $xmlValidationService
      */
     public function __construct(
         EventBusInterface $eventBus,
-        HttpClient $httpClient
+        HttpClient $httpClient,
+        XMLValidationServiceInterface $xmlValidationService = null
     ) {
         $this->eventBus = $eventBus;
         $this->httpClient = $httpClient;
+        $this->xmlValidationService = $xmlValidationService;
         $this->cdbXmlNamespaceUri = new StringLiteral(
             CultureFeed_Cdb_Xml::namespaceUriForVersion('3.3')
         );
@@ -69,10 +80,6 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
         EventUpdated $eventUpdated,
         DomainMessage $message
     ) {
-        $this->logger->debug(
-            'UDB2 event updated, with url ' . $eventUpdated->getUrl()
-        );
-
         $xml = $this->retrieveXml($eventUpdated->getUrl());
 
         $enrichedEventUpdated = EventUpdatedEnrichedWithCdbXml::fromEventUpdated(
@@ -91,10 +98,6 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
         EventCreated $eventCreated,
         DomainMessage $message
     ) {
-        $this->logger->debug(
-            'UDB2 event created, with url ' . $eventCreated->getUrl()
-        );
-
         $xml = $this->retrieveXml($eventCreated->getUrl());
 
         $enrichedEventCreated = EventCreatedEnrichedWithCdbXml::fromEventCreated(
@@ -113,6 +116,7 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
      * @param Url $url
      * @return StringLiteral
      * @throws EventNotFoundException
+     * @throws XMLValidationException
      */
     private function retrieveXml(Url $url)
     {
@@ -132,6 +136,8 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
         }
 
         $xml = $response->getBody()->getContents();
+
+        $this->guardValidXml($xml);
 
         $eventXml = $this->extractEventElement($xml);
 
@@ -164,7 +170,7 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
 
         if (200 !== $response->getStatusCode()) {
             $this->logger->error(
-                'Unable to retrieve cdbxml, server responded with ' .
+                'unable to retrieve cdbxml, server responded with ' .
                 $response->getStatusCode() . ' ' . $response->getReasonPhrase()
             );
 
@@ -172,6 +178,8 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
                 'Unable to retrieve event from ' . (string)$url
             );
         }
+
+        $this->logger->debug('retrieved cdbxml');
 
         return $response;
     }
@@ -209,8 +217,10 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
             switch ($reader->nodeType) {
                 case ($reader::ELEMENT):
                     if ($reader->localName === 'event') {
+                        $this->logger->debug('found event in cdbxml');
+
                         $node = $reader->expand();
-                        $dom = new DomDocument('1.0');
+                        $dom = new DOMDocument('1.0');
                         $n = $dom->importNode($node, true);
                         $dom->appendChild($n);
                         return $dom->saveXML();
@@ -218,8 +228,30 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
             }
         }
 
+        $this->logger->error('no event found in cdbxml!');
+
         throw new \RuntimeException(
             "Event could not be found in the Entry API response body."
         );
+    }
+
+    /**
+     * @param string $xml
+     */
+    private function guardValidXml($xml)
+    {
+        if ($this->xmlValidationService) {
+            $xmlErrors = $this->xmlValidationService->validate($xml);
+            if (!empty($xmlErrors)) {
+                $exception = XMLValidationException::fromXMLValidationErrors($xmlErrors);
+                $this->logger->error(
+                    'cdbxml is invalid!',
+                    ['errors' => $exception->getMessage()]
+                );
+                throw $exception;
+            }
+
+            $this->logger->debug('cdbxml is valid');
+        }
     }
 }

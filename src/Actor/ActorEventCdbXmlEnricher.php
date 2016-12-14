@@ -14,6 +14,8 @@ use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorUpdatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\UrlTransformingTrait;
+use CultuurNet\UDB3\UDB2\XML\XMLValidationException;
+use CultuurNet\UDB3\UDB2\XML\XMLValidationServiceInterface;
 use DOMDocument;
 use GuzzleHttp\Psr7\Request;
 use Http\Client\HttpClient;
@@ -29,7 +31,7 @@ use XMLReader;
  * Creates new event messages based on incoming UDB2 events, enriching them with
  * cdb xml so other components do not need to take care of that themselves.
  */
-class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterface
+class ActorEventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterface
 {
     use DelegateEventHandlingToSpecificMethodTrait;
     use LoggerAwareTrait;
@@ -51,15 +53,23 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
     protected $logContext;
 
     /**
+     * @var XMLValidationServiceInterface|null
+     */
+    protected $xmlValidationService;
+
+    /**
      * @param EventBusInterface $eventBus
      * @param HttpClient $httpClient
+     * @param XMLValidationServiceInterface|null $xmlValidationService
      */
     public function __construct(
         EventBusInterface $eventBus,
-        HttpClient $httpClient
+        HttpClient $httpClient,
+        XMLValidationServiceInterface $xmlValidationService = null
     ) {
         $this->eventBus = $eventBus;
         $this->httpClient = $httpClient;
+        $this->xmlValidationService = $xmlValidationService;
         $this->logger = new NullLogger();
     }
 
@@ -151,6 +161,7 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
      * @param Url $url
      * @return StringLiteral
      * @throws ActorNotFoundException
+     * @throws XMLValidationException
      */
     private function getActorXml(Url $url)
     {
@@ -170,6 +181,8 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
         }
 
         $xml = $response->getBody()->getContents();
+
+        $this->guardValidXml($xml);
 
         $eventXml = $this->extractActorElement($xml);
 
@@ -202,7 +215,7 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
 
         if (200 !== $response->getStatusCode()) {
             $this->logger->error(
-                'Unable to retrieve cdbxml, server responded with ' .
+                'unable to retrieve cdbxml, server responded with ' .
                 $response->getStatusCode() . ' ' . $response->getReasonPhrase()
             );
 
@@ -210,6 +223,8 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
                 'Unable to retrieve actor from ' . (string)$url
             );
         }
+
+        $this->logger->debug('retrieved cdbxml');
 
         return $response;
     }
@@ -228,6 +243,8 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
             switch ($reader->nodeType) {
                 case ($reader::ELEMENT):
                     if ($reader->localName === 'actor') {
+                        $this->logger->debug('found actor in cdbxml');
+
                         $node = $reader->expand();
                         $dom = new DomDocument('1.0');
                         $n = $dom->importNode($node, true);
@@ -237,8 +254,30 @@ class EventCdbXmlEnricher implements EventListenerInterface, LoggerAwareInterfac
             }
         }
 
+        $this->logger->error('no actor found in cdbxml!');
+
         throw new \RuntimeException(
             "Actor could not be found in the Entry API response body."
         );
+    }
+
+    /**
+     * @param string $xml
+     */
+    private function guardValidXml($xml)
+    {
+        if ($this->xmlValidationService) {
+            $xmlErrors = $this->xmlValidationService->validate($xml);
+            if (!empty($xmlErrors)) {
+                $exception = XMLValidationException::fromXMLValidationErrors($xmlErrors);
+                $this->logger->error(
+                    'cdbxml is invalid!',
+                    ['errors' => $exception->getMessage()]
+                );
+                throw $exception;
+            }
+
+            $this->logger->debug('cdbxml is valid');
+        }
     }
 }
