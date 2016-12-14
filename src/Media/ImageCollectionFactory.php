@@ -10,7 +10,6 @@ use CultuurNet\UDB3\Media\Properties\Description;
 use CultuurNet\UDB3\Media\Properties\MIMEType;
 use League\Uri\Modifiers\AbstractUriModifier;
 use League\Uri\Modifiers\Normalize;
-use League\Uri\Modifiers\Pipeline;
 use League\Uri\Schemes\Http;
 use Psr\Http\Message\UriInterface;
 use ValueObjects\Identity\UUID;
@@ -36,10 +35,7 @@ class ImageCollectionFactory implements ImageCollectionFactoryInterface
 
     public function __construct()
     {
-        $this->uriNormalizer = new Pipeline([
-            new Normalize(),
-            new NormalizeUriScheme(),
-        ]);
+        $this->uriNormalizer = new Normalize();
     }
 
     public function withUuidRegex($mediaIdentifierRegex)
@@ -99,7 +95,7 @@ class ImageCollectionFactory implements ImageCollectionFactoryInterface
             return UUID::fromNative($matches['uuid']);
         }
 
-        $namespace = BaseUuid::uuid5('00000000-0000-0000-0000-000000000000', $httpUri->getHost());
+        $namespace = BaseUuid::uuid5(BaseUuid::NAMESPACE_DNS, $httpUri->getHost());
         return UUID::fromNative((string) BaseUuid::uuid5($namespace, (string) $httpUri));
     }
 
@@ -109,7 +105,7 @@ class ImageCollectionFactory implements ImageCollectionFactoryInterface
      */
     public function normalize($link)
     {
-        $originalUri = Http::createFromString($link);
+        $originalUri = Http::createFromString($link)->withScheme('http');
         return $this->uriNormalizer->__invoke($originalUri);
     }
 }

@@ -22,7 +22,7 @@ class ImageCollectionFactoryTest extends \PHPUnit_Framework_TestCase
     public function it_should_return_a_collection_of_images_from_udb2_media()
     {
         $image = new Image(
-            UUID::fromNative('f26433f0-97ef-5c07-8ea9-ef00a64dcb59'),
+            UUID::fromNative('84c4ddea-a00d-5241-bb1a-f4c01cef0a76'),
             MIMEType::fromNative('image/jpeg'),
             new Description('¯\_(ツ)_/¯'),
             new CopyrightHolder('Zelf gemaakt'),
@@ -50,7 +50,7 @@ class ImageCollectionFactoryTest extends \PHPUnit_Framework_TestCase
     public function it_should_set_the_first_main_udb2_image_as_main_collection_image()
     {
         $image = new Image(
-            UUID::fromNative('bc1dfebe-ca8b-5390-a946-8b43fa9bd609'),
+            UUID::fromNative('6f064917-3b55-5459-97fe-4ac15b1e3db3'),
             MIMEType::fromNative('image/jpeg'),
             new Description('¯\_(ツ)_/¯'),
             new CopyrightHolder('Karbido Ensemble'),
