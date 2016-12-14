@@ -19,7 +19,7 @@ use ValueObjects\Web\Url;
 
 class ImageCollectionFactory implements ImageCollectionFactoryInterface
 {
-    const SUPPORTED_IMAGE_TYPES = [
+    const SUPPORTED_UDB2_MEDIA_TYPES = [
         CultureFeed_Cdb_Data_File::MEDIA_TYPE_PHOTO,
         CultureFeed_Cdb_Data_File::MEDIA_TYPE_IMAGEWEB
     ];
@@ -58,7 +58,7 @@ class ImageCollectionFactory implements ImageCollectionFactoryInterface
         Description $fallbackDescription,
         CopyrightHolder $fallbackCopyright
     ) {
-        $udb2ImageFiles = $media->byMediaTypes(self::SUPPORTED_IMAGE_TYPES);
+        $udb2ImageFiles = $media->byMediaTypes(self::SUPPORTED_UDB2_MEDIA_TYPES);
 
         return array_reduce(
             iterator_to_array($udb2ImageFiles),
