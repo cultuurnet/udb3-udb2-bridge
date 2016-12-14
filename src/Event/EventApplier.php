@@ -12,6 +12,7 @@ use CultuurNet\UDB3\Cdb\EventItemFactory;
 use CultuurNet\UDB3\Cdb\UpdateableWithCdbXmlInterface;
 use CultuurNet\UDB3\Event\Event;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
+use CultuurNet\UDB3\Media\Properties\UnsupportedMIMETypeException;
 use CultuurNet\UDB3\UDB2\Event\Events\EventCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Event\Events\EventUpdatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Media\MediaImporter;
@@ -267,8 +268,15 @@ class EventApplier implements EventListenerInterface, LoggerAwareInterface
             $cdbXml->getCdbXml()
         );
 
-        $imageCollection = $this->mediaImporter->importImages($cdbEvent);
-        $entity->importImagesFromUDB2($imageCollection);
+        try {
+            $imageCollection = $this->mediaImporter->importImages($cdbEvent);
+            $entity->importImagesFromUDB2($imageCollection);
+        } catch (UnsupportedMIMETypeException $e) {
+            $this->logger->error(
+                'Unable to import images for offer. ' . $e->getMessage(),
+                ['offer-id' => (string)$id]
+            );
+        };
 
         $this->eventRepository->save($entity);
     }
