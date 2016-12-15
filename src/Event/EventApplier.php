@@ -1,11 +1,7 @@
 <?php
-/**
- * @file
- */
 
 namespace CultuurNet\UDB3\UDB2\Event;
 
-use Broadway\Domain\AggregateRoot;
 use Broadway\EventHandling\EventListenerInterface;
 use Broadway\Repository\AggregateNotFoundException;
 use Broadway\Repository\RepositoryInterface;
@@ -14,9 +10,13 @@ use CultuurNet\UDB3\Cdb\CdbXmlContainerInterface;
 use CultuurNet\UDB3\Cdb\Event\SpecificationInterface;
 use CultuurNet\UDB3\Cdb\EventItemFactory;
 use CultuurNet\UDB3\Cdb\UpdateableWithCdbXmlInterface;
+use CultuurNet\UDB3\Event\Event;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
+use CultuurNet\UDB3\Media\Properties\UnsupportedMIMETypeException;
 use CultuurNet\UDB3\UDB2\Event\Events\EventCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Event\Events\EventUpdatedEnrichedWithCdbXml;
+use CultuurNet\UDB3\UDB2\Media\MediaImporter;
+use CultuurNet\UDB3\UDB2\OfferAlreadyImportedException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
@@ -44,17 +44,30 @@ class EventApplier implements EventListenerInterface, LoggerAwareInterface
     protected $offerFactory;
 
     /**
+     * @var MediaImporter
+     */
+    protected $mediaImporter;
+
+    /**
+     * @var RepositoryInterface
+     */
+    protected $eventRepository;
+
+    /**
      * @param SpecificationInterface $offerSpecification
      * @param RepositoryInterface $eventRepository
      */
     public function __construct(
         SpecificationInterface $offerSpecification,
         RepositoryInterface $eventRepository,
-        EventToUDB3AggregateFactoryInterface $offerFactory
+        EventToUDB3AggregateFactoryInterface $offerFactory,
+        MediaImporter $mediaImporter
     ) {
         $this->offerSpecification = $offerSpecification;
         $this->eventRepository = $eventRepository;
         $this->offerFactory = $offerFactory;
+        $this->mediaImporter = $mediaImporter;
+
         $this->logger = new NullLogger();
     }
 
@@ -177,9 +190,9 @@ class EventApplier implements EventListenerInterface, LoggerAwareInterface
                     'offer-id' => (string)$entityId,
                 ]
             );
-        } catch (\Exception $e) {
+        } catch (OfferAlreadyImportedException $e) {
             $this->logger->debug(
-                'Creation failed, trying to update as a fallback.',
+                'An offer with the same id already exists, trying to update as a fallback.',
                 [
                     'offer-id' => (string)$entityId,
                 ]
@@ -204,13 +217,21 @@ class EventApplier implements EventListenerInterface, LoggerAwareInterface
         StringLiteral $entityId,
         CdbXmlContainerInterface $cdbXml
     ) {
-        /** @var UpdateableWithCdbXmlInterface|AggregateRoot $entity */
+        /** @var UpdateableWithCdbXmlInterface|Event $entity */
         $entity = $this->eventRepository->load((string)$entityId);
 
         $entity->updateWithCdbXml(
             $cdbXml->getCdbXml(),
             $cdbXml->getCdbXmlNamespaceUri()
         );
+
+        $cdbEvent = EventItemFactory::createEventFromCdbXml(
+            $cdbXml->getCdbXmlNamespaceUri(),
+            $cdbXml->getCdbXml()
+        );
+
+        $imageCollection = $this->mediaImporter->importImages($cdbEvent);
+        $entity->updateImagesFromUDB2($imageCollection);
 
         $this->eventRepository->save($entity);
     }
@@ -223,11 +244,39 @@ class EventApplier implements EventListenerInterface, LoggerAwareInterface
         StringLiteral $id,
         CdbXmlContainerInterface $cdbXml
     ) {
+        try {
+            $this->eventRepository->load((string) $id);
+            throw new OfferAlreadyImportedException('An offer with id: ' . $id . 'was already imported.');
+        } catch (AggregateNotFoundException $e) {
+            $this->logger->info(
+                'No existing offer with the same id found so it is safe to import.',
+                [
+                    'offer-id' => (string)$id,
+                ]
+            );
+        }
+
+        /** @var UpdateableWithCdbXmlInterface|Event $entity */
         $entity = $this->offerFactory->createFromCdbXml(
             $id,
             new StringLiteral($cdbXml->getCdbXml()),
             new StringLiteral($cdbXml->getCdbXmlNamespaceUri())
         );
+
+        $cdbEvent = EventItemFactory::createEventFromCdbXml(
+            $cdbXml->getCdbXmlNamespaceUri(),
+            $cdbXml->getCdbXml()
+        );
+
+        try {
+            $imageCollection = $this->mediaImporter->importImages($cdbEvent);
+            $entity->importImagesFromUDB2($imageCollection);
+        } catch (UnsupportedMIMETypeException $e) {
+            $this->logger->error(
+                'Unable to import images for offer. ' . $e->getMessage(),
+                ['offer-id' => (string)$id]
+            );
+        };
 
         $this->eventRepository->save($entity);
     }
