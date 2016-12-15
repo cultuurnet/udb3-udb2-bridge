@@ -270,7 +270,9 @@ class EventApplier implements EventListenerInterface, LoggerAwareInterface
 
         try {
             $imageCollection = $this->mediaImporter->importImages($cdbEvent);
-            $entity->importImagesFromUDB2($imageCollection);
+            if ($imageCollection->length() > 0) {
+                $entity->importImagesFromUDB2($imageCollection);
+            }
         } catch (UnsupportedMIMETypeException $e) {
             $this->logger->error(
                 'Unable to import images for offer. ' . $e->getMessage(),
