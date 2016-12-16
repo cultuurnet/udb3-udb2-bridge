@@ -68,9 +68,10 @@ class ImageCollectionFactory implements ImageCollectionFactoryInterface
                 $udb2Description = $file->getDescription();
                 $udb2Copyright = $file->getCopyright();
                 $normalizedUri = $this->normalize($file->getHLink());
+                $fileType = $file->getFileType();
                 $image = new Image(
                     $this->identify($normalizedUri),
-                    MIMEType::fromSubtype($file->getFileType()),
+                    empty($fileType) ? MIMEType::fromSubtype('octet-stream') : MIMEType::fromSubtype($fileType),
                     empty($udb2Description) ? $fallbackDescription : new Description($udb2Description),
                     empty($udb2Copyright) ? $fallbackCopyright : new CopyrightHolder($udb2Copyright),
                     Url::fromNative((string) $normalizedUri)

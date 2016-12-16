@@ -21,15 +21,22 @@ class ImageCollectionFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function it_should_return_a_collection_of_images_from_udb2_media()
     {
-        $image = new Image(
+        $photo = new Image(
             UUID::fromNative('84c4ddea-a00d-5241-bb1a-f4c01cef0a76'),
             MIMEType::fromNative('image/jpeg'),
             new Description('¯\_(ツ)_/¯'),
             new CopyrightHolder('Zelf gemaakt'),
             Url::fromNative('http://85.255.197.172/images/20140108/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg')
         );
-        $expectedImages = (new ImageCollection())->with($image);
-        $cdbXml = file_get_contents(__DIR__ . '/../Label/Samples/event.xml');
+        $imageweb = new Image(
+            UUID::fromNative('96d1d210-9804-55a4-a2c5-6245031a1d4a'),
+            MIMEType::fromNative('application/octet-stream'),
+            new Description('¯\_(ツ)_/¯'),
+            new CopyrightHolder('KWB'),
+            Url::fromNative('http://testfilm.uitdatabank.be/images/20160531/kwbeensgezind.jpg')
+        );
+        $expectedImages = (ImageCollection::fromArray([$photo, $imageweb]));
+        $cdbXml = file_get_contents(__DIR__ . '/samples/event_with_udb2_images.xml');
         $cdbXmlNamespaceUri = \CultureFeed_Cdb_Xml::namespaceUriForVersion('3.3');
 
         $event = EventItemFactory::createEventFromCdbXml($cdbXmlNamespaceUri, $cdbXml);
