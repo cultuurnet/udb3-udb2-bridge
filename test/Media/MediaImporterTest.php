@@ -32,8 +32,8 @@ class MediaImporterTest extends \PHPUnit_Framework_TestCase
 
     public function setup()
     {
-        $this->mediaManager = $this->getMock(MediaManagerInterface::class);
-        $this->imageCollectionFactory = $this->getMock(ImageCollectionFactoryInterface::class);
+        $this->mediaManager = $this->createMock(MediaManagerInterface::class);
+        $this->imageCollectionFactory = $this->createMock(ImageCollectionFactoryInterface::class);
         $this->importer = new MediaImporter($this->mediaManager, $this->imageCollectionFactory);
     }
 

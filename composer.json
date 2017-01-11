@@ -23,7 +23,7 @@
     "league/uri": "^4.2"
   },
   "require-dev": {
-    "phpunit/phpunit": "~4.3",
+    "phpunit/phpunit": "~5.7",
     "squizlabs/php_codesniffer": "2.6.1",
     "phing/phing": "~2.10",
     "satooshi/php-coveralls": "~0.7"

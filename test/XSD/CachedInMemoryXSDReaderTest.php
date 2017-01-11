@@ -22,7 +22,7 @@ class CachedInMemoryXSDReaderTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->xsd = new XSD(file_get_contents(__DIR__ . '/samples/CdbXSD.3.3.xsd.xml'));
-        $this->decoratedReader = $this->getMock(XSDReaderInterface::class);
+        $this->decoratedReader = $this->createMock(XSDReaderInterface::class);
         $this->cachedReader = new CachedInMemoryXSDReader($this->decoratedReader);
     }
 
