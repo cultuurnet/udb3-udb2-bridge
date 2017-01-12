@@ -12,7 +12,7 @@ use CultuurNet\UDB3\Media\Properties\Description;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
-use ValueObjects\String\String as StringLiteral;
+use ValueObjects\StringLiteral\StringLiteral;
 
 class MediaImporter implements LoggerAwareInterface
 {

@@ -4,7 +4,7 @@ namespace CultuurNet\UDB3\UDB2\Event;
 
 use Broadway\Domain\AggregateRoot;
 use CultuurNet\UDB3\Cdb\UpdateableWithCdbXmlInterface;
-use ValueObjects\String\String as StringLiteral;
+use ValueObjects\StringLiteral\StringLiteral;
 
 /**
  * Implementations create a specific UDB3 entity based on UDB2 cdb xml.

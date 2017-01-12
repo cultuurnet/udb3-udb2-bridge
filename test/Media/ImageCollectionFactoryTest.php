@@ -11,7 +11,7 @@ use CultuurNet\UDB3\Media\Properties\CopyrightHolder;
 use CultuurNet\UDB3\Media\Properties\Description;
 use CultuurNet\UDB3\Media\Properties\MIMEType;
 use ValueObjects\Identity\UUID;
-use ValueObjects\String\String as StringLiteral;
+use ValueObjects\StringLiteral\StringLiteral;
 use ValueObjects\Web\Url;
 
 class ImageCollectionFactoryTest extends \PHPUnit_Framework_TestCase

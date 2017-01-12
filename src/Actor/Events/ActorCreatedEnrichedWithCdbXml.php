@@ -4,7 +4,7 @@ namespace CultuurNet\UDB3\UDB2\Actor\Events;
 use CultuurNet\UDB2DomainEvents\ActorCreated;
 use CultuurNet\UDB3\Cdb\CdbXmlContainerInterface;
 use CultuurNet\UDB3\HasCdbXmlTrait;
-use ValueObjects\String\String as StringLiteral;
+use ValueObjects\StringLiteral\StringLiteral;
 use ValueObjects\Web\Url;
 
 class ActorCreatedEnrichedWithCdbXml extends ActorCreated implements CdbXmlContainerInterface
