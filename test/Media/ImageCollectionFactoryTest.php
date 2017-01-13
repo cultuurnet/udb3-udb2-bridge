@@ -11,7 +11,6 @@ use CultuurNet\UDB3\Media\Properties\CopyrightHolder;
 use CultuurNet\UDB3\Media\Properties\Description;
 use CultuurNet\UDB3\Media\Properties\MIMEType;
 use ValueObjects\Identity\UUID;
-use ValueObjects\String\String as StringLiteral;
 use ValueObjects\Web\Url;
 
 class ImageCollectionFactoryTest extends \PHPUnit_Framework_TestCase
@@ -23,14 +22,14 @@ class ImageCollectionFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $photo = new Image(
             UUID::fromNative('84c4ddea-a00d-5241-bb1a-f4c01cef0a76'),
-            MIMEType::fromNative('image/jpeg'),
+            new MIMEType('image/jpeg'),
             new Description('¯\_(ツ)_/¯'),
             new CopyrightHolder('Zelf gemaakt'),
             Url::fromNative('http://85.255.197.172/images/20140108/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg')
         );
         $imageweb = new Image(
             UUID::fromNative('96d1d210-9804-55a4-a2c5-6245031a1d4a'),
-            MIMEType::fromNative('application/octet-stream'),
+            new MIMEType('application/octet-stream'),
             new Description('¯\_(ツ)_/¯'),
             new CopyrightHolder('KWB'),
             Url::fromNative('http://testfilm.uitdatabank.be/images/20160531/kwbeensgezind.jpg')
