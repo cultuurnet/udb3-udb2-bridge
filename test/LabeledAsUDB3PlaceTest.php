@@ -74,6 +74,8 @@ class LabeledAsUDB3PlaceTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      * @dataProvider EventData
+     * @param Event $event
+     * @param bool $satisfied
      */
     public function it_is_satisifed_by_an_event_with_the_udb3_place_keyword(
         Event $event,
@@ -106,6 +108,8 @@ class LabeledAsUDB3PlaceTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      * @dataProvider invalidKeywordsProvider
+     * @param \CultureFeed_Cdb_Data_Keyword[] $keywords
+     * @param bool $satisfied
      */
     public function it_gracefully_handles_invalid_keywords(
         $keywords,
