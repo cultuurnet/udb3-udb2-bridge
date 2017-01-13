@@ -27,7 +27,7 @@ class LabelImporterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->labelService = $this->getMock(LabelServiceInterface::class);
+        $this->labelService = $this->createMock(LabelServiceInterface::class);
 
         $this->labelImporter = new LabelImporter($this->labelService);
 

@@ -51,9 +51,9 @@ class ActorEventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
 
         $this->eventBus->trace();
 
-        $this->httpClient = $this->getMock(HttpClient::class);
+        $this->httpClient = $this->createMock(HttpClient::class);
 
-        $this->xmlValidationService = $this->getMock(XMLValidationServiceInterface::class);
+        $this->xmlValidationService = $this->createMock(XMLValidationServiceInterface::class);
 
         $this->enricher = new ActorEventCdbXmlEnricher(
             $this->eventBus,
