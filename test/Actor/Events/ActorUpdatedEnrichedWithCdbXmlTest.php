@@ -2,19 +2,19 @@
 
 namespace CultuurNet\UDB3\UDB2\Actor\Events;
 
-use ValueObjects\String\String;
+use ValueObjects\StringLiteral\StringLiteral;
 use ValueObjects\Web\Url;
 
 class ActorUpdatedEnrichedWithCdbXmlTest extends \PHPUnit_Framework_TestCase
 {
     public function testProperties()
     {
-        $id = new String('foo');
+        $id = new StringLiteral('foo');
         $time = new \DateTimeImmutable();
-        $author = new String('me@example.com');
+        $author = new StringLiteral('me@example.com');
         $url = Url::fromNative('http://www.some.url');
-        $cdbXml = new String(file_get_contents(__DIR__ . '/actor.xml'));
-        $cdbXmlNamespaceUri = new String(
+        $cdbXml = new StringLiteral(file_get_contents(__DIR__ . '/actor.xml'));
+        $cdbXmlNamespaceUri = new StringLiteral(
             'http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.2/FINAL'
         );
 

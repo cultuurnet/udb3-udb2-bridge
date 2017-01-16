@@ -18,7 +18,7 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Http\Client\HttpClient;
 use ValueObjects\Identity\UUID;
-use ValueObjects\String\String;
+use ValueObjects\StringLiteral\StringLiteral;
 use ValueObjects\Web\Url;
 
 class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
@@ -153,8 +153,8 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
                     $eventCreated->getTime(),
                     $eventCreated->getAuthor(),
                     $eventCreated->getUrl(),
-                    new String($this->cdbXml()),
-                    new String($this->cdbXmlNamespaceUri())
+                    new StringLiteral($this->cdbXml()),
+                    new StringLiteral($this->cdbXmlNamespaceUri())
                 )
             ],
             [
@@ -164,8 +164,8 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
                     $eventUpdated->getTime(),
                     $eventUpdated->getAuthor(),
                     $eventCreated->getUrl(),
-                    new String($this->cdbXml()),
-                    new String($this->cdbXmlNamespaceUri())
+                    new StringLiteral($this->cdbXml()),
+                    new StringLiteral($this->cdbXmlNamespaceUri())
                 )
             ]
         ];
@@ -257,8 +257,8 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
      */
     private function newEventCreated(\DateTimeImmutable $time)
     {
-        $eventId = new String('d53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1');
-        $author = new String('jonas@cultuurnet.be');
+        $eventId = new StringLiteral('d53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1');
+        $author = new StringLiteral('jonas@cultuurnet.be');
         $url = Url::fromNative('https://io.uitdatabank.be/event/d53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1');
 
         return new EventCreated(
@@ -275,8 +275,8 @@ class EventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
      */
     private function newEventUpdated(\DateTimeImmutable $time)
     {
-        $eventId = new String('d53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1');
-        $author = new String('jonas@cultuurnet.be');
+        $eventId = new StringLiteral('d53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1');
+        $author = new StringLiteral('jonas@cultuurnet.be');
         $url = Url::fromNative('https://io.uitdatabank.be/event/d53c2bc9-8f0e-4c9a-8457-77e8b3cab3d1');
 
         return new EventUpdated(

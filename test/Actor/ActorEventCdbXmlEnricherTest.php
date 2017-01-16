@@ -18,7 +18,7 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Http\Client\HttpClient;
 use ValueObjects\Identity\UUID;
-use ValueObjects\String\String;
+use ValueObjects\StringLiteral\StringLiteral;
 use ValueObjects\Web\Url;
 
 class ActorEventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
@@ -156,8 +156,8 @@ class ActorEventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
                     $actorCreated->getTime(),
                     $actorCreated->getAuthor(),
                     $actorCreated->getUrl(),
-                    new String($this->cdbXml()),
-                    new String($this->cdbXmlNamespaceUri())
+                    new StringLiteral($this->cdbXml()),
+                    new StringLiteral($this->cdbXmlNamespaceUri())
                 )
             ],
             [
@@ -167,8 +167,8 @@ class ActorEventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
                     $actorUpdated->getTime(),
                     $actorUpdated->getAuthor(),
                     $actorCreated->getUrl(),
-                    new String($this->cdbXml()),
-                    new String($this->cdbXmlNamespaceUri())
+                    new StringLiteral($this->cdbXml()),
+                    new StringLiteral($this->cdbXmlNamespaceUri())
                 )
             ]
         ];
@@ -243,8 +243,8 @@ class ActorEventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
 
     private function newActorCreated(\DateTimeImmutable $time)
     {
-        $actorId = new String('318F2ACB-F612-6F75-0037C9C29F44087A');
-        $author = new String('me@example.com');
+        $actorId = new StringLiteral('318F2ACB-F612-6F75-0037C9C29F44087A');
+        $author = new StringLiteral('me@example.com');
         $url = Url::fromNative('https://io.uitdatabank.be/event/318F2ACB-F612-6F75-0037C9C29F44087A');
 
         return new ActorCreated(
@@ -257,8 +257,8 @@ class ActorEventCdbXmlEnricherTest extends \PHPUnit_Framework_TestCase
 
     private function newActorUpdated(\DateTimeImmutable $time)
     {
-        $actorId = new String('318F2ACB-F612-6F75-0037C9C29F44087A');
-        $author = new String('me@example.com');
+        $actorId = new StringLiteral('318F2ACB-F612-6F75-0037C9C29F44087A');
+        $author = new StringLiteral('me@example.com');
         $url = Url::fromNative('https://io.uitdatabank.be/event/318F2ACB-F612-6F75-0037C9C29F44087A');
 
         return new ActorUpdated(

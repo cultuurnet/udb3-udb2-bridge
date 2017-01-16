@@ -10,6 +10,7 @@ use CultuurNet\UDB3\Media\Properties\CopyrightHolder;
 use CultuurNet\UDB3\Media\Properties\Description;
 use CultuurNet\UDB3\Media\Properties\MIMEType;
 use ValueObjects\Identity\UUID;
+use ValueObjects\StringLiteral\StringLiteral;
 use ValueObjects\Web\Url;
 
 class MediaImporterTest extends \PHPUnit_Framework_TestCase
@@ -54,7 +55,7 @@ class MediaImporterTest extends \PHPUnit_Framework_TestCase
             ->willReturn(ImageCollection::fromArray([
                 new Image(
                     UUID::fromNative('f26433f0-97ef-5c07-8ea9-ef00a64dcb59'),
-                    new MIMEType('image/jpeg'),
+                    MIMEType::fromNative('image/jpeg'),
                     new Description('no description'),
                     new CopyrightHolder('Zelf gemaakt'),
                     Url::fromNative('http://85.255.197.172/images/20140108/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg')
@@ -66,7 +67,7 @@ class MediaImporterTest extends \PHPUnit_Framework_TestCase
             ->method('create')
             ->with(
                 UUID::fromNative('f26433f0-97ef-5c07-8ea9-ef00a64dcb59'),
-                new MIMEType('image/jpeg'),
+                MIMEType::fromNative('image/jpeg'),
                 new Description('no description'),
                 new CopyrightHolder('Zelf gemaakt'),
                 Url::fromNative('http://85.255.197.172/images/20140108/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg')

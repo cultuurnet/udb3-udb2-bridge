@@ -3,7 +3,7 @@
 namespace CultuurNet\UDB3\UDB2\Event;
 
 use CultuurNet\UDB3\Event\Event;
-use ValueObjects\String\String as StringLiteral;
+use ValueObjects\StringLiteral\StringLiteral;
 
 class EventToUDB3EventFactory implements EventToUDB3AggregateFactoryInterface
 {
