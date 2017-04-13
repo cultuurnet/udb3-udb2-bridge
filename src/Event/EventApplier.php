@@ -15,6 +15,7 @@ use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\Media\Properties\UnsupportedMIMETypeException;
 use CultuurNet\UDB3\UDB2\Event\Events\EventCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Event\Events\EventUpdatedEnrichedWithCdbXml;
+use CultuurNet\UDB3\UDB2\Label\LabelApplierInterface;
 use CultuurNet\UDB3\UDB2\Media\MediaImporter;
 use CultuurNet\UDB3\UDB2\OfferAlreadyImportedException;
 use Psr\Log\LoggerAwareInterface;
@@ -54,19 +55,29 @@ class EventApplier implements EventListenerInterface, LoggerAwareInterface
     protected $eventRepository;
 
     /**
+     * @var LabelApplierInterface
+     */
+    private $labelApplier;
+
+    /**
      * @param SpecificationInterface $offerSpecification
      * @param RepositoryInterface $eventRepository
+     * @param EventToUDB3AggregateFactoryInterface $offerFactory
+     * @param MediaImporter $mediaImporter
+     * @param LabelApplierInterface $labelApplier
      */
     public function __construct(
         SpecificationInterface $offerSpecification,
         RepositoryInterface $eventRepository,
         EventToUDB3AggregateFactoryInterface $offerFactory,
-        MediaImporter $mediaImporter
+        MediaImporter $mediaImporter,
+        LabelApplierInterface $labelApplier
     ) {
         $this->offerSpecification = $offerSpecification;
         $this->eventRepository = $eventRepository;
         $this->offerFactory = $offerFactory;
         $this->mediaImporter = $mediaImporter;
+        $this->labelApplier = $labelApplier;
 
         $this->logger = new NullLogger();
     }
@@ -232,6 +243,8 @@ class EventApplier implements EventListenerInterface, LoggerAwareInterface
 
         $imageCollection = $this->mediaImporter->importImages($cdbEvent);
         $entity->updateImagesFromUDB2($imageCollection);
+
+        $this->labelApplier->apply($entity);
 
         $this->eventRepository->save($entity);
     }
