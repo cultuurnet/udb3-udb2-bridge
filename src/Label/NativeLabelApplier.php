@@ -68,6 +68,7 @@ class NativeLabelApplier implements LabelApplierInterface
                 if ($label) {
                     $this->logger->info(
                         'Found native label ' . $label->getName()->toNative()
+                        . ' for aggregate ' . $aggregateRoot->getAggregateRootId()
                     );
 
                     $nativeLabels[] = new Label(
@@ -80,7 +81,10 @@ class NativeLabelApplier implements LabelApplierInterface
 
         foreach ($nativeLabels as $nativeLabel) {
             $aggregateRoot->addLabel($nativeLabel);
-            $this->logger->info('Added native label ' . $nativeLabel);
+            $this->logger->info(
+                'Added native label ' . $nativeLabel
+                . ' for aggregate ' . $aggregateRoot->getAggregateRootId()
+            );
         }
     }
 
@@ -98,7 +102,8 @@ class NativeLabelApplier implements LabelApplierInterface
             return RelationType::ORGANIZER();
         } else {
             throw new \InvalidArgumentException(
-                'Type ' . get_class($aggregateRoot) . ' is not supported.'
+                'Type ' . get_class($aggregateRoot) . ' is not supported'
+                . ' for aggregate ' . $aggregateRoot->getAggregateRootId()
             );
         }
     }

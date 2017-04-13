@@ -75,6 +75,17 @@ class NativeLabelApplierTest extends \PHPUnit_Framework_TestCase
     ) {
         $relationId = new StringLiteral($aggregateRoot->getAggregateRootId());
 
+        $this->logger->expects($this->exactly(2))
+            ->method('info')
+            ->withConsecutive(
+                [
+                    'Found native label 2dotstwice for aggregate 4968976e-1b0f-4400-849f-54db45731c43',
+                ],
+                [
+                    'Added native label 2dotstwice for aggregate 4968976e-1b0f-4400-849f-54db45731c43',
+                ]
+            );
+
         $this->labelsRelationsRepository->expects($this->once())
             ->method('getLabelRelationsForItem')
             ->with(
@@ -124,7 +135,8 @@ class NativeLabelApplierTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Type ' . get_class($aggregate) . ' is not supported.'
+            'Type ' . get_class($aggregate) . ' is not supported'
+            . ' for aggregate'
         );
 
         $this->nativeLabelApplier->apply($aggregate);
