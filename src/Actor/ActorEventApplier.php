@@ -2,7 +2,6 @@
 
 namespace CultuurNet\UDB3\UDB2\Actor;
 
-use Broadway\Domain\AggregateRoot;
 use Broadway\EventHandling\EventListenerInterface;
 use Broadway\Repository\AggregateNotFoundException;
 use Broadway\Repository\RepositoryInterface;
@@ -11,10 +10,12 @@ use CultuurNet\UDB3\Cdb\CdbXmlContainerInterface;
 use CultuurNet\UDB3\Cdb\UpdateableWithCdbXmlInterface;
 use CultuurNet\UDB3\EventHandling\DelegateEventHandlingToSpecificMethodTrait;
 use CultuurNet\UDB3\Media\Properties\UnsupportedMIMETypeException;
+use CultuurNet\UDB3\Organizer\Organizer;
 use CultuurNet\UDB3\Place\Place;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorCreatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Actor\Events\ActorUpdatedEnrichedWithCdbXml;
 use CultuurNet\UDB3\UDB2\Actor\Specification\ActorSpecificationInterface;
+use CultuurNet\UDB3\UDB2\Label\LabelApplierInterface;
 use CultuurNet\UDB3\UDB2\Media\MediaImporter;
 use CultuurNet\UDB3\UDB2\OfferAlreadyImportedException;
 use Psr\Log\LoggerAwareInterface;
@@ -60,20 +61,28 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
     protected $mediaImporter;
 
     /**
+     * @var LabelApplierInterface
+     */
+    private $labelApplier;
+
+    /**
      * @param RepositoryInterface $repository
      * @param ActorToUDB3AggregateFactoryInterface $actorFactory
      * @param ActorSpecificationInterface $actorSpecification
+     * @param LabelApplierInterface $labelApplier
      * @param MediaImporter $mediaImporter
      */
     public function __construct(
         RepositoryInterface $repository,
         ActorToUDB3AggregateFactoryInterface $actorFactory,
         ActorSpecificationInterface $actorSpecification,
+        LabelApplierInterface $labelApplier,
         MediaImporter $mediaImporter = null
     ) {
         $this->repository = $repository;
         $this->actorSpecification = $actorSpecification;
         $this->actorFactory = $actorFactory;
+        $this->labelApplier = $labelApplier;
         $this->mediaImporter = $mediaImporter;
 
         $this->logger = new NullLogger();
@@ -205,7 +214,7 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
     ) {
         $entityId = (string) $entityId;
 
-        /** @var UpdateableWithCdbXmlInterface|AggregateRoot $entity */
+        /** @var UpdateableWithCdbXmlInterface|Organizer|Place $entity */
         $entity = $this->repository->load($entityId);
 
         $entity->updateWithCdbXml(
@@ -222,6 +231,8 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
             $imageCollection = $this->mediaImporter->importImages($cdbActor);
             $entity->updateImagesFromUDB2($imageCollection);
         }
+
+        $this->labelApplier->apply($entity);
 
         $this->repository->save($entity);
     }
@@ -246,7 +257,7 @@ class ActorEventApplier implements EventListenerInterface, LoggerAwareInterface
             );
         }
 
-        /** @var UpdateableWithCdbXmlInterface|AggregateRoot $entity */
+        /** @var UpdateableWithCdbXmlInterface|Place|Organizer $entity */
         $entity = $this->actorFactory->createFromCdbXml(
             (string) $id,
             $cdbXml->getCdbXml(),
