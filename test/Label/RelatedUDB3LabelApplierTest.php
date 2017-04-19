@@ -13,14 +13,13 @@ use CultuurNet\UDB3\Label\ValueObjects\LabelName;
 use CultuurNet\UDB3\Label\ValueObjects\Privacy;
 use CultuurNet\UDB3\Label\ValueObjects\RelationType;
 use CultuurNet\UDB3\Label\ValueObjects\Visibility;
-use CultuurNet\UDB3\Media\MediaObject;
 use CultuurNet\UDB3\Organizer\Organizer;
 use CultuurNet\UDB3\Place\Place;
 use Psr\Log\LoggerInterface;
 use ValueObjects\Identity\UUID;
 use ValueObjects\StringLiteral\StringLiteral;
 
-class NativeLabelApplierTest extends \PHPUnit_Framework_TestCase
+class RelatedUDB3LabelApplierTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var LabelsRelationsRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -38,7 +37,7 @@ class NativeLabelApplierTest extends \PHPUnit_Framework_TestCase
     private $logger;
 
     /**
-     * @var NativeLabelApplier
+     * @var RelatedUDB3LabelApplier
      */
     private $nativeLabelApplier;
 
@@ -56,7 +55,7 @@ class NativeLabelApplierTest extends \PHPUnit_Framework_TestCase
             LoggerInterface::class
         );
 
-        $this->nativeLabelApplier = new NativeLabelApplier(
+        $this->nativeLabelApplier = new RelatedUDB3LabelApplier(
             $this->labelsRelationsRepository,
             $this->labelsRepository,
             $this->logger
@@ -79,17 +78,16 @@ class NativeLabelApplierTest extends \PHPUnit_Framework_TestCase
             ->method('info')
             ->withConsecutive(
                 [
-                    'Found native label 2dotstwice for aggregate 4968976e-1b0f-4400-849f-54db45731c43',
+                    'Found udb3 label 2dotstwice for aggregate 4968976e-1b0f-4400-849f-54db45731c43',
                 ],
                 [
-                    'Added native label 2dotstwice for aggregate 4968976e-1b0f-4400-849f-54db45731c43',
+                    'Added udb3 label 2dotstwice for aggregate 4968976e-1b0f-4400-849f-54db45731c43',
                 ]
             );
 
         $this->labelsRelationsRepository->expects($this->once())
             ->method('getLabelRelationsForItem')
             ->with(
-                $relationType,
                 $relationId
             )
             ->willReturn(
@@ -124,22 +122,6 @@ class NativeLabelApplierTest extends \PHPUnit_Framework_TestCase
             );
 
         $this->nativeLabelApplier->apply($aggregateRoot);
-    }
-
-    /**
-     * @test
-     */
-    public function it_throws_exception_for_unsupported_relation_type()
-    {
-        $aggregate = new MediaObject();
-
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'Type ' . get_class($aggregate) . ' is not supported'
-            . ' for aggregate'
-        );
-
-        $this->nativeLabelApplier->apply($aggregate);
     }
 
     /**

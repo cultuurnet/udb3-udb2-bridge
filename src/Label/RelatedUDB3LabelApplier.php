@@ -13,7 +13,7 @@ use CultuurNet\UDB3\Place\Place;
 use Psr\Log\LoggerInterface;
 use ValueObjects\StringLiteral\StringLiteral;
 
-class NativeLabelApplier implements LabelApplierInterface
+class RelatedUDB3LabelApplier implements LabelApplierInterface
 {
     /**
      * @var LabelsRelationsRepositoryInterface
@@ -55,8 +55,8 @@ class NativeLabelApplier implements LabelApplierInterface
             new StringLiteral($aggregateRoot->getAggregateRootId())
         );
 
-        /** @var Label[] $nativeLabels */
-        $nativeLabels = [];
+        /** @var Label[] $udb3Labels */
+        $udb3Labels = [];
 
         foreach ($labelRelations as $labelRelation) {
             if (!$labelRelation->isImported()) {
@@ -65,11 +65,11 @@ class NativeLabelApplier implements LabelApplierInterface
 
                 if ($label) {
                     $this->logger->info(
-                        'Found native label ' . $label->getName()->toNative()
+                        'Found udb3 label ' . $label->getName()->toNative()
                         . ' for aggregate ' . $aggregateRoot->getAggregateRootId()
                     );
 
-                    $nativeLabels[] = new Label(
+                    $udb3Labels[] = new Label(
                         $labelRelation->getLabelName()->toNative(),
                         $label->getVisibility() === Visibility::VISIBLE()
                     );
@@ -77,10 +77,10 @@ class NativeLabelApplier implements LabelApplierInterface
             }
         }
 
-        foreach ($nativeLabels as $nativeLabel) {
-            $aggregateRoot->addLabel($nativeLabel);
+        foreach ($udb3Labels as $udb3Label) {
+            $aggregateRoot->addLabel($udb3Label);
             $this->logger->info(
-                'Added native label ' . $nativeLabel
+                'Added udb3 label ' . $udb3Label
                 . ' for aggregate ' . $aggregateRoot->getAggregateRootId()
             );
         }
