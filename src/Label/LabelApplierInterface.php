@@ -2,9 +2,9 @@
 
 namespace CultuurNet\UDB3\UDB2\Label;
 
-use Broadway\Domain\AggregateRoot;
+use CultuurNet\UDB3\LabelAwareAggregateRoot;
 
 interface LabelApplierInterface
 {
-    public function apply(AggregateRoot $entity);
+    public function apply(LabelAwareAggregateRoot $entity);
 }

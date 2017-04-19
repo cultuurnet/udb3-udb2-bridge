@@ -2,14 +2,11 @@
 
 namespace CultuurNet\UDB3\UDB2\Label;
 
-use Broadway\Domain\AggregateRoot;
-use CultuurNet\UDB3\Event\Event;
 use CultuurNet\UDB3\Label;
 use CultuurNet\UDB3\Label\ReadModels\JSON\Repository\ReadRepositoryInterface as LabelsRepositoryInterface;
 use CultuurNet\UDB3\Label\ReadModels\Relations\Repository\ReadRepositoryInterface as LabelsRelationsRepositoryInterface;
 use CultuurNet\UDB3\Label\ValueObjects\Visibility;
-use CultuurNet\UDB3\Organizer\Organizer;
-use CultuurNet\UDB3\Place\Place;
+use CultuurNet\UDB3\LabelAwareAggregateRoot;
 use Psr\Log\LoggerInterface;
 use ValueObjects\StringLiteral\StringLiteral;
 
@@ -47,9 +44,8 @@ class RelatedUDB3LabelApplier implements LabelApplierInterface
 
     /**
      * @inheritdoc
-     * @param Event|Place|Organizer $aggregateRoot
      */
-    public function apply(AggregateRoot $aggregateRoot)
+    public function apply(LabelAwareAggregateRoot $aggregateRoot)
     {
         $labelRelations = $this->labelsRelationsRepository->getLabelRelationsForItem(
             new StringLiteral($aggregateRoot->getAggregateRootId())
