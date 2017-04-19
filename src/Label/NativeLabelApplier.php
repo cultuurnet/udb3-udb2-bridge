@@ -7,7 +7,6 @@ use CultuurNet\UDB3\Event\Event;
 use CultuurNet\UDB3\Label;
 use CultuurNet\UDB3\Label\ReadModels\JSON\Repository\ReadRepositoryInterface as LabelsRepositoryInterface;
 use CultuurNet\UDB3\Label\ReadModels\Relations\Repository\ReadRepositoryInterface as LabelsRelationsRepositoryInterface;
-use CultuurNet\UDB3\Label\ValueObjects\RelationType;
 use CultuurNet\UDB3\Label\ValueObjects\Visibility;
 use CultuurNet\UDB3\Organizer\Organizer;
 use CultuurNet\UDB3\Place\Place;
@@ -53,7 +52,6 @@ class NativeLabelApplier implements LabelApplierInterface
     public function apply(AggregateRoot $aggregateRoot)
     {
         $labelRelations = $this->labelsRelationsRepository->getLabelRelationsForItem(
-            $this->getRelationType($aggregateRoot),
             new StringLiteral($aggregateRoot->getAggregateRootId())
         );
 
@@ -83,26 +81,6 @@ class NativeLabelApplier implements LabelApplierInterface
             $aggregateRoot->addLabel($nativeLabel);
             $this->logger->info(
                 'Added native label ' . $nativeLabel
-                . ' for aggregate ' . $aggregateRoot->getAggregateRootId()
-            );
-        }
-    }
-
-    /**
-     * @param AggregateRoot $aggregateRoot
-     * @return RelationType
-     */
-    private function getRelationType(AggregateRoot $aggregateRoot)
-    {
-        if ($aggregateRoot instanceof Event) {
-            return RelationType::EVENT();
-        } elseif ($aggregateRoot instanceof Place) {
-            return RelationType::PLACE();
-        } elseif ($aggregateRoot instanceof Organizer) {
-            return RelationType::ORGANIZER();
-        } else {
-            throw new \InvalidArgumentException(
-                'Type ' . get_class($aggregateRoot) . ' is not supported'
                 . ' for aggregate ' . $aggregateRoot->getAggregateRootId()
             );
         }
