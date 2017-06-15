@@ -2,18 +2,13 @@
 
 namespace CultuurNet\UDB3\UDB2\Media;
 
-use CultureFeed_Cdb_Data_Media;
 use CultureFeed_Cdb_Item_Base;
-use CultuurNet\UDB3\Language;
 use CultuurNet\UDB3\Media\Image;
 use CultuurNet\UDB3\Media\ImageCollection;
 use CultuurNet\UDB3\Media\MediaManagerInterface;
-use CultuurNet\UDB3\Media\Properties\CopyrightHolder;
-use CultuurNet\UDB3\Media\Properties\Description;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
-use ValueObjects\StringLiteral\StringLiteral;
 
 class MediaImporter implements LoggerAwareInterface
 {

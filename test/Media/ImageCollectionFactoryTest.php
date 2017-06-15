@@ -12,7 +12,6 @@ use CultuurNet\UDB3\Media\Properties\CopyrightHolder;
 use CultuurNet\UDB3\Media\Properties\Description;
 use CultuurNet\UDB3\Media\Properties\MIMEType;
 use ValueObjects\Identity\UUID;
-use ValueObjects\StringLiteral\StringLiteral;
 use ValueObjects\Web\Url;
 
 class ImageCollectionFactoryTest extends \PHPUnit_Framework_TestCase
@@ -20,12 +19,12 @@ class ImageCollectionFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function it_should_return_a_collection_of_images_from_udb2_media()
+    public function it_should_return_a_collection_of_images_from_udb2_item()
     {
         $photo = new Image(
             UUID::fromNative('84c4ddea-a00d-5241-bb1a-f4c01cef0a76'),
             MIMEType::fromNative('image/jpeg'),
-            new Description('¯\_(ツ)_/¯'),
+            new Description('Ruime Activiteit'),
             new CopyrightHolder('Zelf gemaakt'),
             Url::fromNative('http://85.255.197.172/images/20140108/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg'),
             new Language('nl')
@@ -33,7 +32,7 @@ class ImageCollectionFactoryTest extends \PHPUnit_Framework_TestCase
         $imageweb = new Image(
             UUID::fromNative('96d1d210-9804-55a4-a2c5-6245031a1d4a'),
             MIMEType::fromNative('application/octet-stream'),
-            new Description('¯\_(ツ)_/¯'),
+            new Description('Ruime Activiteit'),
             new CopyrightHolder('KWB'),
             Url::fromNative('http://testfilm.uitdatabank.be/images/20160531/kwbeensgezind.jpg'),
             new Language('nl')
@@ -46,15 +45,11 @@ class ImageCollectionFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory = new ImageCollectionFactory();
 
-        $images = $factory->fromUdb2Media(
-            $this->getMedia($event),
-            new Description('¯\_(ツ)_/¯'),
-            new CopyrightHolder('John Doe'),
-            new Language('nl')
-        );
+        $images = $factory->fromUdb2Item($event);
 
         $this->assertEquals($expectedImages, $images);
     }
+
     /**
      * @test
      */
@@ -63,7 +58,7 @@ class ImageCollectionFactoryTest extends \PHPUnit_Framework_TestCase
         $image = new Image(
             UUID::fromNative('6f064917-3b55-5459-97fe-4ac15b1e3db3'),
             MIMEType::fromNative('image/jpeg'),
-            new Description('¯\_(ツ)_/¯'),
+            new Description('KARBIDO ENSEMBLE - The Table (7+)'),
             new CopyrightHolder('Karbido Ensemble'),
             Url::fromNative('http://media.uitdatabank.be/20140418/edb05b66-611b-4829-b8f6-bb31c285ec89.jpg'),
             new Language('nl')
@@ -76,12 +71,7 @@ class ImageCollectionFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory = new ImageCollectionFactory();
 
-        $images = $factory->fromUdb2Media(
-            $this->getMedia($event),
-            new Description('¯\_(ツ)_/¯'),
-            new CopyrightHolder('John Doe'),
-            new Language('nl')
-        );
+        $images = $factory->fromUdb2Item($event);
 
         $this->assertEquals($expectedImages, $images);
     }

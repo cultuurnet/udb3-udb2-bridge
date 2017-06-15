@@ -50,9 +50,12 @@ class ImageCollectionFactory implements ImageCollectionFactoryInterface
     }
 
     /**
-     * @inheritdoc
+     * @param CultureFeed_Cdb_Data_Media $media
+     * @param Description $fallbackDescription,
+     * @param CopyrightHolder $fallbackCopyright
+     * @return ImageCollection
      */
-    public function fromUdb2Media(
+    private function fromUdb2Media(
         \CultureFeed_Cdb_Data_Media $media,
         Description $fallbackDescription,
         CopyrightHolder $fallbackCopyright,
