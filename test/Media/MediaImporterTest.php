@@ -3,6 +3,7 @@
 namespace CultuurNet\UDB3\UDB2\Media;
 
 use CultuurNet\UDB3\Cdb\EventItemFactory;
+use CultuurNet\UDB3\Language;
 use CultuurNet\UDB3\Media\Image;
 use CultuurNet\UDB3\Media\ImageCollection;
 use CultuurNet\UDB3\Media\MediaManagerInterface;
@@ -51,14 +52,15 @@ class MediaImporterTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->imageCollectionFactory
-            ->method('fromUdb2Media')
+            ->method('fromUdb2Item')
             ->willReturn(ImageCollection::fromArray([
                 new Image(
                     UUID::fromNative('f26433f0-97ef-5c07-8ea9-ef00a64dcb59'),
                     MIMEType::fromNative('image/jpeg'),
                     new Description('no description'),
                     new CopyrightHolder('Zelf gemaakt'),
-                    Url::fromNative('http://85.255.197.172/images/20140108/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg')
+                    Url::fromNative('http://85.255.197.172/images/20140108/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg'),
+                    new Language('nl')
                 )
             ]));
 
@@ -70,7 +72,8 @@ class MediaImporterTest extends \PHPUnit_Framework_TestCase
                 MIMEType::fromNative('image/jpeg'),
                 new Description('no description'),
                 new CopyrightHolder('Zelf gemaakt'),
-                Url::fromNative('http://85.255.197.172/images/20140108/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg')
+                Url::fromNative('http://85.255.197.172/images/20140108/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg'),
+                new Language('nl')
             );
 
         $this->importer->importImages($cdbEvent);

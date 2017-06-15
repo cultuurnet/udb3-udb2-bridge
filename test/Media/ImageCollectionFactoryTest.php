@@ -5,6 +5,7 @@ namespace CultuurNet\UDB3\UDB2\Media;
 use CultureFeed_Cdb_Data_Media;
 use CultureFeed_Cdb_Item_Base;
 use CultuurNet\UDB3\Cdb\EventItemFactory;
+use CultuurNet\UDB3\Language;
 use CultuurNet\UDB3\Media\Image;
 use CultuurNet\UDB3\Media\ImageCollection;
 use CultuurNet\UDB3\Media\Properties\CopyrightHolder;
@@ -26,14 +27,16 @@ class ImageCollectionFactoryTest extends \PHPUnit_Framework_TestCase
             MIMEType::fromNative('image/jpeg'),
             new Description('¯\_(ツ)_/¯'),
             new CopyrightHolder('Zelf gemaakt'),
-            Url::fromNative('http://85.255.197.172/images/20140108/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg')
+            Url::fromNative('http://85.255.197.172/images/20140108/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg'),
+            new Language('nl')
         );
         $imageweb = new Image(
             UUID::fromNative('96d1d210-9804-55a4-a2c5-6245031a1d4a'),
             MIMEType::fromNative('application/octet-stream'),
             new Description('¯\_(ツ)_/¯'),
             new CopyrightHolder('KWB'),
-            Url::fromNative('http://testfilm.uitdatabank.be/images/20160531/kwbeensgezind.jpg')
+            Url::fromNative('http://testfilm.uitdatabank.be/images/20160531/kwbeensgezind.jpg'),
+            new Language('nl')
         );
         $expectedImages = (ImageCollection::fromArray([$photo, $imageweb]));
         $cdbXml = file_get_contents(__DIR__ . '/samples/event_with_udb2_images.xml');
@@ -46,7 +49,8 @@ class ImageCollectionFactoryTest extends \PHPUnit_Framework_TestCase
         $images = $factory->fromUdb2Media(
             $this->getMedia($event),
             new Description('¯\_(ツ)_/¯'),
-            new CopyrightHolder('John Doe')
+            new CopyrightHolder('John Doe'),
+            new Language('nl')
         );
 
         $this->assertEquals($expectedImages, $images);
@@ -61,7 +65,8 @@ class ImageCollectionFactoryTest extends \PHPUnit_Framework_TestCase
             MIMEType::fromNative('image/jpeg'),
             new Description('¯\_(ツ)_/¯'),
             new CopyrightHolder('Karbido Ensemble'),
-            Url::fromNative('http://media.uitdatabank.be/20140418/edb05b66-611b-4829-b8f6-bb31c285ec89.jpg')
+            Url::fromNative('http://media.uitdatabank.be/20140418/edb05b66-611b-4829-b8f6-bb31c285ec89.jpg'),
+            new Language('nl')
         );
         $expectedImages = (new ImageCollection())->withMain($image);
         $cdbXml = file_get_contents(__DIR__ . '/samples/event_with_main_imageweb.xml');
@@ -74,7 +79,8 @@ class ImageCollectionFactoryTest extends \PHPUnit_Framework_TestCase
         $images = $factory->fromUdb2Media(
             $this->getMedia($event),
             new Description('¯\_(ツ)_/¯'),
-            new CopyrightHolder('John Doe')
+            new CopyrightHolder('John Doe'),
+            new Language('nl')
         );
 
         $this->assertEquals($expectedImages, $images);
@@ -92,7 +98,8 @@ class ImageCollectionFactoryTest extends \PHPUnit_Framework_TestCase
             MIMEType::fromNative('image/jpeg'),
             new Description('my best selfie'),
             new CopyrightHolder('my dog'),
-            Url::fromNative('http://udb-silex.dev/web/media/edb05b66-611b-4829-b8f6-bb31c285ec89.jpg')
+            Url::fromNative('http://udb-silex.dev/web/media/edb05b66-611b-4829-b8f6-bb31c285ec89.jpg'),
+            new Language('nl')
         );
         $expectedImages = (new ImageCollection())->withMain($image);
         $cdbXml = file_get_contents(__DIR__ . '/samples/event_with_udb3_image.xml');
@@ -102,11 +109,7 @@ class ImageCollectionFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory = (new ImageCollectionFactory())->withUuidRegex($regex);
 
-        $images = $factory->fromUdb2Media(
-            $this->getMedia($event),
-            new Description('¯\_(ツ)_/¯'),
-            new CopyrightHolder('John Doe')
-        );
+        $images = $factory->fromUdb2Item($event);
         $this->assertEquals($expectedImages, $images);
     }
 
