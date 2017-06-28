@@ -95,15 +95,22 @@ class ImageCollectionFactory implements ImageCollectionFactoryInterface
         );
     }
 
+    /**
+     * Create an ImageCollection from the media in the Dutch details of on an UDB2 item.
+     *
+     * @param CultureFeed_Cdb_Item_Base $item
+     * @return ImageCollection
+     */
     public function fromUdb2Item(CultureFeed_Cdb_Item_Base $item)
     {
-        $title = $this->getTitle($item);
+        $dutch = new Language('nl');
+        $title = $this->getTitle($item, $dutch);
 
         return $this->fromUdb2Media(
-            $this->getMedia($item),
+            $this->getMedia($item, $dutch),
             new Description($title),
             new CopyrightHolder($title),
-            $this->getLanguage($item)
+            $dutch
         );
     }
 
@@ -134,39 +141,31 @@ class ImageCollectionFactory implements ImageCollectionFactoryInterface
 
     /**
      * @param CultureFeed_Cdb_Item_Base $cdbItem
+     * @param Language $language
      * @return CultureFeed_Cdb_Data_Media
      */
-    protected function getMedia(CultureFeed_Cdb_Item_Base $cdbItem)
+    protected function getMedia(CultureFeed_Cdb_Item_Base $cdbItem, Language $language)
     {
         $details = $cdbItem->getDetails();
         $details->rewind();
 
         return $details
-            ->current()
+            ->getDetailByLanguage((string) $language)
             ->getMedia();
     }
 
     /**
      * @param CultureFeed_Cdb_Item_Base $cdbItem
-     * @return Language
-     */
-    protected function getLanguage(CultureFeed_Cdb_Item_Base $cdbItem)
-    {
-        $details = $cdbItem->getDetails();
-        $details->rewind();
-
-        return new Language($details->current()->getLanguage());
-    }
-
-    /**
-     * @param CultureFeed_Cdb_Item_Base $cdbItem
+     * @param Language $language
      * @return string
      */
-    protected function getTitle(CultureFeed_Cdb_Item_Base $cdbItem)
+    protected function getTitle(CultureFeed_Cdb_Item_Base $cdbItem, Language $language)
     {
         $details = $cdbItem->getDetails();
         $details->rewind();
 
-        return $details->current()->getTitle();
+        return $details
+            ->getDetailByLanguage((string) $language)
+            ->getTitle();
     }
 }

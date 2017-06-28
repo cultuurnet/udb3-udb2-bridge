@@ -79,6 +79,32 @@ class ImageCollectionFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function it_should_only_pick_the_dutch_images_from_an_udb2_item()
+    {
+        $image = new Image(
+            UUID::fromNative('84c4ddea-a00d-5241-bb1a-f4c01cef0a76'),
+            MIMEType::fromNative('image/jpeg'),
+            new Description('Ruime Activiteit'),
+            new CopyrightHolder('Zelf gemaakt'),
+            Url::fromNative('http://85.255.197.172/images/20140108/9554d6f6-bed1-4303-8d42-3fcec4601e0e.jpg'),
+            new Language('nl')
+        );
+        $expectedImages = (new ImageCollection())->with($image);
+        $cdbXml = file_get_contents(__DIR__ . '/samples/event_with_dutch_and_french_images.xml');
+        $cdbXmlNamespaceUri = \CultureFeed_Cdb_Xml::namespaceUriForVersion('3.3');
+
+        $event = EventItemFactory::createEventFromCdbXml($cdbXmlNamespaceUri, $cdbXml);
+
+        $factory = new ImageCollectionFactory();
+
+        $images = $factory->fromUdb2Item($event);
+
+        $this->assertEquals($expectedImages, $images);
+    }
+
+    /**
+     * @test
+     */
     public function it_should_identify_images_using_a_configurable_regex()
     {
         $regex = 'https?:\/\/udb-silex\.dev\/web\/media\/(?<uuid>[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})\.jpg';
