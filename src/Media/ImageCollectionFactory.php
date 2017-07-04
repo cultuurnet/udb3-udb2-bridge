@@ -50,8 +50,30 @@ class ImageCollectionFactory implements ImageCollectionFactoryInterface
     }
 
     /**
+     * Create an ImageCollection from the media in the Dutch details of on an UDB2 item.
+     *
+     * @param CultureFeed_Cdb_Item_Base $item
+     * @return ImageCollection
+     */
+    public function fromUdb2Item(CultureFeed_Cdb_Item_Base $item)
+    {
+        $dutch = new Language('nl');
+        $dutchDetail = $item
+            ->getDetails()
+            ->getDetailByLanguage('nl');
+        $title = $dutchDetail->getTitle();
+
+        return $this->fromUdb2Media(
+            $dutchDetail->getMedia(),
+            new Description($title),
+            new CopyrightHolder($title),
+            $dutch
+        );
+    }
+
+    /**
      * @param CultureFeed_Cdb_Data_Media $media
-     * @param Description $fallbackDescription,
+     * @param Description $fallbackDescription ,
      * @param CopyrightHolder $fallbackCopyright
      * @return ImageCollection
      */
@@ -82,7 +104,7 @@ class ImageCollectionFactory implements ImageCollectionFactoryInterface
                     empty($fileType) ? MIMEType::fromSubtype('octet-stream') : MIMEType::fromSubtype($fileType),
                     empty($udb2Description) ? $fallbackDescription : new Description($udb2Description),
                     empty($udb2Copyright) ? $fallbackCopyright : new CopyrightHolder($udb2Copyright),
-                    Url::fromNative((string) $normalizedUri),
+                    Url::fromNative((string)$normalizedUri),
                     $language
                 );
 
@@ -96,22 +118,13 @@ class ImageCollectionFactory implements ImageCollectionFactoryInterface
     }
 
     /**
-     * Create an ImageCollection from the media in the Dutch details of on an UDB2 item.
-     *
-     * @param CultureFeed_Cdb_Item_Base $item
-     * @return ImageCollection
+     * @param string $link
+     * @return UriInterface
      */
-    public function fromUdb2Item(CultureFeed_Cdb_Item_Base $item)
+    private function normalize($link)
     {
-        $dutch = new Language('nl');
-        $title = $this->getTitle($item, $dutch);
-
-        return $this->fromUdb2Media(
-            $this->getMedia($item, $dutch),
-            new Description($title),
-            new CopyrightHolder($title),
-            $dutch
-        );
+        $originalUri = Http::createFromString($link)->withScheme('http');
+        return $this->uriNormalizer->__invoke($originalUri);
     }
 
     /**
@@ -120,52 +133,11 @@ class ImageCollectionFactory implements ImageCollectionFactoryInterface
      */
     private function identify(Http $httpUri)
     {
-        if (isset($this->uuidRegex) && \preg_match('/'.$this->uuidRegex.'/', (string) $httpUri, $matches)) {
+        if (isset($this->uuidRegex) && \preg_match('/' . $this->uuidRegex . '/', (string)$httpUri, $matches)) {
             return UUID::fromNative($matches['uuid']);
         }
 
         $namespace = BaseUuid::uuid5(BaseUuid::NAMESPACE_DNS, $httpUri->getHost());
-        return UUID::fromNative((string) BaseUuid::uuid5($namespace, (string) $httpUri));
-    }
-
-    /**
-     * @param string $link
-     * @return UriInterface
-     */
-    public function normalize($link)
-    {
-        $originalUri = Http::createFromString($link)->withScheme('http');
-        return $this->uriNormalizer->__invoke($originalUri);
-    }
-
-
-    /**
-     * @param CultureFeed_Cdb_Item_Base $cdbItem
-     * @param Language $language
-     * @return CultureFeed_Cdb_Data_Media
-     */
-    protected function getMedia(CultureFeed_Cdb_Item_Base $cdbItem, Language $language)
-    {
-        $details = $cdbItem->getDetails();
-        $details->rewind();
-
-        return $details
-            ->getDetailByLanguage((string) $language)
-            ->getMedia();
-    }
-
-    /**
-     * @param CultureFeed_Cdb_Item_Base $cdbItem
-     * @param Language $language
-     * @return string
-     */
-    protected function getTitle(CultureFeed_Cdb_Item_Base $cdbItem, Language $language)
-    {
-        $details = $cdbItem->getDetails();
-        $details->rewind();
-
-        return $details
-            ->getDetailByLanguage((string) $language)
-            ->getTitle();
+        return UUID::fromNative((string)BaseUuid::uuid5($namespace, (string)$httpUri));
     }
 }
