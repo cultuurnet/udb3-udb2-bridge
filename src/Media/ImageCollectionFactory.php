@@ -3,6 +3,9 @@
 namespace CultuurNet\UDB3\UDB2\Media;
 
 use CultureFeed_Cdb_Data_File;
+use CultureFeed_Cdb_Data_Media;
+use CultureFeed_Cdb_Item_Base;
+use CultuurNet\UDB3\Language;
 use CultuurNet\UDB3\Media\Image;
 use CultuurNet\UDB3\Media\ImageCollection;
 use CultuurNet\UDB3\Media\Properties\CopyrightHolder;
@@ -47,12 +50,38 @@ class ImageCollectionFactory implements ImageCollectionFactoryInterface
     }
 
     /**
-     * @inheritdoc
+     * Create an ImageCollection from the media in the Dutch details of on an UDB2 item.
+     *
+     * @param CultureFeed_Cdb_Item_Base $item
+     * @return ImageCollection
      */
-    public function fromUdb2Media(
+    public function fromUdb2Item(CultureFeed_Cdb_Item_Base $item)
+    {
+        $dutch = new Language('nl');
+        $dutchDetail = $item
+            ->getDetails()
+            ->getDetailByLanguage('nl');
+        $title = $dutchDetail->getTitle();
+
+        return $this->fromUdb2Media(
+            $dutchDetail->getMedia(),
+            new Description($title),
+            new CopyrightHolder($title),
+            $dutch
+        );
+    }
+
+    /**
+     * @param CultureFeed_Cdb_Data_Media $media
+     * @param Description $fallbackDescription ,
+     * @param CopyrightHolder $fallbackCopyright
+     * @return ImageCollection
+     */
+    private function fromUdb2Media(
         \CultureFeed_Cdb_Data_Media $media,
         Description $fallbackDescription,
-        CopyrightHolder $fallbackCopyright
+        CopyrightHolder $fallbackCopyright,
+        Language $language
     ) {
         $udb2ImageFiles = $media->byMediaTypes(self::SUPPORTED_UDB2_MEDIA_TYPES);
 
@@ -63,7 +92,8 @@ class ImageCollectionFactory implements ImageCollectionFactoryInterface
                 CultureFeed_Cdb_Data_File $file
             ) use (
                 $fallbackDescription,
-                $fallbackCopyright
+                $fallbackCopyright,
+                $language
             ) {
                 $udb2Description = $file->getDescription();
                 $udb2Copyright = $file->getCopyright();
@@ -74,7 +104,8 @@ class ImageCollectionFactory implements ImageCollectionFactoryInterface
                     empty($fileType) ? MIMEType::fromSubtype('octet-stream') : MIMEType::fromSubtype($fileType),
                     empty($udb2Description) ? $fallbackDescription : new Description($udb2Description),
                     empty($udb2Copyright) ? $fallbackCopyright : new CopyrightHolder($udb2Copyright),
-                    Url::fromNative((string) $normalizedUri)
+                    Url::fromNative((string)$normalizedUri),
+                    $language
                 );
 
                 return !$images->getMain() && $file->isMain()
@@ -87,26 +118,26 @@ class ImageCollectionFactory implements ImageCollectionFactoryInterface
     }
 
     /**
+     * @param string $link
+     * @return UriInterface
+     */
+    private function normalize($link)
+    {
+        $originalUri = Http::createFromString($link)->withScheme('http');
+        return $this->uriNormalizer->__invoke($originalUri);
+    }
+
+    /**
      * @param UriInterface $httpUri
      * @return UUID
      */
     private function identify(Http $httpUri)
     {
-        if (isset($this->uuidRegex) && \preg_match('/'.$this->uuidRegex.'/', (string) $httpUri, $matches)) {
+        if (isset($this->uuidRegex) && \preg_match('/' . $this->uuidRegex . '/', (string)$httpUri, $matches)) {
             return UUID::fromNative($matches['uuid']);
         }
 
         $namespace = BaseUuid::uuid5(BaseUuid::NAMESPACE_DNS, $httpUri->getHost());
-        return UUID::fromNative((string) BaseUuid::uuid5($namespace, (string) $httpUri));
-    }
-
-    /**
-     * @param string $link
-     * @return UriInterface
-     */
-    public function normalize($link)
-    {
-        $originalUri = Http::createFromString($link)->withScheme('http');
-        return $this->uriNormalizer->__invoke($originalUri);
+        return UUID::fromNative((string)BaseUuid::uuid5($namespace, (string)$httpUri));
     }
 }
