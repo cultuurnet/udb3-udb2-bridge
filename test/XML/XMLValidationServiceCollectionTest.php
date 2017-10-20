@@ -37,7 +37,7 @@ class XMLValidationServiceCollectionTest extends \PHPUnit_Framework_TestCase
         if (interface_exists(\Throwable::class)) {
             $this->expectException(\Throwable::class);
         } else {
-            $this->expectException(\Exception::class);
+            $this->expectException(\PHPUnit_Framework_Error::class);
         }
 
         new XMLValidationServiceCollection(
