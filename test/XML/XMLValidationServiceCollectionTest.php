@@ -34,7 +34,11 @@ class XMLValidationServiceCollectionTest extends \PHPUnit_Framework_TestCase
         $xmlValidationService = $this->createMock(XMLValidationServiceInterface::class);
         $somethingElse = $this->createMock(\Exception::class);
 
-        $this->expectException(\Throwable::class);
+        if (class_exists(\Throwable::class)) {
+            $this->expectException(\Throwable::class);
+        } else {
+            $this->expectException(\Exception::class);
+        }
 
         new XMLValidationServiceCollection(
             $xmlValidationService,
