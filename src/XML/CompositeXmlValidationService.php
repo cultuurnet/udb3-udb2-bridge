@@ -2,7 +2,7 @@
 
 namespace CultuurNet\UDB3\UDB2\XML;
 
-class XMLValidationServiceCollection
+class CompositeXmlValidationService implements XMLValidationServiceInterface
 {
     /**
      * @var XMLValidationServiceInterface[]
@@ -10,7 +10,6 @@ class XMLValidationServiceCollection
     private $xmlValidationServices;
 
     /**
-     * XMLValidationServiceCollection constructor.
      * @param XMLValidationServiceInterface[] $xmlValidationServices
      */
     public function __construct(XMLValidationServiceInterface... $xmlValidationServices)
@@ -19,10 +18,14 @@ class XMLValidationServiceCollection
     }
 
     /**
-     * @return XMLValidationServiceInterface[]
+     * @inheritdoc
      */
-    public function getXmlValidationServices()
+    public function validate($xml)
     {
-        return $this->xmlValidationServices;
+        $errors = [];
+        foreach ($this->xmlValidationServices as $xmlValidationService) {
+            $errors = array_merge($errors, $xmlValidationService->validate($xml));
+        }
+        return $errors;
     }
 }

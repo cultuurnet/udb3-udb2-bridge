@@ -2,7 +2,7 @@
 
 namespace CultuurNet\UDB3\UDB2\Event;
 
-use CultuurNet\UDB3\UDB2\XML\XMLValidationException;
+use CultuurNet\UDB3\UDB2\XML\XMLValidationError;
 use ValueObjects\StringLiteral\StringLiteral;
 
 class EventXMLValidatorServiceTest extends \PHPUnit_Framework_TestCase
@@ -16,9 +16,20 @@ class EventXMLValidatorServiceTest extends \PHPUnit_Framework_TestCase
             new StringLiteral('http://www.cultuurdatabank.com/XMLSchema/CdbXSD/3.3/FINAL')
         );
 
-        $this->expectException(XMLValidationException::class);
-
         $eventXml = file_get_contents(__DIR__ . '/samples/event_same_cdbid_location_and_organizer.xml');
-        $eventXmlValidatorService->validate($eventXml);
+
+        // @codingStandardsIgnoreStart
+        $expected = [
+            new XMLValidationError(
+                'The event with cdbid d9b7d2b9-2dd4-48d7-905d-803e679b6378, has a location and place with the same cdbid f2be2e5c-715c-4e83-9c9b-c8bb9133003b',
+                0,
+                0
+            ),
+        ];
+        // @codingStandardsIgnoreEnd
+
+        $actual = $eventXmlValidatorService->validate($eventXml);
+
+        $this->assertEquals($expected, $actual);
     }
 }

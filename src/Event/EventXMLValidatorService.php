@@ -3,6 +3,7 @@
 namespace CultuurNet\UDB3\UDB2\Event;
 
 use CultuurNet\UDB3\Cdb\EventItemFactory;
+use CultuurNet\UDB3\UDB2\XML\XMLValidationError;
 use CultuurNet\UDB3\UDB2\XML\XMLValidationException;
 use CultuurNet\UDB3\UDB2\XML\XMLValidationServiceInterface;
 use ValueObjects\StringLiteral\StringLiteral;
@@ -24,6 +25,8 @@ class EventXMLValidatorService implements XMLValidationServiceInterface
      */
     public function validate($xml)
     {
+        $errors = [];
+
         $cdbXmlEvent = EventItemFactory::createEventFromCdbXml(
             (string)$this->cdbXmlNamespaceUri,
             (string)$xml
@@ -38,7 +41,9 @@ class EventXMLValidatorService implements XMLValidationServiceInterface
             $message = 'The event with cdbid ' . $cdbXmlEvent->getCdbId();
             $message .= ', has a location and place with the same cdbid ' . $cdbXmlEvent->getLocation()->getCdbid();
 
-            throw new XMLValidationException($message);
+            $errors[] = new XMLValidationError($message, 0, 0);
         }
+
+        return $errors;
     }
 }
