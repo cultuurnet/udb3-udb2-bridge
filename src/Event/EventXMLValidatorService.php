@@ -36,6 +36,7 @@ class EventXMLValidatorService implements XMLValidationServiceInterface
             $cdbXmlEvent->getOrganiser() &&
             $cdbXmlEvent->getLocation()->getExternalId() === null &&
             $cdbXmlEvent->getOrganiser()->getExternalId() === null &&
+            ($cdbXmlEvent->getLocation()->getCdbid() != null || $cdbXmlEvent->getOrganiser()->getCdbid() != null) &&
             $cdbXmlEvent->getLocation()->getCdbid() === $cdbXmlEvent->getOrganiser()->getCdbid()) {
             $message = 'The event with cdbid ' . $cdbXmlEvent->getCdbId();
             $message .= ', has a location and place with the same cdbid ' . $cdbXmlEvent->getLocation()->getCdbid();
